@@ -48,9 +48,10 @@ export const ThreadTrafficTimeline = ({
 				// Generate static demo data for eCO2 with values in between other metrics
 				// Simulate realistic eCO2 values (400-1000 ppm range)
 				const baseValue = 600
-				const variation = Math.sin(index * 0.1) * 100 + Math.cos(index * 0.05) * 50
+				const variation =
+					Math.sin(index * 0.1) * 100 + Math.cos(index * 0.05) * 50
 				const demoValue = Math.round(baseValue + variation)
-				
+
 				return {
 					x: d.timestamp,
 					y: d['eCO2'] || demoValue // Use actual eCO2 data if available, otherwise demo data
@@ -68,12 +69,17 @@ export const ThreadTrafficTimeline = ({
 		// If ALL is selected, return all four metrics with different colors
 		if (selectedMetric.type === 'all') {
 			return {
-				organizedTimelineData: [...temperature, ...humidity, ...pressure, ...eco2],
+				organizedTimelineData: [
+					...temperature,
+					...humidity,
+					...pressure,
+					...eco2
+				],
 				timelineColors: [
-					{ color: 'red', shade: 500 },    // Temperature
-					{ color: 'blue', shade: 500 },   // Humidity
-					{ color: 'amber', shade: 500 },  // Pressure
-					{ color: 'green', shade: 500 }   // eCO2
+					{ color: 'red', shade: 500 }, // Temperature
+					{ color: 'blue', shade: 500 }, // Humidity
+					{ color: 'amber', shade: 500 }, // Pressure
+					{ color: 'green', shade: 500 } // eCO2
 				]
 			}
 		}
@@ -112,7 +118,7 @@ export const ThreadTrafficTimeline = ({
 
 	return (
 		<div>
-			<GSection containerClassName="border border-card-border h-[400px] -mb-6">
+			<GSection containerClassName="border border-card-border h-auto h-[400px] -mb-6">
 				<div className="flex justify-between items-center h-full">
 					<div className="flex flex-row items-center gap-x-1 text-xl font-bold">
 						Real-time trend
