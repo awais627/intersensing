@@ -53,13 +53,13 @@ export class TelemetryService {
     if (!this.collection) {
       const db = this.mongoService.DB;
       const existing = await db
-        .listCollections({ name: "event_emitter" })
+        .listCollections({ name: "telemetries" })
         .toArray();
       if (!existing.length) {
-        await db.createCollection("event_emitter");
-        console.log("[MongoDB] Created collection: event_emitter");
+        await db.createCollection("telemetries");
+        console.log("[MongoDB] Created collection: telemetries");
       }
-      this.collection = db.collection<ITelemetry>("event_emitter");
+      this.collection = db.collection<ITelemetry>("telemetries");
     }
     return this.collection;
   }
