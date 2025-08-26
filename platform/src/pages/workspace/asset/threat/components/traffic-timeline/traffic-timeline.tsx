@@ -66,12 +66,11 @@ export const ThreadTrafficTimeline = () => {
 			<GSection containerClassName="border border-card-border h-[400px] -mb-6">
 				<div className="flex justify-between items-center h-full">
 					<div className="flex flex-row items-center gap-x-1 text-xl font-bold">
-						Traffic timeline
+						Real-time Temperature trend
 						<GTooltip
 							content={
 								<div className="flex flex-col font-normal">
-									Timeline of daily number of{' '}
-									{selectedMetric.name.toLowerCase()}
+									Timeline of live number of {selectedMetric.name.toLowerCase()}
 								</div>
 							}
 						>

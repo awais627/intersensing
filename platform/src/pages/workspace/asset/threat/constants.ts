@@ -1,34 +1,34 @@
 export const metrics = [
 	{
-		label: 'Elevated threat level',
-		key: 'threatLevel',
-		tooltip: '% of clicks with threat level high or medium'
+		label: 'Current Temperature',
+		key: 'temperature',
+		tooltip: 'Current measured temperature (°C)'
 	},
 	{
-		label: 'Elevated bot probability',
-		key: 'botProbability',
-		tooltip: '% of clicks with bot probability level high'
+		label: 'Current Humidity',
+		key: 'humidity',
+		tooltip: 'Current measured humidity (%)'
 	},
 	{
-		label: 'Low user interaction',
-		key: 'userInteraction',
-		tooltip: '% of clicks with user interaction level low or none '
+		label: 'Current Pressure',
+		key: 'pressure',
+		tooltip: 'Current measured atmospheric pressure (hPa)'
 	},
 	{
-		label: 'Datacenter traffic',
-		key: 'dataCenter',
-		tooltip: '% of clicks that came from datacenter'
+		label: 'Air Quality Index',
+		key: 'airQualityIndex',
+		tooltip: 'Current measured air quality index (AQI)'
 	},
 	{
-		label: 'VPN clicks',
-		key: 'vpnClicks',
-		tooltip: '% of vpn clicks'
+		label: 'Ratio',
+		key: 'ratio',
+		tooltip: 'Calculated ratio value'
 	}
 ]
 
 export const cardFilterOptions = [
-	{ name: 'Bad clicks', type: 'bad' },
-	{ name: 'Exclusions', type: 'exclusions' }
+	{ name: 'Temperature', type: 'bad' },
+	{ name: 'Pressure', type: 'exclusions' }
 ]
 
 export const repeatedClicksFilterOptions = [

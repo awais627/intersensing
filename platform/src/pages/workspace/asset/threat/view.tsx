@@ -1,11 +1,11 @@
 import { AnalyticsItem } from 'components/analytics-item'
 import { RepeatedClicksPanel } from './components/repeated-clicks-panel'
 import { Top10 } from './components/top-10'
-import { cardFilterOptions, metrics, top10Options } from './constants'
+import { cardFilterOptions, metrics } from './constants'
 import { useState } from 'react'
 import {
-	getBlacklistEntriesData,
-	getBlockedByIntersensingData,
+	getAlertsByIntersensingData,
+	getEntriesData,
 	getThreadCampaignData,
 	getThreadDeviceData,
 	getThreadIPData
@@ -16,22 +16,18 @@ import { PieCharWithMetrics } from './components/pieCharWithMetrics'
 import { ThreadTrafficTimeline } from './components/traffic-timeline'
 
 export const ThreatPageView = ({}) => {
-	const [deviceType, setDeviceType] = useState<{
+	const [deviceType, setTemperatureType] = useState<{
 		name: string
 		type: string
 	}>(cardFilterOptions[0])
-	const [ipUsageType, setIpUsageType] = useState<{
+	const [ipUsageType, setHumidityType] = useState<{
 		name: string
 		type: string
 	}>(cardFilterOptions[0])
-	const [campaignType, setCampaignType] = useState<{
+	const [campaignType, setAirQualityType] = useState<{
 		name: string
 		type: string
 	}>(cardFilterOptions[0])
-	const [top10Type, setTop10Type] = useState<{
-		name: string
-		type: string
-	}>(top10Options[0])
 	return (
 		<div className="flex items-center justify-center flex-col gap-6 w-full">
 			<div className="flex py-2 items-stretch bg-white rounded-lg divide-x border border-card-border w-full">
@@ -52,8 +48,8 @@ export const ThreatPageView = ({}) => {
 				<div className="h-full">
 					<PieCard
 						containerClassName="h-full"
-						data={getBlockedByIntersensingData()}
-						label="Blocked by Intersensing"
+						data={getAlertsByIntersensingData()}
+						label="Alerts by Intersensing"
 						hasData={true}
 						infoTooltip={
 							<div className="flex flex-col">
@@ -70,12 +66,12 @@ export const ThreatPageView = ({}) => {
 				<div className="h-full">
 					<PieCard
 						containerClassName="h-full"
-						data={getBlacklistEntriesData()}
-						label="Blacklist entries"
+						data={getEntriesData()}
+						label="Sensor Categories"
 						hasData={true}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Number of protective actions Intersensing has taken</p>
+								<p>Temperature, Humidity, Air Quality</p>
 							</div>
 						}
 					/>
@@ -96,14 +92,14 @@ export const ThreatPageView = ({}) => {
 				<PieCharWithMetrics
 					currencyValue
 					data={getThreadDeviceData()}
-					label="Devices"
+					label="Temperature Zones"
 					loading={false}
 					availableMetrics={cardFilterOptions}
 					selectedMetric={deviceType}
-					setSelectedMetric={setDeviceType}
+					setSelectedMetric={setTemperatureType}
 					assetId={'assetId'}
 					infoTooltip={
-						'Shows the distribution of device types for the select metric'
+						'Shows the distribution of Temperature Zones types for the select metric'
 					}
 				/>
 
@@ -111,13 +107,13 @@ export const ThreatPageView = ({}) => {
 					currencyValue
 					data={getThreadIPData()}
 					loading={false}
-					label="IP usage"
+					label="Humidity Levels"
 					availableMetrics={cardFilterOptions}
 					selectedMetric={ipUsageType}
-					setSelectedMetric={setIpUsageType}
+					setSelectedMetric={setHumidityType}
 					assetId={'assetId'}
 					infoTooltip={
-						'Shows the distribution of IP usage types for the select metric'
+						'Shows the distribution of Humidity Levelse types for the select metric'
 					}
 				/>
 
@@ -125,13 +121,13 @@ export const ThreatPageView = ({}) => {
 					currencyValue
 					data={getThreadCampaignData()}
 					loading={false}
-					label="Campaign types"
+					label="Air Quality Index (AQI)"
 					availableMetrics={cardFilterOptions}
 					selectedMetric={campaignType}
-					setSelectedMetric={setCampaignType}
+					setSelectedMetric={setAirQualityType}
 					assetId={'assetId'}
 					infoTooltip={
-						'Shows the distribution of top 3 campaign types for the select metric'
+						'Shows the distribution of top 3 Air Quality Index (AQI) for the select metric'
 					}
 				/>
 			</div>

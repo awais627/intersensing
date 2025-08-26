@@ -10,11 +10,11 @@ export const Top10 = () => {
 
 	// demo static data
 	const demoData = [
-		{ entity: 'United States', type: 'countries', rate: 15 },
-		{ entity: 'Mobile', type: 'deviceTypes', rate: 12 },
-		{ entity: 'Proxy IP', type: 'ipTypes', rate: 9 },
-		{ entity: 'Campaign A', type: 'campaigns', rate: 8, adPlatform: 'google' },
-		{ entity: 'France', type: 'countries', rate: 6 }
+		{ entity: 'Temperature', type: 'countries', rate: '20.11 °C' },
+		{ entity: 'Humidity', type: 'deviceTypes', rate: '52.81 %' },
+		{ entity: 'TVOC', type: 'ipTypes', rate: '400 ppm' },
+		{ entity: 'eCO2', type: 'campaigns', rate: '0 ppb' },
+		{ entity: 'Pressure', type: 'countries', rate: '939.75 hPa' }
 	]
 
 	return (
@@ -22,7 +22,7 @@ export const Top10 = () => {
 			<div className="flex flex-col items-start mb-2 4xl:flex-row 4xl:justify-between 4xl:items-center ">
 				<div className="text-gray-500 text-md flex flex-row items-center gap-x-1">
 					<div className="text-xl font-bold text-t-default ">
-						Elevated fraud rate
+						Table of last 10 telemetry records
 					</div>
 					<GNewTooltip content="List of top 10 entities with highest fraud rate (% of bad clicks)">
 						<RiQuestionLine className="w-3.5 h-3.5 text-t-dark" />
@@ -50,7 +50,12 @@ export const Top10 = () => {
 }
 
 export const TopStatsItem = (props: {
-	current: { entity: string; type: string; rate: number; adPlatform?: string }
+	current: {
+		entity: string
+		type: string
+		rate: number | string
+		adPlatform?: string
+	}
 }) => {
 	const { current } = props
 

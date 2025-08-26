@@ -1,112 +1,53 @@
-export const buildQueryParams = (props: {
-	from: Date
-	to: Date
-	adAccountId?: string
-	campaignId?: string
-	platform?: string
-}) => {
-	const { from, to, adAccountId, campaignId, platform } = props
-
-	const query = {
-		dateFrom: from.getTime(),
-		dateTo: to.getTime()
-	}
-	if (adAccountId) Object.assign(query, { adAccountId })
-	if (campaignId) Object.assign(query, { campaignId, platform })
-
-	return query
-}
-
-export const buildRepeatedData = (data?: any) => {
-	if (!data) return
-	const values = data.reduce(
-		(r: any, i: any) => {
-			let key = i.number
-			if (key >= 10) key = '10+'
-			r[key] += i.count
-			return r
-		},
-		{ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, '10+': 0 }
-	)
-	return Object.keys(values).map((k) => {
-		return {
-			number: k,
-			count: values[k]
-		}
-	})
-}
-
-export const buildDeepLink = (props: {
-	accountId: string
-	assetId: string
-	level: string
-	page: string
-	filters?: string
-	adAccountId?: string
-	campaignId?: string
-}) => {
-	const { accountId, assetId, level, page, filters, adAccountId, campaignId } =
-		props
-
-	if (!filters) return `/workspace/${accountId}/asset/${assetId}/${page}`
-	if (level === 'website')
-		return `/workspace/${accountId}/asset/${assetId}/${page}?${filters}`
-	if (level === 'ad-account')
-		return `/workspace/${accountId}/asset/${assetId}/${page}?${filters}&adAccount=${adAccountId}`
-
-	return `/workspace/${accountId}/asset/${assetId}/${page}?${filters}&adAccount=${adAccountId}&campaign=${campaignId}`
-}
-
-export const getBlockedByIntersensingData = () => {
+export const getAlertsByIntersensingData = () => {
 	return [
 		{
-			id: 'IP address',
+			id: 'Temperature Alerts',
 			value: 0,
-			color: 'primary',
+			color: 'red',
 			variant: '900'
 		},
 		{
-			id: 'IP range',
+			id: 'Humidity Alerts',
 			value: 0,
-			color: 'primary',
+			color: 'red',
 			variant: '700'
 		},
 		{
-			id: 'App placement',
+			id: 'Air Quality Alerts',
 			value: 0,
-			color: 'primary',
+			color: 'red',
 			variant: '500'
 		},
 		{
-			id: 'Domain placement',
+			id: 'Pressure Alerts',
 			value: 0,
-			color: 'primary',
+			color: 'red',
 			variant: '300'
 		}
 	]
 }
-export const getBlacklistEntriesData = () => {
+export const getEntriesData = () => {
 	return [
 		{
-			id: 'IP address',
+			id: 'Temperature',
 			value: 0,
 			color: 'gray',
 			variant: '900'
 		},
 		{
-			id: 'IP range',
+			id: 'Humidity',
 			value: 0,
 			color: 'gray',
 			variant: '700'
 		},
 		{
-			id: 'App placement',
+			id: 'Air Quality',
 			value: 0,
 			color: 'gray',
 			variant: '500'
 		},
 		{
-			id: 'Domain placement',
+			id: 'Pressure',
 			value: 0,
 			color: 'gray',
 			variant: '300'
@@ -117,19 +58,19 @@ export const getBlacklistEntriesData = () => {
 export const getThreadDeviceData = () => {
 	return [
 		{
-			id: 'Desktop',
+			id: 'Normal',
 			value: 0,
 			color: 'blue',
 			variant: '900'
 		},
 		{
-			id: 'Mobile',
+			id: 'Warning',
 			value: 0,
 			color: 'blue',
 			variant: '700'
 		},
 		{
-			id: 'Table',
+			id: 'Critical',
 			value: 0,
 			color: 'blue',
 			variant: '500'
@@ -140,19 +81,19 @@ export const getThreadDeviceData = () => {
 export const getThreadIPData = () => {
 	return [
 		{
-			id: 'Residential',
+			id: 'Dry',
 			value: 0,
 			color: 'amber',
 			variant: '900'
 		},
 		{
-			id: 'Business',
+			id: 'Comfort',
 			value: 0,
 			color: 'amber',
 			variant: '700'
 		},
 		{
-			id: 'Data center',
+			id: 'Humid',
 			value: 0,
 			color: 'amber',
 			variant: '500'
@@ -162,13 +103,19 @@ export const getThreadIPData = () => {
 export const getThreadCampaignData = () => {
 	return [
 		{
-			id: 'Display',
+			id: 'Good',
 			value: 0,
 			color: 'purple',
 			variant: '900'
 		},
 		{
-			id: 'Search',
+			id: 'Moderate',
+			value: 0,
+			color: 'purple',
+			variant: '700'
+		},
+		{
+			id: 'Unhealthy',
 			value: 0,
 			color: 'purple',
 			variant: '700'
