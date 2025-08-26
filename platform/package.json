@@ -1,0 +1,126 @@
+{
+  "name": "clickguard-platform",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": false,
+  "dependencies": {
+    "@auth0/auth0-react": "^1.8.0",
+    "@headlessui/react": "^1.7.15",
+    "@heroicons/react": "^1.0.5",
+    "@nivo/bar": "^0.83.0",
+    "@nivo/core": "^0.83.0",
+    "@nivo/funnel": "^0.83.0",
+    "@nivo/geo": "^0.83.0",
+    "@nivo/heatmap": "^0.83.0",
+    "@nivo/line": "^0.83.0",
+    "@nivo/pie": "^0.83.0",
+    "@popperjs/core": "^2.11.5",
+    "@radix-ui/react-dropdown-menu": "2.0.5",
+    "@radix-ui/react-tooltip": "1.0.6",
+    "@sentry/cli": "^2.42.2",
+    "@sentry/react": "^7.120.3",
+    "@stripe/react-stripe-js": "^1.7.0",
+    "@stripe/stripe-js": "^1.22.0",
+    "@tailwindcss/forms": "^0.4.0",
+    "api-models": "file:../api-models",
+    "awesome-phonenumber": "^6.4.0",
+    "axios": "^0.24.0",
+    "clsx": "^1.1.1",
+    "date-fns": "^2.30.0",
+    "disposable-email-domains": "^1.0.62",
+    "jdenticon": "^3.2.0",
+    "joi": "^17.6.0",
+    "lodash": "^4.17.21",
+    "marked": "^11.1.0",
+    "mobx": "^6.4.2",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
+    "posthog-js": "^1.236.8",
+    "react": "^17.0.2",
+    "react-date-range": "^1.4.0",
+    "react-datepicker": "^6.5.0",
+    "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
+    "react-icons": "^4.8.0",
+    "react-joyride": "^2.7.2",
+    "react-otp-input": "^3.1.1",
+    "react-phone-input-2": "^2.15.1",
+    "react-popper": "^2.3.0",
+    "react-query": "^3.34.12",
+    "react-router-dom": "6.1.1",
+    "react-scripts": "5.0.0",
+    "react-select": "^5.4.0",
+    "react-table": "^7.8.0",
+    "react-toastify": "^8.2.0",
+    "react-virtualized": "^9.22.3",
+    "react-virtuoso": "4.1.0",
+    "react-windowed-select": "5.0.0",
+    "socket.io-client": "^4.7.2",
+    "streamsaver": "^2.0.6",
+    "tailwind-merge": "^1.13.2",
+    "timezones-list": "^3.0.1",
+    "typescript": "~4.3.5",
+    "zustand": "^4.4.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "NODE_OPTIONS='--max_old_space_size=8192' DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint:fix": "eslint --ext .js,jsx,.ts,.tsx --fix",
+    "prettier": "prettier --check --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json,css}'",
+    "prettier:fix": "prettier --write --ignore-path .gitignore './**/*.{js,ts,tsx,json,css}'",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org clickguard --project clickguard-platform ./build && sentry-cli sourcemaps upload --org clickguard --project clickguard-platform ./build"
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/disposable-email-domains": "^1.0.6",
+    "@types/intercom-web": "^2.8.19",
+    "@types/jest": "^24.0.0",
+    "@types/lodash": "^4.14.181",
+    "@types/react": "^17.0.37",
+    "@types/react-date-range": "^1.4.3",
+    "@types/react-datepicker": "^6.2.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-helmet": "^6.1.6",
+    "@types/react-table": "^7.7.14",
+    "@types/react-test-renderer": "^17.0.2",
+    "@types/react-virtualized": "^9.21.21",
+    "@types/streamsaver": "^2.0.1",
+    "@types/tailwindcss": "^3.0.10",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier": "^2.8.7",
+    "react-test-renderer": "^17.0.2",
+    "tailwindcss": "^3.0.2"
+  }
+}

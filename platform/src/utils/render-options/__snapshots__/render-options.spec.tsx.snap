@@ -1,0 +1,199 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Utils RenderOptions when platform is Facebook and it does have a customized color renders correctly with the customized color 1`] = `
+<div
+  className="flex justify-center items-center gap-x-3"
+>
+  <div
+    className="flex items-center justify-center w-6 h-6 rounded-full"
+    style={
+      Object {
+        "background": "#1d4ed8",
+      }
+    }
+  >
+    <svg
+      className="w-4 h-4 text-white"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      strokeWidth="0"
+      style={
+        Object {
+          "color": undefined,
+        }
+      }
+      viewBox="0 0 16 16"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8.217 5.243C9.145 3.988 10.171 3 11.483 3 13.96 3 16 6.153 16.001 9.907c0 2.29-.986 3.725-2.757 3.725-1.543 0-2.395-.866-3.924-3.424l-.667-1.123-.118-.197a54.944 54.944 0 0 0-.53-.877l-1.178 2.08c-1.673 2.925-2.615 3.541-3.923 3.541C1.086 13.632 0 12.217 0 9.973 0 6.388 1.995 3 4.598 3c.319 0 .625.039.924.122.31.086.611.22.913.407.577.359 1.154.915 1.782 1.714Zm1.516 2.224c-.252-.41-.494-.787-.727-1.133L9 6.326c.845-1.305 1.543-1.954 2.372-1.954 1.723 0 3.102 2.537 3.102 5.653 0 1.188-.39 1.877-1.195 1.877-.773 0-1.142-.51-2.61-2.87l-.937-1.565ZM4.846 4.756c.725.1 1.385.634 2.34 2.001A212.13 212.13 0 0 0 5.551 9.3c-1.357 2.126-1.826 2.603-2.581 2.603-.777 0-1.24-.682-1.24-1.9 0-2.602 1.298-5.264 2.846-5.264.091 0 .181.006.27.018Z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+  <div
+    className="flex flex-col"
+  >
+    <span
+      className="text-xs"
+    >
+      Facebook Ads AdAccount
+    </span>
+    <span
+      className="text-xs"
+    >
+      123456789
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Utils RenderOptions when platform is Facebook and it does not have a customized color renders correctly with the default color 1`] = `
+<div
+  className="flex justify-center items-center gap-x-3"
+>
+  <div
+    className="flex items-center justify-center w-6 h-6 rounded-full"
+    style={
+      Object {
+        "background": "#3b82f6",
+      }
+    }
+  >
+    <svg
+      className="w-4 h-4 text-white"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      strokeWidth="0"
+      style={
+        Object {
+          "color": undefined,
+        }
+      }
+      viewBox="0 0 16 16"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8.217 5.243C9.145 3.988 10.171 3 11.483 3 13.96 3 16 6.153 16.001 9.907c0 2.29-.986 3.725-2.757 3.725-1.543 0-2.395-.866-3.924-3.424l-.667-1.123-.118-.197a54.944 54.944 0 0 0-.53-.877l-1.178 2.08c-1.673 2.925-2.615 3.541-3.923 3.541C1.086 13.632 0 12.217 0 9.973 0 6.388 1.995 3 4.598 3c.319 0 .625.039.924.122.31.086.611.22.913.407.577.359 1.154.915 1.782 1.714Zm1.516 2.224c-.252-.41-.494-.787-.727-1.133L9 6.326c.845-1.305 1.543-1.954 2.372-1.954 1.723 0 3.102 2.537 3.102 5.653 0 1.188-.39 1.877-1.195 1.877-.773 0-1.142-.51-2.61-2.87l-.937-1.565ZM4.846 4.756c.725.1 1.385.634 2.34 2.001A212.13 212.13 0 0 0 5.551 9.3c-1.357 2.126-1.826 2.603-2.581 2.603-.777 0-1.24-.682-1.24-1.9 0-2.602 1.298-5.264 2.846-5.264.091 0 .181.006.27.018Z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+  <div
+    className="flex flex-col"
+  >
+    <span
+      className="text-xs"
+    >
+      Facebook Ads AdAccount
+    </span>
+    <span
+      className="text-xs"
+    >
+      123456789
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Utils RenderOptions when platform is Google and it does have a customized color renders correctly with the customized color 1`] = `
+<div
+  className="flex justify-center items-center gap-x-3"
+>
+  <div
+    className="flex items-center justify-center w-6 h-6 rounded-full"
+    style={
+      Object {
+        "background": "#b91c1c",
+      }
+    }
+  >
+    <svg
+      className="w-4 h-4 text-white"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      strokeWidth="0"
+      style={
+        Object {
+          "color": undefined,
+        }
+      }
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 11H20.5329C20.5769 11.3847 20.6 11.7792 20.6 12.1837C20.6 14.9184 19.6204 17.2204 17.9224 18.7837C16.4367 20.1551 14.404 20.9592 11.9796 20.9592C8.46933 20.9592 5.43266 18.947 3.9551 16.0123C3.34695 14.8 3 13.4286 3 11.9796C3 10.5306 3.34695 9.1592 3.9551 7.94698C5.43266 5.01226 8.46933 3 11.9796 3C14.4 3 16.4326 3.88983 17.9877 5.33878L16.5255 6.80101C15.3682 5.68153 13.8028 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.5265 19 18.1443 16.3923 18.577 13H12V11Z"
+      />
+    </svg>
+  </div>
+  <div
+    className="flex flex-col"
+  >
+    <span
+      className="text-xs"
+    >
+      Google Ads AdAccount
+    </span>
+    <span
+      className="text-xs"
+    >
+      123456789
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Utils RenderOptions when platform is Google and it does not have a customized color renders correctly with the default color 1`] = `
+<div
+  className="flex justify-center items-center gap-x-3"
+>
+  <div
+    className="flex items-center justify-center w-6 h-6 rounded-full"
+    style={
+      Object {
+        "background": "#ef4444",
+      }
+    }
+  >
+    <svg
+      className="w-4 h-4 text-white"
+      fill="currentColor"
+      height="1em"
+      stroke="currentColor"
+      strokeWidth="0"
+      style={
+        Object {
+          "color": undefined,
+        }
+      }
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 11H20.5329C20.5769 11.3847 20.6 11.7792 20.6 12.1837C20.6 14.9184 19.6204 17.2204 17.9224 18.7837C16.4367 20.1551 14.404 20.9592 11.9796 20.9592C8.46933 20.9592 5.43266 18.947 3.9551 16.0123C3.34695 14.8 3 13.4286 3 11.9796C3 10.5306 3.34695 9.1592 3.9551 7.94698C5.43266 5.01226 8.46933 3 11.9796 3C14.4 3 16.4326 3.88983 17.9877 5.33878L16.5255 6.80101C15.3682 5.68153 13.8028 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.5265 19 18.1443 16.3923 18.577 13H12V11Z"
+      />
+    </svg>
+  </div>
+  <div
+    className="flex flex-col"
+  >
+    <span
+      className="text-xs"
+    >
+      Google Ads AdAccount
+    </span>
+    <span
+      className="text-xs"
+    >
+      123456789
+    </span>
+  </div>
+</div>
+`;

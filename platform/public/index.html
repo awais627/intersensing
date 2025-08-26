@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-white">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#000000" />
+		<meta
+			name="description"
+			content="Eliminate unwanted clicks on your PPC ads, clean up your traffic,	and save your budget for your real audience"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#06112f" />
+		<meta name="msapplication-TileColor" content="#06112f" />
+		<meta name="theme-color" content="#ffffff" />
+		<meta name="og:title" content="ClickGUARD #EveryClickCounts" />
+		<meta
+			name="og:image"
+			content="https://storage.googleapis.com/clickguard-storage-dev/public/assets/img/logo-full.png"
+		/>
+		<meta
+			name="og:description"
+			content="Eliminate unwanted clicks on your PPC ads, clean up your traffic,	and save your budget for your real audience"
+		/>
+
+		<title>ClickGUARD #EveryClickCounts</title>
+
+		<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				let gtmId = 'GTM-XXXXXX'; // Local GTM ID
+				let hotJarGtmId = 'GTM-XXXXXX '; // Local GTM ID
+				const currentUrl = window.location.href;
+				if (currentUrl.includes('https://staging.clickguard.com/')) {
+					// gtmId = 'GTM-N5G32X2H';
+					gtmId = 'GTM-XXXXXX';
+				} else if (currentUrl.includes('https://app.clickguard.com/')) {
+					gtmId = 'GTM-P9WXT9WD';
+				}
+				const scriptElement = document.createElement('script');
+				scriptElement.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+			'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','${gtmId}');`;
+				document.head.insertAdjacentElement('afterbegin', scriptElement);
+				const noscriptElement = document.createElement('noscript');
+				noscriptElement.innerHTML = `<iframe src="https://www.googletagmanager.com/ns.html?id=${gtmId}"
+										height="0" width="0" style="display:none;visibility:hidden"></iframe>`;
+				document.body.insertAdjacentElement('afterbegin', noscriptElement);
+			});
+		</script>
+		<!-- UserGuiding script -->
+		<script>
+			;(function (g, u, i, d, e, s) {
+				g[e] = g[e] || []
+				var f = u.getElementsByTagName(i)[0]
+				var k = u.createElement(i)
+				k.async = true
+				k.src =
+					'https://static.userguiding.com/media/user-guiding-' +
+					s +
+					'-embedded.js'
+				f.parentNode.insertBefore(k, f)
+				if (g[d]) return
+				var ug = (g[d] = { q: [] })
+				ug.c = function (n) {
+					return function () {
+						ug.q.push([n, arguments])
+					}
+				}
+				var m = [
+					'previewGuide',
+					'finishPreview',
+					'track',
+					'identify',
+					'triggerNps',
+					'hideChecklist',
+					'launchChecklist'
+				]
+				for (var j = 0; j < m.length; j += 1) {
+					ug[m[j]] = ug.c(m[j])
+				}
+			})(
+				window,
+				document,
+				'script',
+				'userGuiding',
+				'userGuidingLayer',
+				'063819926ID'
+			)
+		</script>
+
+		<!-- MS Clarity -->
+		<script type="text/javascript">
+			;(function (c, l, a, r, i, t, y) {
+				c[a] =
+					c[a] ||
+					function () {
+						;(c[a].q = c[a].q || []).push(arguments)
+					}
+				t = l.createElement(r)
+				t.async = 1
+				t.src = 'https://www.clarity.ms/tag/' + i
+				y = l.getElementsByTagName(r)[0]
+				y.parentNode.insertBefore(t, y)
+			})(window, document, 'clarity', 'script', 'fkrhlnzove')
+		</script>
+
+		<!-- Rewardful -->
+		<script>
+			;(function (w, r) {
+				w._rwq = r
+				w[r] =
+					w[r] ||
+					function () {
+						;(w[r].q = w[r].q || []).push(arguments)
+					}
+			})(window, 'rewardful')
+		</script>
+		<script
+			async
+			src="https://r.wdfl.co/rw.js"
+			data-rewardful="abba0c"
+		></script>
+	</head>
+
+	<body class="min-h-screen h-full text-base bg-gray-100">
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root"></div>
+		<div id="modal"></div>
+		<!--
+	This HTML file is a template.
+	If you open it directly in the browser, you will see an empty page.
+
+	You can add webfonts, meta tags, or analytics to this file.
+	The build step will place the bundled scripts into the <body> tag.
+
+	To begin the development, run `npm start` or `yarn start`.
+	To create a production bundle, use `npm run build` or `yarn build`.
+-->
+
+		<!-- Start of clickguard Zendesk Widget script -->
+		<script
+			id="ze-snippet"
+			src="https://static.zdassets.com/ekr/snippet.js?key=056b5f8e-747a-4800-8dda-dc7569d819c3"
+		></script>
+		<!-- End of clickguard Zendesk Widget script -->
+	</body>
+</html>
