@@ -1,5 +1,4 @@
 import { GTransition } from 'components/basic-blocks'
-import { UserHeader } from 'layout/navbar/user-header'
 import { RiListSettingsLine } from 'react-icons/ri'
 import { useUiStore } from 'store'
 import { useShallow } from 'zustand/react/shallow'
@@ -89,6 +88,7 @@ export const Sidebar = () => {
 									className="settings-bar"
 									label="Settings"
 									activeText={'/settings'}
+									disabled
 									to={() => '/'}
 									icon={RiListSettingsLine}
 								/>
@@ -96,8 +96,13 @@ export const Sidebar = () => {
 						</>
 					)}
 					<div className="pt-4">
-						<NavItem label="Team" to={() => '/admin/team'} icon={LuUser} />
-						<UserHeader />
+						<NavItem
+							disabled
+							label="Team"
+							to={() => '/admin/team'}
+							icon={LuUser}
+						/>
+						{/*<UserHeader />*/}
 					</div>
 				</div>
 			</div>
