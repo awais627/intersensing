@@ -2,7 +2,6 @@ import React from 'react'
 import { useTelemetry } from 'hooks/useTelemetry'
 import { AnalyticsItem } from 'components/analytics-item'
 import { PieCard } from 'components/pie-card'
-import { CgSpinner } from 'react-icons/cg'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
 import { FaLeaf, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
@@ -125,43 +124,24 @@ export const TelemetryDashboard: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-center flex-col gap-6 w-full">
-			{/* Connection Status */}
 			<div className="flex items-center gap-2 text-sm">
 				<div
-					className={`w-3 h-3 rounded-full ${
+					className={`w-5 h-5 rounded-full ${
 						isConnected ? 'bg-green-500' : 'bg-red-500'
 					}`}
 				/>
-				<span className={isConnected ? 'text-green-600' : 'text-red-600'}>
+				<span
+					className={
+						isConnected
+							? 'text-green-600 font-bold text-base'
+							: 'text-red-600 font-bold text-base'
+					}
+				>
 					{isConnected
 						? 'Connected to IoT Device'
 						: 'Disconnected from IoT Device'}
 				</span>
 			</div>
-
-			{/* Control Buttons */}
-			<div className="flex gap-4">
-				<button
-					onClick={generateMockData}
-					disabled={loading}
-					className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-				>
-					{loading ? (
-						<CgSpinner className="w-4 h-4 animate-spin" />
-					) : (
-						'Generate Mock Data'
-					)}
-				</button>
-				<button
-					onClick={refresh}
-					disabled={loading}
-					className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-				>
-					{loading ? <CgSpinner className="w-4 h-4 animate-spin" /> : 'Refresh'}
-				</button>
-			</div>
-
-			{/* Metrics Dashboard */}
 			<div className="flex py-2 items-stretch bg-white rounded-lg divide-x border border-card-border w-full">
 				{metrics.map((metric, index) => {
 					const IconComponent = metric.icon
@@ -210,30 +190,6 @@ export const TelemetryDashboard: React.FC = () => {
 				<div className="col-span-2 h-full">
 					<ThreadTrafficTimeline telemetryData={telemetryData} />
 				</div>
-				{/*<div className="col-span-2 h-full">*/}
-				{/*	<div className="bg-white p-4 rounded-lg border h-full">*/}
-				{/*		<h3 className="text-lg font-semibold mb-4">*/}
-				{/*			Recent Telemetry Data*/}
-				{/*		</h3>*/}
-				{/*		<div className="space-y-2 max-h-80 overflow-y-auto">*/}
-				{/*			{telemetryData.slice(0, 10).map((item, index) => (*/}
-				{/*				<div*/}
-				{/*					key={item._id}*/}
-				{/*					className="flex justify-between items-center p-2 bg-gray-50 rounded"*/}
-				{/*				>*/}
-				{/*					<span className="text-sm text-gray-600">*/}
-				{/*						{new Date(item.createdAt).toLocaleString()}*/}
-				{/*					</span>*/}
-				{/*					<div className="flex gap-4 text-sm">*/}
-				{/*						<span>🌡️ {item.Temperature.toFixed(1)}°C</span>*/}
-				{/*						<span>💧 {item.Humidity.toFixed(1)}%</span>*/}
-				{/*						<span>🌬️ {item['eCO2']} ppm</span>*/}
-				{/*					</div>*/}
-				{/*				</div>*/}
-				{/*			))}*/}
-				{/*		</div>*/}
-				{/*	</div>*/}
-				{/*</div>*/}
 			</div>
 
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
