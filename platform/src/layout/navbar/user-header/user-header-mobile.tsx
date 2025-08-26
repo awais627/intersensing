@@ -1,18 +1,14 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { AppConfig } from 'config'
 import { Fragment } from 'react'
 import {
 	RiBankCardLine,
-	RiBook3Line,
 	RiBriefcaseLine,
-	RiChatSmile2Line,
 	RiCloseLine,
 	RiListSettingsLine,
 	RiLockPasswordLine,
 	RiLogoutBoxRLine
 } from 'react-icons/ri'
 import { NavLink } from 'react-router-dom'
-import { ZendeskService } from 'services/zendesk'
 import { removeFromLocalStorage } from '../../../utils'
 
 export const UserHeaderMobile = (props: any) => {
@@ -137,22 +133,6 @@ function UserMenuContent(removeImpersonationId: any) {
 					<RiLockPasswordLine className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6" />
 					<div className="text-gray-700">Security</div>
 				</NavLink>
-			</div>
-			<div className="py-1">
-				<a
-					onClick={() => window.open(AppConfig.KNOWLEDGEBASE_URL, '_blank')}
-					className="flex items-center px-6 py-4 text-lg text-gray-700 hover:bg-gray-50 cursor-pointer"
-				>
-					<RiBook3Line className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6" />
-					Knowledge Base
-				</a>
-				<a
-					onClick={() => ZendeskService.open()}
-					className="flex items-center px-6 py-4 text-lg text-gray-700 hover:bg-gray-50 cursor-pointer"
-				>
-					<RiChatSmile2Line className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6" />
-					Contact Support
-				</a>
 			</div>
 			<div className="flex-1"></div>
 			<div className="py-1">
