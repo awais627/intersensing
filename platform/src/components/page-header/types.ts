@@ -1,4 +1,3 @@
-import { TabItem } from 'components/tabs/types'
 import { ReactElement } from 'react'
 
 export interface PageHeaderProps {
@@ -9,7 +8,7 @@ export interface PageHeaderProps {
 		| Array<{ icon?: any; subtitle?: string | null }>
 		| ReactElement
 	currentTab?: string
-	tabs?: Array<TabItem>
+	tabs?: Array<any>
 	tabsActions?: any
 	info?: any
 	tags?: Array<{ icon?: any; label?: string | null }>

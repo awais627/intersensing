@@ -2,12 +2,10 @@ import { toast } from 'react-toastify'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
-import { GModalProps } from 'components/basic-blocks/g-modal/types'
 import { UIAction, UIActionState } from './types'
 
 interface UiStoreState {
 	modalStatus: boolean
-	modalContent: GModalProps
 	activePath: string
 	context: string
 	sidebarCollapsed: boolean
@@ -20,7 +18,6 @@ interface UiStoreState {
 
 	// Action Methods
 	setModalState(value: boolean): void
-	setModalContent(content: GModalProps): void
 	setActivePage(path: string): void
 	collapseSidebar(val: boolean): void
 	setMobileSidebarOpen(value: boolean): void
@@ -36,11 +33,7 @@ interface UiStoreState {
 
 const UiStore = immer<UiStoreState>((set, get) => ({
 	modalStatus: false,
-	modalContent: {},
 	setModalState: (value: boolean) => set({ modalStatus: value }),
-	setModalContent: (content: GModalProps) => {
-		set({ modalContent: { ...content }, modalStatus: true })
-	},
 	activePath: '/',
 	context: 'user',
 	setActivePage: (path: string) => {
