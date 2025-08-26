@@ -59,7 +59,7 @@ export const ThreatPageView = ({}) => {
 					/>
 				</div>
 				<div className="col-span-2 h-full">
-					<ThreadTrafficTimeline />
+					<ThreadTrafficTimeline telemetryData={[]} />
 				</div>
 			</div>
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">

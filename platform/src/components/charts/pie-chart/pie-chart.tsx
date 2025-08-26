@@ -2,6 +2,7 @@ import { ResponsivePie } from '@nivo/pie'
 import { RiLoader2Line } from 'react-icons/ri'
 import { color } from 'utils/colors'
 import { formatSpendWithCurrency } from 'utils'
+import { formatNumber } from '../../../utils/helpers'
 
 export const PieChart = ({
 	data,
@@ -39,7 +40,7 @@ export const PieChart = ({
 							: formatSpendWithCurrency(total, currency)
 						: totalValue
 						? totalValue
-						: total}
+						: formatNumber(total)}
 				</text>
 				<text
 					x={centerX}

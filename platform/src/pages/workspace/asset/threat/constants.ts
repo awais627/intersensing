@@ -27,8 +27,9 @@ export const metrics = [
 ]
 
 export const cardFilterOptions = [
-	{ name: 'Temperature', type: 'bad' },
-	{ name: 'Pressure', type: 'exclusions' }
+	{ name: 'Temperature', type: 'temperature' },
+	{ name: 'Pressure', type: 'pressure' },
+	{ name: 'Humidity', type: 'humidity' }
 ]
 
 export const repeatedClicksFilterOptions = [

@@ -5,6 +5,7 @@ import { PieCard } from 'components/pie-card'
 import { CgSpinner } from 'react-icons/cg'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
 import { FaLeaf, FaWind } from 'react-icons/fa'
+import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 
 export const TelemetryDashboard: React.FC = () => {
 	const {
@@ -169,6 +170,7 @@ export const TelemetryDashboard: React.FC = () => {
 							key={index}
 							assetId={'assetId'}
 							metrics={metrics}
+							format="comma"
 							label={metric.label}
 							showMetricSelector={false}
 							value={metric.value}
@@ -206,29 +208,32 @@ export const TelemetryDashboard: React.FC = () => {
 					/>
 				</div>
 				<div className="col-span-2 h-full">
-					<div className="bg-white p-4 rounded-lg border h-full">
-						<h3 className="text-lg font-semibold mb-4">
-							Recent Telemetry Data
-						</h3>
-						<div className="space-y-2 max-h-80 overflow-y-auto">
-							{telemetryData.slice(0, 10).map((item, index) => (
-								<div
-									key={item._id}
-									className="flex justify-between items-center p-2 bg-gray-50 rounded"
-								>
-									<span className="text-sm text-gray-600">
-										{new Date(item.createdAt).toLocaleString()}
-									</span>
-									<div className="flex gap-4 text-sm">
-										<span>🌡️ {item.Temperature.toFixed(1)}°C</span>
-										<span>💧 {item.Humidity.toFixed(1)}%</span>
-										<span>🌬️ {item['eCO2']} ppm</span>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
+					<ThreadTrafficTimeline telemetryData={telemetryData} />
 				</div>
+				{/*<div className="col-span-2 h-full">*/}
+				{/*	<div className="bg-white p-4 rounded-lg border h-full">*/}
+				{/*		<h3 className="text-lg font-semibold mb-4">*/}
+				{/*			Recent Telemetry Data*/}
+				{/*		</h3>*/}
+				{/*		<div className="space-y-2 max-h-80 overflow-y-auto">*/}
+				{/*			{telemetryData.slice(0, 10).map((item, index) => (*/}
+				{/*				<div*/}
+				{/*					key={item._id}*/}
+				{/*					className="flex justify-between items-center p-2 bg-gray-50 rounded"*/}
+				{/*				>*/}
+				{/*					<span className="text-sm text-gray-600">*/}
+				{/*						{new Date(item.createdAt).toLocaleString()}*/}
+				{/*					</span>*/}
+				{/*					<div className="flex gap-4 text-sm">*/}
+				{/*						<span>🌡️ {item.Temperature.toFixed(1)}°C</span>*/}
+				{/*						<span>💧 {item.Humidity.toFixed(1)}%</span>*/}
+				{/*						<span>🌬️ {item['eCO2']} ppm</span>*/}
+				{/*					</div>*/}
+				{/*				</div>*/}
+				{/*			))}*/}
+				{/*		</div>*/}
+				{/*	</div>*/}
+				{/*</div>*/}
 			</div>
 
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">

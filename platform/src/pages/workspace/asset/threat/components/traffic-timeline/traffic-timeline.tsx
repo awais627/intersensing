@@ -5,8 +5,13 @@ import { LineChart } from 'components/charts/line-chart'
 import { RiErrorWarningLine, RiQuestionLine } from 'react-icons/ri'
 import { cardFilterOptions } from '../../constants'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
+import { TelemetryData } from '../../../../../../services/telemetry'
 
-export const ThreadTrafficTimeline = () => {
+export const ThreadTrafficTimeline = ({
+	telemetryData
+}: {
+	telemetryData: TelemetryData[]
+}) => {
 	const [type, setType] = useState<'DAY' | 'WEEK' | 'MONTH'>('DAY')
 	const [selectedMetric, setSelectedMetric] = useState<{
 		name: string
@@ -14,38 +19,53 @@ export const ThreadTrafficTimeline = () => {
 	}>(cardFilterOptions[0])
 
 	// demo timeline data
-	const demoData = [
+
+	// example mapping
+	const mappedData = [
 		{
-			id: 'Suspicious clicks',
-			data: [
-				{ x: '2025-08-20', y: 12 },
-				{ x: '2025-08-21', y: 25 },
-				{ x: '2025-08-22', y: 18 }
-			]
+			id: 'Temperature',
+			data: telemetryData.map((d) => ({
+				x: d.timestamp, // or new Date(d.timestamp).toISOString().slice(0, 10)
+				y: d.Temperature
+			}))
 		},
 		{
-			id: 'Bad clicks',
-			data: [
-				{ x: '2025-08-20', y: 5 },
-				{ x: '2025-08-21', y: 8 },
-				{ x: '2025-08-22', y: 6 }
-			]
+			id: 'Humidity',
+			data: telemetryData.map((d) => ({
+				x: d.timestamp,
+				y: d.Humidity
+			}))
+		},
+		{
+			id: 'Pressure',
+			data: telemetryData.map((d) => ({
+				x: d.timestamp,
+				y: d.Pressure
+			}))
 		}
 	]
 
 	const { organizedTimelineData, timelineColors } = useMemo(() => {
-		const exclusions = demoData.filter((d) => d.id === 'Suspicious clicks')
-		const conversions = demoData.filter((d) => d.id === 'Bad clicks')
+		const temperature = mappedData.filter((d) => d.id === 'Temperature')
+		const humidity = mappedData.filter((d) => d.id === 'Humidity')
+		const pressure = mappedData.filter((d) => d.id === 'Pressure')
+
 		return {
 			organizedTimelineData:
-				selectedMetric.type === 'bad' ? conversions : exclusions,
+				selectedMetric.type === 'humidity'
+					? humidity
+					: selectedMetric.type === 'temperature'
+					? temperature
+					: pressure,
 			timelineColors: [
-				selectedMetric.type === 'bad'
+				selectedMetric.type === 'humidity'
+					? { color: 'blue', shade: 500 }
+					: selectedMetric.type === 'temperature'
 					? { color: 'red', shade: 500 }
 					: { color: 'amber', shade: 500 }
 			]
 		}
-	}, [selectedMetric])
+	}, [selectedMetric, telemetryData])
 
 	const timelineDataValueFormatter = (value: number) => value.toLocaleString()
 
@@ -123,7 +143,7 @@ export const ThreadTrafficTimeline = () => {
 						</div>
 					</div>
 				</div>
-				{demoData.length ? (
+				{telemetryData?.length ? (
 					<LineChart
 						enablePoints={false}
 						className="h-[300px]"

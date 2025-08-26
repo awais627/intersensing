@@ -5,7 +5,7 @@ import { ThemeFix } from 'theme-fix'
 import { ThreatPage } from './pages/workspace/asset/threat/threat-page'
 import { PageNotFound } from './pages/pagenotfound'
 import { MainLayout } from './layout'
-import { TelemetryDashboard } from './components'
+import { TelemetryPage } from './pages/workspace/asset/threat/telemetry-page'
 
 export const App = () => {
 	return (
@@ -18,7 +18,7 @@ export const App = () => {
 				<div>
 					<MainLayout>
 						<Routes>
-							<Route path="telemetry" element={<TelemetryDashboard />} />
+							<Route path="telemetry" element={<TelemetryPage />} />
 							<Route path="dashboard" element={<ThreatPage />} />
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>

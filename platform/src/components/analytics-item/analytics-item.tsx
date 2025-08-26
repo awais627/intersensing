@@ -4,8 +4,8 @@ import { BsInfinity } from 'react-icons/bs'
 import { RiQuestionLine } from 'react-icons/ri'
 import { AnalyticsItemProps } from './types'
 import { PercentageBadge } from './percentage-badge'
-import { formatStatsCard } from 'utils'
 import { MetricsAvailableStats } from '../metrics-available-stats'
+import { formatNumber } from '../../utils/helpers'
 
 export const AnalyticsItem = (props: AnalyticsItemProps) => {
 	const {
@@ -63,7 +63,7 @@ export const AnalyticsItem = (props: AnalyticsItemProps) => {
 					{showValue && (
 						<>
 							<p className="text-2xl font-bold text-t-heading whitespace-nowrap">
-								{prefix} {format === 'comma' ? formatStatsCard(+value) : value}
+								{prefix} {format === 'comma' ? formatNumber(+value) : value}
 								{suffix}
 							</p>
 							<span>
