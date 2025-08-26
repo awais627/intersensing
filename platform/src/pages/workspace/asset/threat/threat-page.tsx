@@ -5,7 +5,7 @@ import { ThreatPageView } from './view'
 export const ThreatPage = () => {
 	return (
 		<>
-			<PageTitle pageName="Threat" entityName={'asset?.name'} />
+			<PageTitle pageName="Threat" />
 			<PageHeader
 				title={'Threat'}
 				tagline="Insight and analysis about threat and fraudulent activities for"

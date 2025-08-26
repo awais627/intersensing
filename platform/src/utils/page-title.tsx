@@ -9,8 +9,8 @@ export const PageTitle = (props: titleProps) => {
 	const { pageName, entityName } = props
 
 	const pageTitle = entityName
-		? `${pageName} - ${entityName} - ClickGUARD`
-		: `${pageName} - ClickGUARD`
+		? `${pageName} - ${entityName} - Intersensing`
+		: `${pageName} - Intersensing`
 
 	return (
 		<Helmet>

@@ -1,11 +1,9 @@
 /* eslint-disable no-prototype-builtins */
-import { CollapseSidebar } from 'layout/sidebar/menus/collapse-sidebar'
 import { useEffect, useState } from 'react'
 import { RiMoonLine, RiSunLine } from 'react-icons/ri'
 import { useLocation } from 'react-router-dom'
 
 import { useUiStore } from 'store'
-import { publicRoutes } from 'utils/public-routes'
 import { useShallow } from 'zustand/react/shallow'
 import { useThemeStore } from './store'
 
@@ -60,10 +58,6 @@ export const Navbar = () => {
 		})
 	}
 
-	const isPublicRoute = publicRoutes.find((route) =>
-		window.location.pathname.startsWith(route)
-	)
-
 	const changeTheme = (theme: 'light' | 'dark') => {
 		switchTheme(theme)
 		setActiveTheme(theme)
@@ -104,11 +98,7 @@ export const Navbar = () => {
 					: 'w-[calc(100%-200px)] md:ml-[200px]'
 			}`}
 		>
-			<div className="flex-1 flex justify-between gap-4 mx-auto items-center relative">
-				<div className={'flex transition-all absolute'}>
-					<CollapseSidebar />
-				</div>
-			</div>
+			<div className="flex-1 flex justify-between gap-4 mx-auto items-center relative"></div>
 			<div className="flex flex-row gap-x-2">
 				<div className="flex items-center justify-end mr-6">
 					<div

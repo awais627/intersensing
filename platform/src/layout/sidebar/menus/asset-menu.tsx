@@ -1,8 +1,4 @@
-import {
-	RiBubbleChartLine,
-	RiDonutChartLine,
-	RiFolderChartLine
-} from 'react-icons/ri'
+import { RiDonutChartLine, RiFolderChartLine } from 'react-icons/ri'
 import { GTransition } from 'components/basic-blocks'
 import { NavItem } from 'layout/sidebar/nav-item'
 
@@ -26,22 +22,11 @@ export const AssetMenu = () => {
 							</span>
 						</Disclosure.Button>
 					</Disclosure>
-					<Disclosure as="div" className="pl-2" defaultOpen={true}>
-						<Disclosure.Button
-							className={`group flex w-full items-center justify-between hover:bg-gray-50 ${'bg-gray-100 rounded-md'}`}
-						>
-							<NavItem
-								className="threats-tab"
-								label="Threat"
-								to={() => `/`}
-								icon={RiBubbleChartLine}
-							/>
-						</Disclosure.Button>
-					</Disclosure>
 					<div className="pl-2">
 						<NavItem
 							className="reports-tab"
 							label="Reports"
+							disabled
 							to={() => `/`}
 							icon={RiFolderChartLine}
 						/>
