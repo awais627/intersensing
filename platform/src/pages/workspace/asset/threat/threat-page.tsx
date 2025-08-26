@@ -5,10 +5,10 @@ import { ThreatPageView } from './view'
 export const ThreatPage = () => {
 	return (
 		<>
-			<PageTitle pageName="Threat" />
+			<PageTitle pageName="IoT Telemetry Dashboard" />
 			<PageHeader
-				title={'Threat'}
-				tagline="Insight and analysis about threat and fraudulent activities for"
+				title={'IoT Telemetry Dashboard'}
+				tagline="Real-time monitoring and analysis of IoT sensor data"
 			/>
 
 			<div className="max-w-full mx-auto px-6 sm:px-8">

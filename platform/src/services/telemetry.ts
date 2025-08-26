@@ -1,0 +1,76 @@
+import { ApiClient } from './api-client'
+
+export interface TelemetryData {
+  _id: string
+  timestamp: string
+  Temperature: number
+  Humidity: number
+  TVOC: number
+  eCO2: number
+  'Raw H2': number
+  'Raw Ethanol': number
+  Pressure: number
+  'PM1.0': number
+  'PM2.5': number
+  'NC0.5': number
+  'NC1.0': number
+  'NC2.5': number
+  CNT: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTelemetryDto {
+  timestamp: string
+  Temperature: number
+  Humidity: number
+  TVOC: number
+  eCO2: number
+  'Raw H2': number
+  'Raw Ethanol': number
+  Pressure: number
+  'PM1.0': number
+  'PM2.5': number
+  'NC0.5': number
+  'NC1.0': number
+  'NC2.5': number
+  CNT: number
+}
+
+export const TelemetryService = {
+  // Get latest telemetry data
+  async getLatest(): Promise<TelemetryData[]> {
+    const { data } = await ApiClient.client.get('/api/telemetry/latest')
+    return data
+  },
+
+  // Get all telemetry data
+  async getAll(): Promise<TelemetryData[]> {
+    const { data } = await ApiClient.client.get('/api/telemetry')
+    return data
+  },
+
+  // Get specific telemetry record
+  async getById(id: string): Promise<TelemetryData> {
+    const { data } = await ApiClient.client.get(`/api/telemetry/${id}`)
+    return data
+  },
+
+  // Create new telemetry record
+  async create(telemetryData: CreateTelemetryDto): Promise<TelemetryData> {
+    const { data } = await ApiClient.client.post('/api/telemetry', telemetryData)
+    return data
+  },
+
+  // Generate mock telemetry data
+  async generateMock(): Promise<TelemetryData> {
+    const { data } = await ApiClient.client.post('/api/telemetry/mock')
+    return data
+  },
+
+  // Delete telemetry record
+  async delete(id: string): Promise<TelemetryData> {
+    const { data } = await ApiClient.client.delete(`/api/telemetry/${id}`)
+    return data
+  }
+}

@@ -22,6 +22,19 @@ export const AssetMenu = () => {
 							</span>
 						</Disclosure.Button>
 					</Disclosure>
+					<Disclosure as="div" className="pt-4 pl-2">
+						<Disclosure.Button
+							className={`group flex w-full items-center justify-between hover:bg-gray-50 ${'bg-gray-100 rounded-md'}`}
+						>
+							<span className="text-sm/6 font-medium text-white group-aria-[hover]:text-white/80">
+								<NavItem
+									label="telemetry"
+									to={() => `/telemetry`}
+									icon={RiDonutChartLine}
+								/>
+							</span>
+						</Disclosure.Button>
+					</Disclosure>
 					<div className="pl-2">
 						<NavItem
 							className="reports-tab"
