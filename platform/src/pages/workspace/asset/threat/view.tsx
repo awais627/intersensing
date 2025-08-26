@@ -5,7 +5,7 @@ import { cardFilterOptions, metrics, top10Options } from './constants'
 import { useState } from 'react'
 import {
 	getBlacklistEntriesData,
-	getBlockedByClickGuardData,
+	getBlockedByIntersensingData,
 	getThreadCampaignData,
 	getThreadDeviceData,
 	getThreadIPData
@@ -52,12 +52,12 @@ export const ThreatPageView = ({}) => {
 				<div className="h-full">
 					<PieCard
 						containerClassName="h-full"
-						data={getBlockedByClickGuardData()}
-						label="Blocked by ClickGuard"
+						data={getBlockedByIntersensingData()}
+						label="Blocked by Intersensing"
 						hasData={true}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Number of blacklist entities created by ClickGUARD</p>
+								<p>Number of blacklist entities created by Intersensing</p>
 							</div>
 						}
 					/>
@@ -75,7 +75,7 @@ export const ThreatPageView = ({}) => {
 						hasData={true}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Number of protective actions ClickGUARD has taken</p>
+								<p>Number of protective actions Intersensing has taken</p>
 							</div>
 						}
 					/>

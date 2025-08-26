@@ -57,7 +57,7 @@ export const buildDeepLink = (props: {
 	return `/workspace/${accountId}/asset/${assetId}/${page}?${filters}&adAccount=${adAccountId}&campaign=${campaignId}`
 }
 
-export const getBlockedByClickGuardData = () => {
+export const getBlockedByIntersensingData = () => {
 	return [
 		{
 			id: 'IP address',
