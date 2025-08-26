@@ -1,18 +1,12 @@
 import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
 import { TelemetryController } from "./telemetry.controller";
-import { TelemetryService } from "./telemetry.service";
 import { TelemetryGateway } from "./telemetry.gateway";
-import { Telemetry, TelemetrySchema } from "./schemas/telemetry.schema";
+import { CommonModule } from "../common/common/src";
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Telemetry.name, schema: TelemetrySchema },
-    ]),
-  ],
+  imports: [CommonModule],
   controllers: [TelemetryController],
-  providers: [TelemetryService, TelemetryGateway],
-  exports: [TelemetryService, TelemetryGateway],
+  providers: [TelemetryGateway],
+  exports: [TelemetryGateway],
 })
 export class TelemetryModule {}

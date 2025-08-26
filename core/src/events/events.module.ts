@@ -8,9 +8,11 @@ import { EventsCronService } from "./events.cron";
 import { BullBoardModule } from "@bull-board/nestjs";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { QueueNames } from "./constants/queue";
+import { CommonModule } from "../common/common/src";
 
 @Module({
   imports: [
+    CommonModule,
     ScheduleModule.forRoot(),
     BullModule.registerQueue({
       name: QueueNames.MOCK.MOCK,
