@@ -4,18 +4,61 @@ import { RiGlobalLine, RiQuestionLine } from 'react-icons/ri'
 import { top10Options } from '../../constants'
 import { PercentageBadge } from '../../../../../../components/analytics-item/percentage-badge'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
+import { TelemetryData } from '../../../../../../services/telemetry'
 
-export const Top10 = () => {
+// Helper function to format numbers with appropriate precision
+const formatNumber = (value: number, unit: string): string => {
+	if (unit === '°C' || unit === 'hPa') {
+		return `${value.toFixed(2)} ${unit}`
+	}
+	if (unit === '%') {
+		return `${value.toFixed(1)} ${unit}`
+	}
+	if (unit === 'ppm' || unit === 'ppb') {
+		return `${value.toFixed(0)} ${unit}`
+	}
+	if (unit === 'μg/m³') {
+		return `${value.toFixed(2)} ${unit}`
+	}
+	if (unit === '#') {
+		return `${value.toFixed(0)} ${unit}`
+	}
+	return `${value} ${unit}`
+}
+
+export const Top10 = ({
+	telemetryData
+}: {
+	telemetryData: TelemetryData[]
+}) => {
 	const demoTop10Type = top10Options[0]
 
-	// demo static data
-	const demoData = [
-		{ entity: 'Temperature', type: 'countries', rate: '20.11 °C' },
-		{ entity: 'Humidity', type: 'deviceTypes', rate: '52.81 %' },
-		{ entity: 'TVOC', type: 'ipTypes', rate: '400 ppm' },
-		{ entity: 'eCO2', type: 'campaigns', rate: '0 ppb' },
-		{ entity: 'Pressure', type: 'countries', rate: '939.75 hPa' }
-	]
+	// Transform telemetry data to match the expected format
+	const transformedData = telemetryData.slice(0, 10).map((item, index) => {
+		// Get the most recent values for each metric
+		const metrics = [
+			{ name: 'Temperature', value: item.Temperature, unit: '°C' },
+			{ name: 'Humidity', value: item.Humidity, unit: '%' },
+			{ name: 'TVOC', value: item.TVOC, unit: 'ppm' },
+			{ name: 'eCO2', value: item.eCO2, unit: 'ppb' },
+			{ name: 'Pressure', value: item.Pressure, unit: 'hPa' },
+			{ name: 'PM1.0', value: item['PM1.0'], unit: 'μg/m³' },
+			{ name: 'PM2.5', value: item['PM2.5'], unit: 'μg/m³' },
+			{ name: 'Raw H2', value: item['Raw H2'], unit: 'ppm' },
+			{ name: 'Raw Ethanol', value: item['Raw Ethanol'], unit: 'ppm' },
+			{ name: 'CNT', value: item.CNT, unit: '#' }
+		]
+
+		// Select a metric based on index to show variety
+		const selectedMetric = metrics[index % metrics.length]
+		
+		return {
+			entity: selectedMetric.name,
+			type: getTypeForMetric(selectedMetric.name),
+			rate: formatNumber(selectedMetric.value, selectedMetric.unit),
+			timestamp: item.timestamp
+		}
+	})
 
 	return (
 		<GSection containerClassName="-mb-6 h-full" loading={false}>
@@ -39,14 +82,27 @@ export const Top10 = () => {
 					/>
 				</div>
 			</div>
-
 			<div className="flex flex-col gap-2 divide-y divide-t-border-gray-100 h-[300px] flex-wrap">
-				{demoData.map((item) => (
-					<TopStatsItem key={item.entity} current={item} />
-				))}
+				{transformedData.length > 0 ? (
+					transformedData.map((item, index) => (
+						<TopStatsItem key={`${item.entity}-${index}`} current={item} />
+					))
+				) : (
+					<div className="flex items-center justify-center h-full text-t-secondary">
+						No telemetry data available
+					</div>
+				)}
 			</div>
 		</GSection>
 	)
+}
+
+// Helper function to determine type for each metric
+const getTypeForMetric = (metricName: string): string => {
+	if (['Temperature', 'Humidity', 'Pressure'].includes(metricName)) return 'environmental'
+	if (['TVOC', 'eCO2', 'Raw H2', 'Raw Ethanol'].includes(metricName)) return 'airQuality'
+	if (['PM1.0', 'PM2.5', 'NC0.5', 'NC1.0', 'NC2.5'].includes(metricName)) return 'particulate'
+	return 'sensor'
 }
 
 export const TopStatsItem = (props: {
@@ -55,6 +111,7 @@ export const TopStatsItem = (props: {
 		type: string
 		rate: number | string
 		adPlatform?: string
+		timestamp?: string
 	}
 }) => {
 	const { current } = props
@@ -74,7 +131,7 @@ export const TopStatsItem = (props: {
 				</div>
 			</div>
 			<div className="flex items-center gap-2">
-				<span className="text-t-default font-bold">{current.rate}%</span>
+				<span className="text-t-default font-bold">{current.rate}</span>
 				<PercentageBadge change={+2} />
 			</div>
 		</div>
@@ -85,25 +142,25 @@ const TopItemIcon = (props: { item: { type: string; entity: string } }) => {
 	const { item } = props
 	const { type } = item
 
-	if (type === 'deviceTypes') return <span>📱</span>
-	if (type === 'ipTypes') return <span>🌐</span>
-	if (type === 'countries')
-		return <RiGlobalLine className="h-4 w-4 text-t-default" />
-	if (type === 'campaigns') return <span>🎯</span>
+	if (type === 'particulate') return <span>🌫️</span>
+	if (type === 'airQuality') return <span>💨</span>
+	if (type === 'environmental') return <span>🌡️</span>
+	if (type === 'sensor') return <span>📊</span>
 	return <RiQuestionLine className="h-4 w-4 text-t-default" />
 }
 
 const topItemName = (item: { type: string; entity: string }) => {
-	if (item.type === 'deviceTypes') return item.entity + ' traffic'
-	if (item.type === 'ipTypes') return item.entity + ' traffic'
-	if (item.type === 'countries') return item.entity
+	if (item.type === 'particulate') return item.entity + ' sensor'
+	if (item.type === 'airQuality') return item.entity + ' monitor'
+	if (item.type === 'environmental') return item.entity + ' reading'
+	if (item.type === 'sensor') return item.entity + ' data'
 	return item.entity
 }
 
 const topItemTypeLabel = (item: { type: string }) => {
-	if (item.type === 'deviceTypes') return 'Device type'
-	if (item.type === 'ipTypes') return 'IP type'
-	if (item.type === 'countries') return 'Country'
-	if (item.type === 'campaigns') return 'Campaign'
+	if (item.type === 'particulate') return 'Particulate Matter'
+	if (item.type === 'airQuality') return 'Air Quality'
+	if (item.type === 'environmental') return 'Environmental'
+	if (item.type === 'sensor') return 'Sensor Data'
 	return 'Other'
 }

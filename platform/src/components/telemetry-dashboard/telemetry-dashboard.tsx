@@ -5,6 +5,8 @@ import { PieCard } from 'components/pie-card'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
 import { FaLeaf, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
+import { getEntriesData } from '../../pages/workspace/asset/threat/utils'
+import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
 
 export const TelemetryDashboard: React.FC = () => {
 	const {
@@ -189,6 +191,24 @@ export const TelemetryDashboard: React.FC = () => {
 				</div>
 				<div className="col-span-2 h-full">
 					<ThreadTrafficTimeline telemetryData={telemetryData} />
+				</div>
+			</div>
+			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
+				<div className="h-full">
+					<PieCard
+						containerClassName="h-full"
+						data={getEntriesData()}
+						label="Sensor Categories"
+						hasData={true}
+						infoTooltip={
+							<div className="flex flex-col">
+								<p>Temperature, Humidity, Air Quality</p>
+							</div>
+						}
+					/>
+				</div>
+				<div className="col-span-2 h-full">
+					<Top10 telemetryData={telemetryData} />
 				</div>
 			</div>
 
