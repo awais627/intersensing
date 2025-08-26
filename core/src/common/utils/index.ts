@@ -1,6 +1,8 @@
-import ShortUniqueId from 'short-unique-id';
+import ShortUniqueId from "short-unique-id";
 
 export function generateId(prefix?: string): string {
+  // @ts-ignore
   const uid = new ShortUniqueId({ length: 10 });
-  return `${prefix ?? ''}${uid.rnd()}`;
+  // @ts-ignore
+  return `${prefix ?? ""}${uid.rnd()}`;
 }
