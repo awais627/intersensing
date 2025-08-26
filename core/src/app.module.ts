@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BullModule } from '@nestjs/bull';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { BullAdapter } from '@bull-board/api/bullAdapter';
+import { ExpressAdapter } from '@bull-board/express';
 import { TelemetryModule } from './telemetry/telemetry.module';
 import { EventsModule } from './events/events.module';
 
@@ -10,6 +14,29 @@ import { EventsModule } from './events/events.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/iot-telemetry'),
+    // Global Bull configuration
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT) || 6379,
+        password: process.env.REDIS_PASSWORD,
+        db: parseInt(process.env.REDIS_DB) || 0,
+      },
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    }),
+    // BullBoard configuration
+    BullBoardModule.forRoot({
+      route: '/admin/queues',
+      adapter: ExpressAdapter,
+    }),
     TelemetryModule,
     EventsModule,
   ],

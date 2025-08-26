@@ -11,13 +11,6 @@ import { QueueNames } from "./constants/queue";
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      url: process.env.REDIS_URL,
-      defaultJobOptions: {
-        attempts: 3,
-        delay: 500,
-      },
-    }),
     ScheduleModule.forRoot(),
     BullModule.registerQueue({
       name: QueueNames.MOCK.MOCK,
