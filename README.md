@@ -1,10 +1,10 @@
 # IoT Telemetry Dashboard
 
-A complete IoT telemetry monitoring system with real-time data visualization and WebSocket updates.
+A complete IoT telemetry monitoring system with real-time data visualization, WebSocket updates, and comprehensive API documentation.
 
 ## 🏗️ Architecture
 
-- **Backend**: NestJS + Socket.IO + MongoDB (in `core/` directory)
+- **Backend**: NestJS + Socket.IO + MongoDB + **Swagger/OpenAPI** (in `core/` directory)
 - **Frontend**: React + TypeScript + Tailwind CSS (in `platform/` directory)
 
 ## 🚀 Quick Start
@@ -66,6 +66,23 @@ The backend will start on `http://localhost:9000`
 
 The frontend will start on `http://localhost:3000`
 
+## 📚 API Documentation
+
+### Interactive Swagger UI
+Access the complete API documentation at: **`http://localhost:9000/api/docs`**
+
+The Swagger UI provides:
+- Interactive API testing
+- Request/response schemas
+- Example data and responses
+- Error code documentation
+- WebSocket event documentation
+
+### Documentation Files
+- **`core/API_DOCUMENTATION.md`**: Comprehensive API reference
+- **`core/README.md`**: Backend setup and Swagger guide
+- **Swagger UI**: Interactive documentation and testing
+
 ## 📊 Features
 
 ### Backend (NestJS)
@@ -74,6 +91,8 @@ The frontend will start on `http://localhost:3000`
 - **MongoDB integration** for data persistence
 - **Mock data generation** for testing and demonstration
 - **Data validation** with class-validator
+- **Swagger/OpenAPI documentation** with interactive UI
+- **Comprehensive error handling** and status codes
 
 ### Frontend (React)
 - **Real-time dashboard** with live data updates
@@ -113,6 +132,13 @@ The telemetry data includes:
 
 ## 🧪 Testing
 
+### Using Swagger UI
+1. Open `http://localhost:9000/api/docs`
+2. Click on any endpoint to expand it
+3. Click "Try it out" to test the API
+4. Use the example data or modify it as needed
+5. Execute the request and see the response
+
 ### Generate Mock Data
 ```bash
 # Via API
@@ -120,6 +146,9 @@ curl -X POST http://localhost:9000/api/telemetry/mock
 
 # Via Frontend
 Click "Generate Mock Data" button in the dashboard
+
+# Via Swagger UI
+Use the interactive testing interface
 ```
 
 ### View Latest Data
@@ -145,7 +174,7 @@ The frontend is configured to connect to:
 
 ```
 intersensing/
-├── core/                          # Backend (NestJS)
+├── core/                          # Backend (NestJS + Swagger)
 │   ├── src/
 │   │   ├── telemetry/            # Telemetry module
 │   │   │   ├── schemas/          # MongoDB schemas
@@ -155,9 +184,13 @@ intersensing/
 │   │   │   ├── telemetry.gateway.ts
 │   │   │   └── telemetry.module.ts
 │   │   ├── app.module.ts
-│   │   └── main.ts
+│   │   └── main.ts               # Swagger configuration
 │   ├── package.json
-│   └── start.sh
+│   ├── start.sh                  # Backend startup script
+│   ├── test-api.sh               # API testing script
+│   ├── demo-swagger.sh           # Swagger demo script
+│   ├── README.md                 # Backend documentation
+│   └── API_DOCUMENTATION.md      # Comprehensive API reference
 ├── platform/                      # Frontend (React)
 │   ├── src/
 │   │   ├── components/
@@ -205,16 +238,30 @@ npm run build
    - Clear `node_modules` and reinstall
    - Check TypeScript version compatibility
 
+4. **Swagger UI Issues**
+   - Ensure backend is running on port 9000
+   - Check browser console for JavaScript errors
+   - Verify all Swagger decorators are properly imported
+
 ### Logs
 - Backend logs are displayed in the terminal
 - Frontend logs are in the browser console
+
+## 🎯 Swagger Benefits
+
+- **Self-documenting API** with automatic schema generation
+- **Interactive testing environment** for all endpoints
+- **Request validation** with clear error messages
+- **Professional API documentation** for developers
+- **Easy API exploration** and testing
+- **Automatic response examples** and schemas
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
+4. Test thoroughly using Swagger UI
 5. Submit a pull request
 
 ## 📄 License
@@ -225,5 +272,7 @@ This project is licensed under the ISC License.
 
 For issues and questions:
 1. Check the troubleshooting section
-2. Review the logs
-3. Create an issue in the repository
+2. Review the Swagger UI documentation
+3. Check the implementation logs
+4. Test individual components using provided scripts
+5. Create an issue in the repository

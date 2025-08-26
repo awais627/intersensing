@@ -5,21 +5,94 @@ import {
   Body,
   Param,
   Delete,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 import { TelemetryService } from './telemetry.service';
 import { CreateTelemetryDto } from './dto/create-telemetry.dto';
+import { 
+  TelemetryResponseDto, 
+  TelemetryArrayResponseDto,
+  TelemetryMockResponseDto 
+} from './dto/telemetry-response.dto';
 import { Telemetry } from './schemas/telemetry.schema';
 
+@ApiTags('telemetry')
 @Controller('api/telemetry')
 export class TelemetryController {
   constructor(private readonly telemetryService: TelemetryService) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Create new telemetry record',
+    description: 'Creates a new IoT telemetry data record with all sensor readings'
+  })
+  @ApiBody({
+    type: CreateTelemetryDto,
+    description: 'Telemetry data from IoT device',
+    examples: {
+      sample: {
+        summary: 'Sample IoT Data',
+        description: 'A typical IoT device telemetry payload',
+        value: {
+          timestamp: '1654733331',
+          Temperature: 20.117,
+          Humidity: 52.81,
+          TVOC: 0,
+          eCO2: 400,
+          'Raw H2': 12448,
+          'Raw Ethanol': 19155,
+          Pressure: 939.758,
+          'PM1.0': 0.0,
+          'PM2.5': 0.0,
+          'NC0.5': 0.0,
+          'NC1.0': 0.0,
+          'NC2.5': 0.0,
+          CNT: 8
+        }
+      }
+    }
+  })
+  @ApiCreatedResponse({
+    description: 'Telemetry record created successfully',
+    type: TelemetryResponseDto
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid input data or validation errors'
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error occurred'
+  })
+  @HttpCode(HttpStatus.CREATED)
   async create(@Body() createTelemetryDto: CreateTelemetryDto): Promise<Telemetry> {
     return this.telemetryService.create(createTelemetryDto);
   }
 
   @Post('mock')
+  @ApiOperation({
+    summary: 'Generate mock telemetry data',
+    description: 'Creates and saves a mock telemetry record with realistic sensor values for testing purposes'
+  })
+  @ApiCreatedResponse({
+    description: 'Mock telemetry data generated successfully',
+    type: TelemetryResponseDto
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error occurred'
+  })
+  @HttpCode(HttpStatus.CREATED)
   async createMock(): Promise<Telemetry> {
     const mockData: CreateTelemetryDto = {
       timestamp: Date.now().toString(),
@@ -41,21 +114,82 @@ export class TelemetryController {
   }
 
   @Get('latest')
+  @ApiOperation({
+    summary: 'Get latest telemetry records',
+    description: 'Retrieves the 10 most recent telemetry records from the database'
+  })
+  @ApiOkResponse({
+    description: 'Latest telemetry records retrieved successfully',
+    type: [TelemetryResponseDto]
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error occurred'
+  })
   async findLatest(): Promise<Telemetry[]> {
     return this.telemetryService.findLatest(10);
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Get all telemetry records',
+    description: 'Retrieves all telemetry records from the database, sorted by creation date (newest first)'
+  })
+  @ApiOkResponse({
+    description: 'All telemetry records retrieved successfully',
+    type: [TelemetryResponseDto]
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error occurred'
+  })
   async findAll(): Promise<Telemetry[]> {
     return this.telemetryService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Get telemetry record by ID',
+    description: 'Retrieves a specific telemetry record using its unique identifier'
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Unique identifier of the telemetry record',
+    example: '507f1f77bcf86cd799439011'
+  })
+  @ApiOkResponse({
+    description: 'Telemetry record retrieved successfully',
+    type: TelemetryResponseDto
+  })
+  @ApiNotFoundResponse({
+    description: 'Telemetry record not found'
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid ID format'
+  })
   async findOne(@Param('id') id: string): Promise<Telemetry> {
     return this.telemetryService.findOne(id);
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Delete telemetry record',
+    description: 'Removes a specific telemetry record from the database'
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Unique identifier of the telemetry record to delete',
+    example: '507f1f77bcf86cd799439011'
+  })
+  @ApiOkResponse({
+    description: 'Telemetry record deleted successfully',
+    type: TelemetryResponseDto
+  })
+  @ApiNotFoundResponse({
+    description: 'Telemetry record not found'
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid ID format'
+  })
+  @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<Telemetry> {
     return this.telemetryService.remove(id);
   }

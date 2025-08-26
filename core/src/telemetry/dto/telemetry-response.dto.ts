@@ -1,132 +1,128 @@
-import { IsNumber, IsString } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateTelemetryDto {
+export class TelemetryResponseDto {
+  @ApiProperty({
+    description: 'Unique identifier for the telemetry record',
+    example: '507f1f77bcf86cd799439011'
+  })
+  _id: string;
+
   @ApiProperty({
     description: 'Timestamp of the telemetry reading',
-    example: '1654733331',
-    type: String
+    example: '1654733331'
   })
-  @IsString()
   timestamp: string;
 
   @ApiProperty({
     description: 'Temperature reading in Celsius',
-    example: 20.117,
-    type: Number,
-    minimum: -50,
-    maximum: 100
+    example: 20.117
   })
-  @IsNumber()
   Temperature: number;
 
   @ApiProperty({
     description: 'Humidity percentage',
-    example: 52.81,
-    type: Number,
-    minimum: 0,
-    maximum: 100
+    example: 52.81
   })
-  @IsNumber()
   Humidity: number;
 
   @ApiProperty({
     description: 'Total Volatile Organic Compounds in ppb',
-    example: 0,
-    type: Number,
-    minimum: 0
+    example: 0
   })
-  @IsNumber()
   TVOC: number;
 
   @ApiProperty({
     description: 'Equivalent CO2 concentration in ppm',
-    example: 400,
-    type: Number,
-    minimum: 0
+    example: 400
   })
-  @IsNumber()
   eCO2: number;
 
   @ApiProperty({
     description: 'Raw Hydrogen gas sensor reading',
-    example: 12448,
-    type: Number,
-    minimum: 0
+    example: 12448
   })
-  @IsNumber()
   'Raw H2': number;
 
   @ApiProperty({
     description: 'Raw Ethanol sensor reading',
-    example: 19155,
-    type: Number,
-    minimum: 0
+    example: 19155
   })
-  @IsNumber()
   'Raw Ethanol': number;
 
   @ApiProperty({
     description: 'Atmospheric pressure in hPa',
-    example: 939.758,
-    type: Number,
-    minimum: 800,
-    maximum: 1200
+    example: 939.758
   })
-  @IsNumber()
   Pressure: number;
 
   @ApiProperty({
     description: 'PM1.0 particulate matter in μg/m³',
-    example: 0.0,
-    type: Number,
-    minimum: 0
+    example: 0.0
   })
-  @IsNumber()
   'PM1.0': number;
 
   @ApiProperty({
     description: 'PM2.5 particulate matter in μg/m³',
-    example: 0.0,
-    type: Number,
-    minimum: 0
+    example: 0.0
   })
-  @IsNumber()
   'PM2.5': number;
 
   @ApiProperty({
     description: 'Number concentration of particles >0.5μm in particles/cm³',
-    example: 0.0,
-    type: Number,
-    minimum: 0
+    example: 0.0
   })
-  @IsNumber()
   'NC0.5': number;
 
   @ApiProperty({
     description: 'Number concentration of particles >1.0μm in particles/cm³',
-    example: 0.0,
-    type: Number,
-    minimum: 0
+    example: 0.0
   })
-  @IsNumber()
   'NC1.0': number;
 
   @ApiProperty({
     description: 'Number concentration of particles >2.5μm in particles/cm³',
-    example: 0.0,
-    type: Number,
-    minimum: 0
+    example: 0.0
   })
-  @IsNumber()
   'NC2.5': number;
 
   @ApiProperty({
     description: 'Count value',
-    example: 8,
-    type: Number,
-    minimum: 0
+    example: 8
   })
-  @IsNumber()
   CNT: number;
+
+  @ApiProperty({
+    description: 'Record creation timestamp',
+    example: '2023-06-08T12:35:31.000Z'
+  })
+  createdAt: string;
+
+  @ApiProperty({
+    description: 'Record last update timestamp',
+    example: '2023-06-08T12:35:31.000Z'
+  })
+  updatedAt: string;
+}
+
+export class TelemetryArrayResponseDto {
+  @ApiProperty({
+    description: 'Array of telemetry records',
+    type: [TelemetryResponseDto],
+    isArray: true
+  })
+  data: TelemetryResponseDto[];
+}
+
+export class TelemetryMockResponseDto {
+  @ApiProperty({
+    description: 'Success status of mock data generation',
+    example: true
+  })
+  success: boolean;
+
+  @ApiProperty({
+    description: 'Generated mock telemetry data',
+    type: TelemetryResponseDto
+  })
+  data: TelemetryResponseDto;
 }

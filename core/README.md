@@ -26,6 +26,58 @@ A NestJS backend for IoT telemetry data with real-time WebSocket updates.
 - `telemetry:subscribe` - Subscribe to telemetry updates
 - `telemetry:unsubscribe` - Unsubscribe from updates
 
+## API Documentation
+
+### Interactive Swagger UI
+Access the complete API documentation at: **`http://localhost:9000/api/docs`**
+
+The Swagger UI provides:
+- Interactive API testing
+- Request/response schemas
+- Example data and responses
+- Error code documentation
+- **WebSocket event documentation**
+- Data model validation
+
+### API Documentation Files
+- **`API_DOCUMENTATION.md`**: Comprehensive API reference
+- **`WEBSOCKET_DOCUMENTATION.md`**: Detailed WebSocket API guide
+- **`README.md`**: Backend setup and Swagger guide
+- **Swagger UI**: Interactive documentation and testing
+
+## WebSocket Support
+
+### Real-time Data Streaming
+The backend provides real-time IoT data streaming via WebSocket connections using Socket.IO.
+
+### WebSocket Features
+- **Real-time broadcasting** of telemetry data
+- **Automatic room management** for subscribers
+- **Fallback transport** (WebSocket + Polling)
+- **Comprehensive event documentation**
+- **Error handling** and response confirmation
+
+### WebSocket Events
+- `telemetry:new` - Send/receive telemetry data
+- `telemetry:subscribe` - Subscribe to updates
+- `telemetry:unsubscribe` - Unsubscribe from updates
+
+### Connection Details
+- **URL**: `ws://localhost:9000/telemetry`
+- **Namespace**: `/telemetry`
+- **Transport**: WebSocket (primary), Polling (fallback)
+
+### Testing WebSocket
+```bash
+# Test WebSocket functionality
+./test-websocket.sh
+
+# Or use wscat directly
+wscat -c ws://localhost:9000/telemetry
+```
+
+For complete WebSocket documentation, see: **`WEBSOCKET_DOCUMENTATION.md`**
+
 ## Setup
 
 1. Install dependencies:
