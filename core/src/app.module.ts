@@ -5,6 +5,7 @@ import { BullBoardModule } from "@bull-board/nestjs";
 import { ExpressAdapter } from "@bull-board/express";
 import { TelemetryModule } from "./telemetry/telemetry.module";
 import { EventsModule } from "./events/events.module";
+import { AlertsModule } from "./alerts/alerts.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EventsModule } from "./events/events.module";
     }),
     TelemetryModule,
     EventsModule,
+    AlertsModule,
   ],
 })
 export class AppModule {}

@@ -10,6 +10,7 @@ import { ApiOperation, ApiProperty, ApiTags } from "@nestjs/swagger";
 import { CreateTelemetryDto } from "./dto/create-telemetry.dto";
 import { TelemetryService } from "../common/common/src/services/telemetry.service";
 import { ITelemetry } from "../common/interfaces/telemetry";
+import { IAlert } from "../common/interfaces/alert";
 
 // WebSocket event DTOs for comprehensive documentation
 export class WebSocketTelemetryEvent {
@@ -192,6 +193,17 @@ export class TelemetryGateway {
   // Method to broadcast telemetry updates to all connected clients
   broadcastTelemetryUpdate(telemetry: any): void {
     this.server.emit("telemetry:new", telemetry);
+  }
+
+  // Method to broadcast alerts to all connected clients
+  broadcastAlert(alert: IAlert): void {
+    this.server.emit("alert:new", {
+      success: true,
+      data: alert,
+      message: `Alert triggered: ${alert.rule_id} - ${alert.sensor_type} ${alert.operator} ${alert.threshold}`,
+      severity: alert.severity,
+      timestamp: alert.triggered_at,
+    });
   }
 
   // Method to get connected clients count

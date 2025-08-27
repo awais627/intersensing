@@ -9,10 +9,14 @@ import { BullBoardModule } from "@bull-board/nestjs";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { QueueNames } from "./constants/queue";
 import { CommonModule } from "../common/common/src";
+import { AlertsModule } from "../alerts/alerts.module";
+import { TelemetryModule } from "../telemetry/telemetry.module";
 
 @Module({
   imports: [
     CommonModule,
+    AlertsModule,
+    TelemetryModule,
     ScheduleModule.forRoot(),
     BullModule.registerQueue({
       name: QueueNames.MOCK.MOCK,
