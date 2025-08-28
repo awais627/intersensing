@@ -13,7 +13,7 @@ export interface ITelemetry {
   "NC0.5": number;
   "NC1.0": number;
   "NC2.5": number;
-  CNT: number;
+  machineId: number;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -60,7 +60,7 @@ Sends new telemetry data to all connected clients and saves it to the database.
   "NC0.5": 0.0,
   "NC1.0": 0.0,
   "NC2.5": 0.0,
-  "CNT": 8
+  "machineId": 3
 }
 ```
 

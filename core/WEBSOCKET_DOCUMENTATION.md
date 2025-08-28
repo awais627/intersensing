@@ -99,7 +99,7 @@ Sends new telemetry data to all connected clients and saves it to the database.
   "NC0.5": 0.0,
   "NC1.0": 0.0,
   "NC2.5": 0.0,
-  "CNT": 8
+  "machineId": 3
 }
 ```
 
@@ -124,7 +124,7 @@ Sends new telemetry data to all connected clients and saves it to the database.
     "NC0.5": 0.0,
     "NC1.0": 0.0,
     "NC2.5": 0.0,
-    "CNT": 8,
+    "machineId": 3,
     "createdAt": "2023-06-08T12:35:31.000Z",
     "updatedAt": "2023-06-08T12:35:31.000Z"
   },
@@ -159,7 +159,7 @@ socket.emit('telemetry:new', {
   'NC0.5': 5.2,
   'NC1.0': 3.8,
   'NC2.5': 2.1,
-  CNT: 12
+  machineId: 3
 });
 
 // Listen for response
@@ -259,7 +259,7 @@ Received when new telemetry data is available (broadcast to all subscribers).
   "NC0.5": 0.0,
   "NC1.0": 0.0,
   "NC2.5": 0.0,
-  "CNT": 8,
+  "machineId": 3,
   "createdAt": "2023-06-08T12:35:31.000Z",
   "updatedAt": "2023-06-08T12:35:31.000Z"
 }

@@ -115,7 +115,7 @@ The telemetry data includes:
 - Pressure (hPa)
 - PM1.0, PM2.5 (μg/m³)
 - NC0.5, NC1.0, NC2.5 (particles/cm³)
-- CNT (count)
+- machineId (Machine Id)
 
 ## Testing
 

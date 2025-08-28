@@ -56,7 +56,7 @@ echo '   {"event": "telemetry:subscribe"}'
 echo ""
 
 echo "2. Send telemetry data:"
-echo '   {"event": "telemetry:new", "data": {"timestamp": "1654733331", "Temperature": 22.5, "Humidity": 45.2, "TVOC": 15, "eCO2": 450, "Raw H2": 12000, "Raw Ethanol": 18000, "Pressure": 950.5, "PM1.0": 2.1, "PM2.5": 3.5, "NC0.5": 5.2, "NC1.0": 3.8, "NC2.5": 2.1, "CNT": 12}}'
+echo '   {"event": "telemetry:new", "data": {"timestamp": "1654733331", "Temperature": 22.5, "Humidity": 45.2, "TVOC": 15, "eCO2": 450, "Raw H2": 12000, "Raw Ethanol": 18000, "Pressure": 950.5, "PM1.0": 2.1, "PM2.5": 3.5, "NC0.5": 5.2, "NC1.0": 3.8, "NC2.5": 2.1, "machineId": 1}}'
 echo ""
 
 echo "3. Unsubscribe from updates:"

@@ -35,8 +35,7 @@ The system handles all required IoT sensor data:
 - Raw H2, Raw Ethanol
 - PM1.0, PM2.5 (particulate matter)
 - NC0.5, NC1.0, NC2.5 (particle counts)
-- CNT (count value)
-
+- machineId 
 ## 🚀 How to Use
 
 ### Starting the System
