@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { TelemetryService, TelemetryData, Alert } from 'services/telemetry'
+import { TelemetryService, TelemetryData, Alert, AlertService } from 'services/telemetry'
 import { socketService } from 'services/socket'
 
 export const useTelemetry = () => {
@@ -41,6 +41,33 @@ export const useTelemetry = () => {
       setError(errorMessage)
     } finally {
       setLoading(false)
+    }
+  }, [])
+
+  // Fetch recent alerts
+  const fetchRecentAlerts = useCallback(async () => {
+    try {
+      console.log('🚨 Fetching recent alerts...')
+      const recentAlerts = await AlertService.getRecentAlerts(5)
+      console.log('🚨 Fetched recent alerts:', recentAlerts)
+      
+      // Ensure dates are properly formatted
+      const formattedAlerts = recentAlerts.map(alert => ({
+        ...alert,
+        triggered_at: formatDate(alert.triggered_at),
+        createdAt: formatDate(alert.createdAt),
+        updatedAt: formatDate(alert.updatedAt),
+        telemetry_data: {
+          ...alert.telemetry_data,
+          createdAt: formatDate(alert.telemetry_data.createdAt),
+          updatedAt: formatDate(alert.telemetry_data.updatedAt)
+        }
+      }))
+      
+      setAlerts(formattedAlerts)
+    } catch (err) {
+      console.error('❌ Error fetching recent alerts:', err)
+      // Don't set error for alerts, just log it
     }
   }, [])
 
@@ -118,7 +145,8 @@ export const useTelemetry = () => {
         }
       }
       
-      setAlerts(prev => [formattedAlert, ...prev.slice(0, 9)]) // Keep only latest 10 alerts
+      // Add new alert to the beginning and keep only latest 10
+      setAlerts(prev => [formattedAlert, ...prev.slice(0, 9)])
     })
 
     // Test connection after a short delay
@@ -138,7 +166,8 @@ export const useTelemetry = () => {
   useEffect(() => {
     console.log('🚀 Initial data fetch...')
     fetchLatestData()
-  }, [fetchLatestData])
+    fetchRecentAlerts()
+  }, [fetchLatestData, fetchRecentAlerts])
 
   return {
     telemetryData,
@@ -149,6 +178,7 @@ export const useTelemetry = () => {
     isConnected,
     fetchLatestData,
     generateMockData,
-    refresh: fetchLatestData
+    refresh: fetchLatestData,
+    refreshAlerts: fetchRecentAlerts
   }
 }

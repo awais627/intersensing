@@ -4,7 +4,7 @@ import { AnalyticsItem } from 'components/analytics-item'
 import { PieCard } from 'components/pie-card'
 import { AlertNotification } from 'components/alert-notification'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
-import { FaLeaf, FaWind, FaBell, FaBug } from 'react-icons/fa'
+import { FaLeaf, FaWind, FaBell, FaBug, FaTimes, FaSync } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 import { getEntriesData } from '../../pages/workspace/asset/threat/utils'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
@@ -16,12 +16,15 @@ export const TelemetryDashboard: React.FC = () => {
 		telemetryData,
 		latestData,
 		alerts,
+		loading,
 		error,
 		isConnected,
-		refresh
+		refresh,
+		refreshAlerts
 	} = useTelemetry()
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
+	const [alertsLoading, setAlertsLoading] = useState(false)
 
 	// Handle new alerts and show notifications
 	useEffect(() => {
@@ -41,6 +44,19 @@ export const TelemetryDashboard: React.FC = () => {
 
 	const closeNotification = (alertId: string) => {
 		setActiveNotifications(prev => prev.filter(n => n._id !== alertId))
+	}
+
+	const removeAllNotifications = () => {
+		setActiveNotifications([])
+	}
+
+	const handleRefreshAlerts = async () => {
+		setAlertsLoading(true)
+		try {
+			await refreshAlerts()
+		} finally {
+			setAlertsLoading(false)
+		}
 	}
 
 	const testWebSocketConnection = () => {
@@ -176,14 +192,30 @@ export const TelemetryDashboard: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-center flex-col gap-6 w-full">
-			{/* Alert Notifications */}
-			{activeNotifications.map((alert) => (
-				<AlertNotification
-					key={alert._id}
-					alert={alert}
-					onClose={() => closeNotification(alert._id || '')}
-				/>
-			))}
+			{/* Alert Notifications - Stacked with compact spacing */}
+			<div className="fixed top-4 right-4 z-50 space-y-2">
+				{activeNotifications.map((alert, index) => (
+					<div key={alert._id} className="notification-container">
+						<AlertNotification
+							alert={alert}
+							onClose={() => closeNotification(alert._id || '')}
+						/>
+					</div>
+				))}
+			</div>
+
+			{/* Remove All Notifications Button - Positioned above notifications */}
+			{activeNotifications.length > 1 && (
+				<button
+					onClick={removeAllNotifications}
+					className="fixed top-4 right-4 z-50 px-3 py-1 bg-gray-600 text-white text-xs rounded-full hover:bg-gray-700 transition-colors flex items-center gap-1"
+					title="Remove all notifications"
+					style={{ transform: 'translateY(-40px)' }}
+				>
+					<FaTimes className="w-3 h-3" />
+					Clear All
+				</button>
+			)}
 
 			<div className="flex items-center gap-2 text-sm">
 				<div
@@ -244,6 +276,17 @@ export const TelemetryDashboard: React.FC = () => {
 			{/* Charts Grid */}
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="h-full">
+					<div className="flex items-center justify-between mb-2">
+						<h3 className="text-lg font-semibold">Active Alerts by Sensor</h3>
+						<button
+							onClick={handleRefreshAlerts}
+							disabled={alertsLoading}
+							className="p-1 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
+							title="Refresh alerts"
+						>
+							<FaSync className={`w-4 h-4 ${alertsLoading ? 'animate-spin' : ''}`} />
+						</button>
+					</div>
 					<PieCard
 						containerClassName="h-full"
 						data={getAlertsData()}
@@ -254,6 +297,9 @@ export const TelemetryDashboard: React.FC = () => {
 								<p>Recent alerts by sensor type and severity</p>
 								<p className="text-xs text-gray-500">
 									Red: Critical, Orange: High, Yellow: Medium, Blue: Low
+								</p>
+								<p className="text-xs text-gray-400 mt-2">
+									Shows last 5 alerts from API + real-time updates
 								</p>
 							</div>
 						}

@@ -91,3 +91,28 @@ export const TelemetryService = {
     return data
   }
 }
+
+export const AlertService = {
+  // Get recent alerts
+  async getRecentAlerts(limit: number = 5): Promise<Alert[]> {
+    const { data } = await ApiClient.client.get(`/api/alerts?limit=${limit}`)
+    return data
+  },
+
+  // Get alerts for a specific day
+  async getAlertsForDay(date: string): Promise<Alert[]> {
+    const { data } = await ApiClient.client.get(`/api/alerts/day/${date}`)
+    return data
+  },
+
+  // Get today's alerts
+  async getTodayAlerts(): Promise<Alert[]> {
+    const { data } = await ApiClient.client.get('/api/alerts/today')
+    return data
+  },
+
+  // Resolve an alert
+  async resolveAlert(alertId: string): Promise<void> {
+    await ApiClient.client.patch(`/api/alerts/${alertId}/resolve`)
+  }
+}

@@ -85,38 +85,40 @@ export const AlertNotification: React.FC<AlertNotificationProps> = ({ alert, onC
   }
 
   return (
-    <div className={`fixed top-4 right-4 z-50 max-w-sm w-full bg-white rounded-lg shadow-lg border ${config.borderColor} animate-slide-in`}>
-      <div className={`p-4 ${config.bgColor} rounded-t-lg`}>
+    <div className={`w-full bg-white rounded-lg shadow-lg border ${config.borderColor} animate-slide-in`}>
+      <div className={`p-3 ${config.bgColor} rounded-t-lg`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
-            <span className={`font-semibold ${config.textColor} capitalize`}>
+            <IconComponent className={`w-4 h-4 ${config.iconColor}`} />
+            <span className={`font-semibold ${config.textColor} capitalize text-sm`}>
               {alert.severity} Alert
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-600 hover:text-gray-800 transition-colors"
+            className="text-gray-600 hover:text-gray-800 transition-colors text-lg font-bold"
           >
             ×
           </button>
         </div>
       </div>
       
-      <div className="p-4">
-        <h4 className="font-semibold text-gray-900 mb-2">
-          Rule: {alert.rule_id}
-        </h4>
-        <p className="text-gray-700 mb-2">
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="font-semibold text-gray-900 text-sm">
+            {alert.rule_id}
+          </h4>
+          <span className="text-xs text-gray-500">
+            {formatTimestamp(alert.triggered_at)}
+          </span>
+        </div>
+        <p className="text-gray-700 text-sm mb-2">
           {getAlertMessage()}
-        </p>
-        <p className="text-sm text-gray-500">
-          Triggered at: {formatTimestamp(alert.triggered_at)}
         </p>
         
         {alert.telemetry_data && (
-          <div className="mt-3 p-2 bg-gray-50 rounded text-sm">
-            <span className="font-medium">Current Value: </span>
+          <div className="p-2 bg-gray-50 rounded text-xs">
+            <span className="font-medium">Current: </span>
             <span className="font-semibold">
               {getCurrentValue()}
             </span>

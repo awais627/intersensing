@@ -608,9 +608,18 @@ p > p {
 }
 
 .animate-slide-in {
-	animation: slide-in 0.3s ease-out forwards;
+	animation: slide-in 0.25s ease-out forwards;
 }
 
 .animate-slide-out {
-	animation: slide-out 0.3s ease-in forwards;
+	animation: slide-out 0.25s ease-in forwards;
+}
+
+/* Compact notification spacing */
+.notification-container {
+	margin-bottom: 0.5rem;
+}
+
+.notification-container:last-child {
+	margin-bottom: 0;
 }
