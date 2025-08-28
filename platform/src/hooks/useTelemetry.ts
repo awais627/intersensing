@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { TelemetryService, TelemetryData, Alert, AlertService } from 'services/telemetry'
+import { TelemetryService, TelemetryData, Alert, AlertService, MachineCount } from 'services/telemetry'
 import { socketService } from 'services/socket'
 
 export const useTelemetry = () => {
   const [telemetryData, setTelemetryData] = useState<TelemetryData[]>([])
   const [latestData, setLatestData] = useState<TelemetryData | null>(null)
   const [alerts, setAlerts] = useState<Alert[]>([])
+  const [machineCounts, setMachineCounts] = useState<MachineCount[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -71,6 +72,19 @@ export const useTelemetry = () => {
     }
   }, [])
 
+  // Fetch machine counts
+  const fetchMachineCounts = useCallback(async () => {
+    try {
+      console.log('📊 Fetching machine counts...')
+      const counts = await TelemetryService.getCountsByMachine()
+      console.log('📊 Fetched machine counts:', counts)
+      setMachineCounts(counts)
+    } catch (err) {
+      console.error('❌ Error fetching machine counts:', err)
+      // Don't set error for machine counts, just log it
+    }
+  }, [])
+
   // Generate mock data
   const generateMockData = useCallback(async () => {
     try {
@@ -126,6 +140,9 @@ export const useTelemetry = () => {
       
       setTelemetryData(prev => [formattedData, ...prev.slice(0, 19)]) // Keep only latest 20
       setLatestData(formattedData)
+      
+      // Update machine counts when new telemetry data arrives
+      fetchMachineCounts()
     })
 
     // Subscribe to alert updates
@@ -160,14 +177,15 @@ export const useTelemetry = () => {
       socketService.unsubscribeFromAlerts()
       socketService.disconnect()
     }
-  }, [])
+  }, [fetchMachineCounts])
 
   // Initial data fetch
   useEffect(() => {
     console.log('🚀 Initial data fetch...')
     fetchLatestData()
     fetchRecentAlerts()
-  }, [fetchLatestData, fetchRecentAlerts])
+    fetchMachineCounts()
+  }, [fetchLatestData, fetchRecentAlerts, fetchMachineCounts])
 
   return {
     telemetryData,
@@ -179,6 +197,7 @@ export const useTelemetry = () => {
     fetchLatestData,
     generateMockData,
     refresh: fetchLatestData,
-    refreshAlerts: fetchRecentAlerts
+    refreshAlerts: fetchRecentAlerts,
+    machineCounts
   }
 }

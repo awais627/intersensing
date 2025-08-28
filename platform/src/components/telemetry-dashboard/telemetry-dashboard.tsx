@@ -5,7 +5,6 @@ import { PieCard } from 'components/pie-card'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
 import { FaBell, FaBug, FaLeaf, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
-import { getEntriesData } from '../../pages/workspace/asset/threat/utils'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
 import { Alert, TelemetryData } from 'services/telemetry'
 import { socketService } from 'services/socket'
@@ -19,7 +18,8 @@ export const TelemetryDashboard: React.FC = () => {
 		error,
 		isConnected,
 		refresh,
-		refreshAlerts
+		refreshAlerts,
+		machineCounts
 	} = useTelemetry()
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
@@ -192,6 +192,40 @@ export const TelemetryDashboard: React.FC = () => {
 		return aqiData.slice(0, 5) // Show last 5 readings
 	}
 
+	const getMachineCountsData = () => {
+		if (
+			!machineCounts ||
+			!Array.isArray(machineCounts) ||
+			machineCounts.length === 0
+		) {
+			return [
+				{
+					id: 'No Data',
+					value: 0,
+					color: 'gray',
+					variant: '900'
+				}
+			]
+		}
+
+		// Convert machine counts to the format expected by PieCard
+		return machineCounts.map((machine: any, index: number) => ({
+			id: machine.machineId,
+			value: machine.count,
+			color:
+				index === 0
+					? 'blue'
+					: index === 1
+					? 'blue'
+					: index === 2
+					? 'blue'
+					: index === 3
+					? 'blue'
+					: 'blue',
+			variant: (100 * (index + 1)).toLocaleString()
+		}))
+	}
+
 	if (error) {
 		return (
 			<div className="flex items-center justify-center h-64">
@@ -305,7 +339,7 @@ export const TelemetryDashboard: React.FC = () => {
 				<div className="h-full">
 					<PieCard
 						containerClassName="h-full"
-						data={getEntriesData()}
+						data={getMachineCountsData()}
 						label="Sensor Categories"
 						hasData={true}
 						infoTooltip={

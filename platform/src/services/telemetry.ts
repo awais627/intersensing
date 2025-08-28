@@ -58,6 +58,11 @@ export interface CreateTelemetryDto {
   CNT: number
 }
 
+export interface MachineCount {
+  count: number
+  machineId: string
+}
+
 export const TelemetryService = {
   // Get latest telemetry data
   async getLatest(): Promise<TelemetryData[]> {
@@ -68,6 +73,12 @@ export const TelemetryService = {
   // Get all telemetry data
   async getAll(): Promise<TelemetryData[]> {
     const { data } = await ApiClient.client.get('/api/telemetry')
+    return data
+  },
+
+  // Get telemetry counts by machine
+  async getCountsByMachine(): Promise<MachineCount[]> {
+    const { data } = await ApiClient.client.get('/api/telemetry/count/by-machine')
     return data
   },
 
