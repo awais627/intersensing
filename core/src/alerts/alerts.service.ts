@@ -125,6 +125,15 @@ export class AlertsService {
       .toArray();
   }
 
+  async getRecentAlertsByAcknowledgment(acknowledged: boolean, limit: number = 50): Promise<IAlert[]> {
+    const collection = await this.getAlertsCollection();
+    return await collection
+      .find({ acknowledged })
+      .sort({ triggered_at: -1 })
+      .limit(limit)
+      .toArray();
+  }
+
   async ackAlert(alertId: string): Promise<void> {
     const collection = await this.getAlertsCollection();
     await collection.updateOne(
