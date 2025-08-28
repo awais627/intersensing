@@ -33,7 +33,7 @@ export const AlertsDashboard: React.FC = () => {
 	const [alertsPerPage] = useState(10)
 	const [totalAlertsCount, setTotalAlertsCount] = useState(0)
 	
-	// Severity counts for metrics
+	// Severity counts for metrics - updated in real-time via socket
 	const [severityCounts, setSeverityCounts] = useState<AlertSeverityCountsResponse | null>(null)
 	const [severityCountsLoading, setSeverityCountsLoading] = useState(false)
 	
@@ -124,6 +124,43 @@ export const AlertsDashboard: React.FC = () => {
 					return updated.slice(0, alertsPerPage)
 				})
 
+				// Update severity counts in real-time
+				setSeverityCounts((prev) => {
+					if (!prev) return prev
+					
+					// Create updated counts object
+					const updatedCounts = { ...prev }
+					
+					// Update the specific severity count
+					switch (newAlert.severity) {
+						case 'critical':
+							updatedCounts.critical += 1
+							break
+						case 'high':
+							updatedCounts.high += 1
+							break
+						case 'warning':
+							updatedCounts.warning += 1
+							break
+						case 'low':
+							updatedCounts.low += 1
+							break
+						default:
+							// Handle any other severity types
+							break
+					}
+					
+					// Update total count
+					updatedCounts.total += 1
+					
+					// Update resolved count if the alert is resolved
+					if (newAlert.resolved) {
+						updatedCounts.resolved += 1
+					}
+					
+					return updatedCounts
+				})
+
 				// Update active notifications
 				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
@@ -166,6 +203,43 @@ export const AlertsDashboard: React.FC = () => {
 					const updated = [alertWithDefaults, ...prev]
 					// Keep only the first 10 records to maintain pagination
 					return updated.slice(0, alertsPerPage)
+				})
+
+				// Update severity counts in real-time
+				setSeverityCounts((prev) => {
+					if (!prev) return prev
+					
+					// Create updated counts object
+					const updatedCounts = { ...prev }
+					
+					// Update the specific severity count
+					switch (latestAlert.severity) {
+						case 'critical':
+							updatedCounts.critical += 1
+							break
+						case 'high':
+							updatedCounts.high += 1
+							break
+						case 'warning':
+							updatedCounts.warning += 1
+							break
+						case 'low':
+							updatedCounts.low += 1
+							break
+						default:
+							// Handle any other severity types
+							break
+					}
+					
+					// Update total count
+					updatedCounts.total += 1
+					
+					// Update resolved count if the alert is resolved
+					if (latestAlert.resolved) {
+						updatedCounts.resolved += 1
+					}
+					
+					return updatedCounts
 				})
 
 				// Update active notifications
