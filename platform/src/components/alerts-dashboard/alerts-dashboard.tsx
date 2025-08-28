@@ -7,7 +7,7 @@ import {
 	FaExclamationTriangle,
 	FaInfoCircle
 } from 'react-icons/fa'
-import { Alert, AlertService } from 'services/telemetry'
+import { Alert, AlertService, RecentAlertsResponse, AlertSeverityCountsResponse } from 'services/telemetry'
 import { socketService } from 'services/socket'
 import { AlertsTimeline } from '../../pages/workspace/asset/threat/components/alerts-timeline'
 
@@ -29,19 +29,52 @@ export const AlertsDashboard: React.FC = () => {
 	const [currentPage, setCurrentPage] = useState(1)
 	const [totalPages, setTotalPages] = useState(1)
 	const [alertsPerPage] = useState(10)
+	const [totalAlertsCount, setTotalAlertsCount] = useState(0)
+	const [severityCounts, setSeverityCounts] = useState<AlertSeverityCountsResponse | null>(null)
+	const [severityCountsLoading, setSeverityCountsLoading] = useState(false)
+	const [timelineAlerts, setTimelineAlerts] = useState<Alert[]>([])
+	const [timelineLoading, setTimelineLoading] = useState(false)
 
 
-	// Fetch all alerts for pagination
-	const fetchAllAlerts = async (page: number = 1) => {
+	// Fetch alerts for current page
+	const fetchAlertsForPage = async (page: number = 1) => {
 		try {
 			setAlertsLoading(true)
-			const allAlertsData = await AlertService.getRecentAlerts(100) // Get more for pagination
-			setAllAlerts(allAlertsData)
-			setTotalPages(Math.ceil(allAlertsData.length / alertsPerPage))
+			const offset = (page - 1) * alertsPerPage
+			const response = await AlertService.getRecentAlerts(alertsPerPage, offset)
+			setAllAlerts(response.alerts)
+			setTotalAlertsCount(response.totalCount)
+			setTotalPages(Math.ceil(response.totalCount / alertsPerPage))
 		} catch (err) {
-			console.error('Error fetching all alerts:', err)
+			console.error('Error fetching alerts:', err)
 		} finally {
 			setAlertsLoading(false)
+		}
+	}
+
+	// Fetch alert severity counts
+	const fetchSeverityCounts = async (days: number = 1) => {
+		try {
+			setSeverityCountsLoading(true)
+			const counts = await AlertService.getAlertSeverityCounts(days)
+			setSeverityCounts(counts)
+		} catch (err) {
+			console.error('Error fetching severity counts:', err)
+		} finally {
+			setSeverityCountsLoading(false)
+		}
+	}
+
+	// Fetch last 25 alerts for timeline
+	const fetchTimelineAlerts = async () => {
+		try {
+			setTimelineLoading(true)
+			const response = await AlertService.getRecentAlerts(25, 0) // Get last 25 alerts
+			setTimelineAlerts(response.alerts)
+		} catch (err) {
+			console.error('Error fetching timeline alerts:', err)
+		} finally {
+			setTimelineLoading(false)
 		}
 	}
 
@@ -49,8 +82,10 @@ export const AlertsDashboard: React.FC = () => {
 
 	// Initialize alerts data
 	useEffect(() => {
-		fetchAllAlerts(currentPage)
-	}, [currentPage])
+		fetchAlertsForPage(1)
+		fetchSeverityCounts(1) // Default to 1 day
+		fetchTimelineAlerts() // Fetch timeline alerts
+	}, [])
 
 
 
@@ -67,6 +102,13 @@ export const AlertsDashboard: React.FC = () => {
 				}
 				setAllAlerts((prev) => [alertWithDefaults, ...prev])
 				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
+
+				// Update timeline alerts with new alert
+				setTimelineAlerts((prev) => {
+					const updated = [alertWithDefaults, ...prev]
+					// Keep only last 25 alerts for timeline
+					return updated.slice(0, 25)
+				})
 
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
@@ -96,6 +138,13 @@ export const AlertsDashboard: React.FC = () => {
 				}
 				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
+				// Update timeline alerts with new alert
+				setTimelineAlerts((prev) => {
+					const updated = [alertWithDefaults, ...prev]
+					// Keep only last 25 alerts for timeline
+					return updated.slice(0, 25)
+				})
+
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
 					setActiveNotifications((prev) =>
@@ -107,7 +156,9 @@ export const AlertsDashboard: React.FC = () => {
 	}, [alerts, activeNotifications])
 
 	const handleRefreshAlerts = async () => {
-		await fetchAllAlerts(currentPage)
+		await fetchAlertsForPage(currentPage)
+		await fetchSeverityCounts(1) // Refresh severity counts as well
+		await fetchTimelineAlerts() // Refresh timeline alerts as well
 	}
 
 	const handleResolveAlert = async (alertId: string) => {
@@ -125,31 +176,22 @@ export const AlertsDashboard: React.FC = () => {
 			console.error('Error resolving alert:', err)
 		}
 	}
-	// Calculate alert metrics by severity
+	// Get alert metrics from API data
 	const getAlertMetrics = () => {
-		const criticalCount = allAlerts.filter(
-			(a) => a.severity === 'critical' && !a.resolved
-		).length
-		const highCount = allAlerts.filter(
-			(a) => a.severity === 'high' && !a.resolved
-		).length
-		const mediumCount = allAlerts.filter(
-			(a) => a.severity === 'medium' && !a.resolved
-		).length
-		const lowCount = allAlerts.filter(
-			(a) => a.severity === 'low' && !a.resolved
-		).length
-		const warningCount = allAlerts.filter(
-			(a) => a.severity === 'warning' && !a.resolved
-		).length
-		const resolvedCount = allAlerts.filter((a) => a.resolved).length
+		if (!severityCounts) return []
+
+
+
+
+
+
 
 		return [
 			{
 				label: 'Critical Alerts',
 				key: 'critical',
 				tooltip: 'Number of critical severity alerts',
-				value: criticalCount,
+				value: severityCounts.critical,
 				icon: FaExclamationTriangle,
 				unit: '',
 				color: 'text-red-600'
@@ -158,58 +200,55 @@ export const AlertsDashboard: React.FC = () => {
 				label: 'High Alerts',
 				key: 'high',
 				tooltip: 'Number of high severity alerts',
-				value: highCount,
+				value: severityCounts.high,
 				icon: FaBell,
 				unit: '',
 				color: 'text-orange-600'
 			},
 			{
-				label: 'Medium Alerts',
-				key: 'medium',
-				tooltip: 'Number of medium severity alerts',
-				value: mediumCount,
-				icon: FaInfoCircle,
-				unit: '',
-				color: 'text-yellow-600'
-			},
-			{
-				label: 'Low Alerts',
-				key: 'low',
-				tooltip: 'Number of low severity alerts',
-				value: lowCount,
-				icon: FaInfoCircle,
-				unit: '',
-				color: 'text-blue-600'
-			},
-			{
 				label: 'Warning Alerts',
 				key: 'warning',
 				tooltip: 'Number of warning alerts',
-				value: warningCount,
+				value: severityCounts.warning,
 				icon: FaClock,
 				unit: '',
 				color: 'text-amber-600'
 			},
 			{
+				label: 'Low Alerts',
+				key: 'low',
+				tooltip: 'Number of low severity alerts',
+				value: severityCounts.low,
+				icon: FaInfoCircle,
+				unit: '',
+				color: 'text-blue-600'
+			},
+			{
 				label: 'Resolved Alerts',
 				key: 'resolved',
 				tooltip: 'Number of resolved alerts',
-				value: resolvedCount,
+				value: severityCounts.resolved,
 				icon: FaCheckCircle,
 				unit: '',
 				color: 'text-green-600'
+			},
+			{
+				label: 'Total Alerts',
+				key: 'total',
+				tooltip: 'Total number of alerts in the date range',
+				value: severityCounts.total,
+				icon: FaInfoCircle,
+				unit: '',
+				color: 'text-gray-600'
 			}
 		]
 	}
-	// Get paginated alerts
-	const getPaginatedAlerts = () => {
-		const startIndex = (currentPage - 1) * alertsPerPage
-		const endIndex = startIndex + alertsPerPage
-		return allAlerts.slice(startIndex, endIndex)
-	}
 
-	const handlePageChange = (page: number) => {
+
+	const handlePageChange = async (page: number) => {
+		if (page === currentPage) return
 		setCurrentPage(page)
+		await fetchAlertsForPage(page)
 	}
 
 	if (error) {
@@ -253,11 +292,11 @@ export const AlertsDashboard: React.FC = () => {
 
 
 				{/* Alerts Counter */}
-				{allAlerts.length > 0 && (
+				{totalAlertsCount > 0 && (
 					<div className="flex items-center gap-2 ml-4">
 						<FaBell className="text-red-500" />
 						<span className="text-red-600 font-semibold">
-							{allAlerts.filter((a) => !a.resolved).length} Active Alerts
+							{totalAlertsCount} Total Alerts
 						</span>
 					</div>
 				)}
@@ -265,28 +304,63 @@ export const AlertsDashboard: React.FC = () => {
 
 			{/* Alert Metrics */}
 			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
-				{metrics.map((metric, index) => {
-					const IconComponent = metric.icon
-					return (
+				{severityCountsLoading ? (
+					// Loading skeleton for metrics
+					Array.from({ length: 6 }).map((_, index) => (
 						<div
 							key={index}
-							className="bg-white p-4 rounded-lg border border-card-border"
+							className="bg-white p-4 rounded-lg border border-card-border animate-pulse"
 						>
 							<div className="flex items-center justify-between mb-2">
-								<IconComponent className={`w-5 h-5 ${metric.color}`} />
-								<span className="text-xs text-gray-500">{metric.label}</span>
+								<div className="w-5 h-5 bg-gray-300 rounded"></div>
+								<div className="w-20 h-3 bg-gray-300 rounded"></div>
 							</div>
-							<div className="text-2xl font-bold ">{metric.value}</div>
+							<div className="w-16 h-8 bg-gray-300 rounded"></div>
 						</div>
-					)
-				})}
+					))
+				) : (
+					metrics.map((metric, index) => {
+						const IconComponent = metric.icon
+						return (
+							<div
+								key={index}
+								className="bg-white p-4 rounded-lg border border-card-border"
+							>
+								<div className="flex items-center justify-between mb-2">
+									<IconComponent className={`w-5 h-5 ${metric.color}`} />
+									<span className="text-xs text-gray-500">{metric.label}</span>
+								</div>
+								<div className="text-2xl font-bold ">{metric.value}</div>
+							</div>
+						)
+					})
+				)}
 			</div>
 
 
 
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="col-span-3 h-full">
-					<AlertsTimeline alerts={allAlerts} />
+					<div className="flex justify-between items-center mb-4">
+						<h3 className="text-lg font-semibold">Alerts Timeline</h3>
+						<button
+							onClick={fetchTimelineAlerts}
+							disabled={timelineLoading}
+							className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+						>
+							{timelineLoading ? 'Refreshing...' : 'Refresh Timeline'}
+						</button>
+					</div>
+					{timelineLoading ? (
+						<div className="flex items-center justify-center h-full">
+							<div className="text-center">
+								<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+								<p className="text-gray-500">Loading timeline...</p>
+							</div>
+						</div>
+					) : (
+						<AlertsTimeline alerts={timelineAlerts} />
+					)}
 				</div>
 			</div>
 
@@ -333,7 +407,7 @@ export const AlertsDashboard: React.FC = () => {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{getPaginatedAlerts().map((alert) => (
+							{allAlerts.map((alert) => (
 								<tr key={alert._id} className="hover:bg-gray-50">
 									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
 										{alert.machineId || 'Unknown'}
@@ -398,8 +472,8 @@ export const AlertsDashboard: React.FC = () => {
 					<div className="flex items-center justify-between mt-4">
 						<div className="text-sm text-gray-700">
 							Showing {(currentPage - 1) * alertsPerPage + 1} to{' '}
-							{Math.min(currentPage * alertsPerPage, getPaginatedAlerts().length)} of{' '}
-							{allAlerts.length} results
+							{Math.min(currentPage * alertsPerPage, totalAlertsCount)} of{' '}
+							{totalAlertsCount} results
 						</div>
 						<div className="flex space-x-2">
 							<button
@@ -409,21 +483,6 @@ export const AlertsDashboard: React.FC = () => {
 							>
 								Previous
 							</button>
-							{Array.from({ length: totalPages }, (_, i) => i + 1).map(
-								(page) => (
-									<button
-										key={page}
-										onClick={() => handlePageChange(page)}
-										className={`px-3 py-2 text-sm font-medium rounded-md ${
-											currentPage === page
-												? 'bg-blue-600 text-white'
-												: 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
-										}`}
-									>
-										{page}
-									</button>
-								)
-							)}
 							<button
 								onClick={() => handlePageChange(currentPage + 1)}
 								disabled={currentPage === totalPages}

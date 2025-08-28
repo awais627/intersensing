@@ -73,6 +73,33 @@ export interface AlertCountsResponse {
   date: string
 }
 
+export interface AlertSeverityCountsResponse {
+  critical: number
+  high: number
+  warning: number
+  low: number
+  resolved: number
+  total: number
+  dateRange: {
+    start: string
+    end: string
+  }
+}
+
+export interface RecentAlertsResponse {
+  alerts: Alert[]
+  totalCount: number
+  returnedCount: number
+  limit: number
+}
+
+export interface DailyAlertsResponse {
+  alerts: Alert[]
+  totalCount: number
+  returnedCount: number
+  date: string
+}
+
 export const TelemetryService = {
   // Get latest telemetry data
   async getLatest(): Promise<TelemetryData[]> {
@@ -97,6 +124,8 @@ export const TelemetryService = {
     const { data } = await ApiClient.client.get('/api/alerts/counts')
     return data
   },
+
+
 
   // Get specific telemetry record
   async getById(id: string): Promise<TelemetryData> {
@@ -124,21 +153,39 @@ export const TelemetryService = {
 }
 
 export const AlertService = {
-  // Get recent alerts
-  async getRecentAlerts(limit: number = 5): Promise<Alert[]> {
-    const { data } = await ApiClient.client.get(`/api/alerts?limit=${limit}`)
+  // Get recent alerts with pagination
+  async getRecentAlerts(limit: number = 10, offset: number = 0): Promise<RecentAlertsResponse> {
+    const { data } = await ApiClient.client.get(`/api/alerts?limit=${limit}&offset=${offset}`)
+    return data
+  },
+
+  // Get acknowledged alerts with pagination
+  async getAcknowledgedAlerts(limit: number = 10, offset: number = 0): Promise<RecentAlertsResponse> {
+    const { data } = await ApiClient.client.get(`/api/alerts/acknowledged?limit=${limit}&offset=${offset}`)
+    return data
+  },
+
+  // Get unacknowledged alerts with pagination
+  async getUnacknowledgedAlerts(limit: number = 10, offset: number = 0): Promise<RecentAlertsResponse> {
+    const { data } = await ApiClient.client.get(`/api/alerts/unacknowledged?limit=${limit}&offset=${offset}`)
     return data
   },
 
   // Get alerts for a specific day
-  async getAlertsForDay(date: string): Promise<Alert[]> {
+  async getAlertsForDay(date: string): Promise<DailyAlertsResponse> {
     const { data } = await ApiClient.client.get(`/api/alerts/day/${date}`)
     return data
   },
 
   // Get today's alerts
-  async getTodayAlerts(): Promise<Alert[]> {
+  async getTodayAlerts(): Promise<DailyAlertsResponse> {
     const { data } = await ApiClient.client.get('/api/alerts/today')
+    return data
+  },
+
+  // Get alert severity and status counts
+  async getAlertSeverityCounts(days: number = 1): Promise<AlertSeverityCountsResponse> {
+    const { data } = await ApiClient.client.get(`/api/alerts/severity-counts?days=${days}`)
     return data
   },
 

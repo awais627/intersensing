@@ -116,6 +116,35 @@ export class AlertsService {
     }).sort({ triggered_at: -1 }).toArray();
   }
 
+  async getAlertsForDayWithCounts(date: Date): Promise<{ alerts: IAlert[]; totalCount: number; returnedCount: number; date: string }> {
+    const collection = await this.getAlertsCollection();
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const dateFilter = {
+      triggered_at: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      }
+    };
+
+    // Get total count for the day
+    const totalCount = await collection.countDocuments(dateFilter);
+    
+    // Get alerts for the day
+    const alerts = await collection.find(dateFilter).sort({ triggered_at: -1 }).toArray();
+    
+    return {
+      alerts,
+      totalCount,
+      returnedCount: alerts.length,
+      date: date.toISOString().split('T')[0] // Format as YYYY-MM-DD
+    };
+  }
+
   async getRecentAlerts(limit: number = 50): Promise<IAlert[]> {
     const collection = await this.getAlertsCollection();
     return await collection
@@ -125,13 +154,41 @@ export class AlertsService {
       .toArray();
   }
 
-  async getRecentAlertsByAcknowledgment(acknowledged: boolean, limit: number = 50): Promise<IAlert[]> {
+  async getRecentAlertsWithCounts(limit: number = 50, offset: number = 0): Promise<{ alerts: IAlert[]; totalCount: number; returnedCount: number; limit: number }> {
+    const collection = await this.getAlertsCollection();
+    
+    // Get total count of all alerts
+    const totalCount = await collection.countDocuments();
+    
+    // Get recent alerts with limit and offset
+    const alerts = await collection
+      .find()
+      .sort({ triggered_at: -1 })
+      .skip(offset)
+      .limit(limit)
+      .toArray();
+    
+    return {
+      alerts,
+      totalCount,
+      returnedCount: alerts.length,
+      limit
+    };
+  }
+
+  async getRecentAlertsByAcknowledgment(acknowledged: boolean, limit: number = 50, offset: number = 0): Promise<IAlert[]> {
     const collection = await this.getAlertsCollection();
     return await collection
       .find({ acknowledged })
       .sort({ triggered_at: -1 })
+      .skip(offset)
       .limit(limit)
       .toArray();
+  }
+
+  async getTotalAcknowledgedAlertsCount(acknowledged: boolean = true): Promise<number> {
+    const collection = await this.getAlertsCollection();
+    return await collection.countDocuments({ acknowledged });
   }
 
   async ackAlert(alertId: string): Promise<void> {
@@ -193,6 +250,70 @@ export class AlertsService {
       count: countsMap.get(type) || 0,
       type
     }));
+  }
+
+  async getAlertCountsBySeverityAndStatus(days: number = 1): Promise<{
+    critical: number;
+    high: number;
+    warning: number;
+    low: number;
+    resolved: number;
+    total: number;
+    dateRange: { start: string; end: string };
+  }> {
+    const collection = await this.getAlertsCollection();
+    
+    // Calculate date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days);
+    
+    // Set time boundaries
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+
+    const dateFilter = {
+      triggered_at: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    };
+
+    // Get counts by severity
+    const severityPipeline = [
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: "$severity",
+          count: { $sum: 1 }
+        }
+      }
+    ];
+
+    const severityResult = await collection.aggregate(severityPipeline).toArray();
+    const severityCounts = new Map(severityResult.map(item => [item._id, item.count]));
+
+    // Get resolved count
+    const resolvedCount = await collection.countDocuments({
+      ...dateFilter,
+      resolved: true
+    });
+
+    // Get total count
+    const totalCount = await collection.countDocuments(dateFilter);
+
+    return {
+      critical: severityCounts.get("critical") || 0,
+      high: severityCounts.get("high") || 0,
+      warning: severityCounts.get("warning") || 0,
+      low: severityCounts.get("low") || 0,
+      resolved: resolvedCount,
+      total: totalCount,
+      dateRange: {
+        start: startDate.toISOString().split('T')[0],
+        end: endDate.toISOString().split('T')[0]
+      }
+    };
   }
 
   private async getAlertsCollection(): Promise<Collection<IAlert>> {

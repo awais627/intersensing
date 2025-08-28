@@ -2,6 +2,9 @@ import { Controller, Get, Query, Param, Patch } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from "@nestjs/swagger";
 import { AlertsService } from "./alerts.service";
 import { AlertCountsResponseDto } from "./dto/alert-count.dto";
+import { RecentAlertsResponseDto } from "./dto/recent-alerts.dto";
+import { DailyAlertsResponseDto } from "./dto/daily-alerts.dto";
+import { AlertSeverityCountsDto } from "./dto/alert-severity-counts.dto";
 
 @ApiTags("alerts")
 @Controller("api/alerts")
@@ -9,45 +12,90 @@ export class AlertsController {
   constructor(private readonly alertsService: AlertsService) {}
 
   @Get()
-  @ApiOperation({ summary: "Get recent alerts" })
+  @ApiOperation({ summary: "Get recent alerts with total counts" })
   @ApiQuery({ name: "limit", required: false, type: Number })
-  @ApiResponse({ status: 200, description: "Recent alerts retrieved successfully" })
-  async getRecentAlerts(@Query("limit") limit?: number) {
-    return await this.alertsService.getRecentAlerts(limit ? parseInt(limit.toString()) : 50);
+  @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Recent alerts with total counts retrieved successfully",
+    type: RecentAlertsResponseDto
+  })
+  async getRecentAlerts(@Query("limit") limit?: number, @Query("offset") offset?: number): Promise<RecentAlertsResponseDto> {
+    const parsedLimit = limit ? parseInt(limit.toString()) : 50;
+    const parsedOffset = offset ? parseInt(offset.toString()) : 0;
+    return await this.alertsService.getRecentAlertsWithCounts(parsedLimit, parsedOffset);
   }
 
   @Get("acknowledged")
-  @ApiOperation({ summary: "Get recent acknowledged alerts" })
+  @ApiOperation({ summary: "Get recent acknowledged alerts with total counts" })
   @ApiQuery({ name: "limit", required: false, type: Number })
-  @ApiResponse({ status: 200, description: "Recent acknowledged alerts retrieved successfully" })
-  async getRecentAcknowledgedAlerts(@Query("limit") limit?: number) {
-    return await this.alertsService.getRecentAlertsByAcknowledgment(true, limit ? parseInt(limit.toString()) : 50);
+  @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Recent acknowledged alerts with total counts retrieved successfully",
+    type: RecentAlertsResponseDto
+  })
+  async getRecentAcknowledgedAlerts(@Query("limit") limit?: number, @Query("offset") offset?: number): Promise<RecentAlertsResponseDto> {
+    const parsedLimit = limit ? parseInt(limit.toString()) : 50;
+    const parsedOffset = offset ? parseInt(offset.toString()) : 0;
+    const alerts = await this.alertsService.getRecentAlertsByAcknowledgment(true, parsedLimit, parsedOffset);
+    const totalCount = await this.alertsService.getTotalAcknowledgedAlertsCount();
+    
+    return {
+      alerts,
+      totalCount,
+      returnedCount: alerts.length,
+      limit: parsedLimit
+    };
   }
 
   @Get("unacknowledged")
-  @ApiOperation({ summary: "Get recent unacknowledged alerts" })
+  @ApiOperation({ summary: "Get recent unacknowledged alerts with total counts" })
   @ApiQuery({ name: "limit", required: false, type: Number })
-  @ApiResponse({ status: 200, description: "Recent unacknowledged alerts retrieved successfully" })
-  async getRecentUnacknowledgedAlerts(@Query("limit") limit?: number) {
-    return await this.alertsService.getRecentAlertsByAcknowledgment(false, limit ? parseInt(limit.toString()) : 50);
+  @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Recent unacknowledged alerts with total counts retrieved successfully",
+    type: RecentAlertsResponseDto
+  })
+  async getRecentUnacknowledgedAlerts(@Query("limit") limit?: number, @Query("offset") offset?: number): Promise<RecentAlertsResponseDto> {
+    const parsedLimit = limit ? parseInt(limit.toString()) : 50;
+    const parsedOffset = offset ? parseInt(offset.toString()) : 0;
+    const alerts = await this.alertsService.getRecentAlertsByAcknowledgment(false, parsedLimit, parsedOffset);
+    const totalCount = await this.alertsService.getTotalAcknowledgedAlertsCount(false);
+    
+    return {
+      alerts,
+      totalCount,
+      returnedCount: alerts.length,
+      limit: parsedLimit
+    };
   }
 
   @Get("day/:date")
-  @ApiOperation({ summary: "Get alerts for a specific day" })
-  @ApiResponse({ status: 200, description: "Daily alerts retrieved successfully" })
-  async getAlertsForDay(@Param("date") dateStr: string) {
+  @ApiOperation({ summary: "Get alerts for a specific day with total counts" })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Daily alerts with total counts retrieved successfully",
+    type: DailyAlertsResponseDto
+  })
+  async getAlertsForDay(@Param("date") dateStr: string): Promise<DailyAlertsResponseDto> {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) {
       throw new Error("Invalid date format. Use YYYY-MM-DD");
     }
-    return await this.alertsService.getAlertsForDay(date);
+    return await this.alertsService.getAlertsForDayWithCounts(date);
   }
 
   @Get("today")
-  @ApiOperation({ summary: "Get alerts for today" })
-  @ApiResponse({ status: 200, description: "Today's alerts retrieved successfully" })
-  async getTodaysAlerts() {
-    return await this.alertsService.getAlertsForDay(new Date());
+  @ApiOperation({ summary: "Get alerts for today with total counts" })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Today's alerts with total counts retrieved successfully",
+    type: DailyAlertsResponseDto
+  })
+  async getTodaysAlerts(): Promise<DailyAlertsResponseDto> {
+    return await this.alertsService.getAlertsForDayWithCounts(new Date());
   }
 
   @Get("counts")
@@ -69,6 +117,27 @@ export class AlertsController {
       data: counts,
       date: date.toISOString().split('T')[0] // Format as YYYY-MM-DD
     };
+  }
+
+  @Get("severity-counts")
+  @ApiOperation({ summary: "Get alert counts by severity and resolution status for a date range" })
+  @ApiQuery({ 
+    name: "days", 
+    required: false, 
+    type: Number, 
+    description: "Number of days to look back (defaults to 1 day)" 
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Alert severity and status counts retrieved successfully",
+    type: AlertSeverityCountsDto
+  })
+  async getAlertSeverityCounts(@Query("days") days?: number): Promise<AlertSeverityCountsDto> {
+    const parsedDays = days ? parseInt(days.toString()) : 1;
+    if (parsedDays < 1 || parsedDays > 365) {
+      throw new Error("Days parameter must be between 1 and 365");
+    }
+    return await this.alertsService.getAlertCountsBySeverityAndStatus(parsedDays);
   }
 
   @Patch(":id/acknowledge")
