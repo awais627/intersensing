@@ -2,16 +2,17 @@ import React, { useMemo, useState } from 'react'
 import { classNames } from 'utils'
 import { GSection, GTooltip } from 'components/basic-blocks'
 import { LineChart } from 'components/charts/line-chart'
-import { RiErrorWarningLine, RiQuestionLine } from 'react-icons/ri'
+import {
+	RiErrorWarningLine,
+	RiLoader2Line,
+	RiQuestionLine
+} from 'react-icons/ri'
 import { alertFilterOptions, alertTypeFilterOptions } from '../../constants'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
 import { Alert } from '../../../../../../services/telemetry'
+import moment from 'moment/moment'
 
-export const AlertsTimeline = ({
-	alerts
-}: {
-	alerts: Alert[]
-}) => {
+export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 	const [type, setType] = useState<'DAY' | 'WEEK' | 'MONTH'>('DAY')
 	const [selectedSeverity, setSelectedSeverity] = useState<{
 		name: string
@@ -29,110 +30,103 @@ export const AlertsTimeline = ({
 		// Filter by severity
 		if (selectedSeverity.type !== 'all') {
 			if (selectedSeverity.type === 'resolved') {
-				filtered = filtered.filter(alert => alert.resolved)
+				filtered = filtered.filter((alert) => alert.resolved)
 			} else {
-				filtered = filtered.filter(alert => alert.severity === selectedSeverity.type)
+				filtered = filtered.filter(
+					(alert) => alert.severity === selectedSeverity.type
+				)
 			}
 		}
 
 		// Filter by alert type
 		if (selectedAlertType.type !== 'all') {
-			filtered = filtered.filter(alert => alert.sensor_type === selectedAlertType.type)
+			filtered = filtered.filter(
+				(alert) => alert.sensor_type === selectedAlertType.type
+			)
 		}
 
 		return filtered
 	}, [alerts, selectedSeverity, selectedAlertType])
 
-	// Group alerts by date for timeline visualization
+	// Create timeline data with actual telemetry values
 	const timelineData = useMemo(() => {
-		const alertsByDate = filteredAlerts.reduce((acc, alert) => {
-			const date = new Date(alert.triggered_at).toISOString().split('T')[0]
-			if (!acc[date]) {
-				acc[date] = {
-					critical: 0,
-					high: 0,
-					medium: 0,
-					low: 0,
-					warning: 0
-				}
-			}
-			acc[date][alert.severity as keyof (typeof acc)[typeof date]]++
-			return acc
-		}, {} as Record<string, { critical: number; high: number; medium: number; low: number; warning: number }>)
+		// Create sequential index mapping for alerts
+		const alertsWithIndex = filteredAlerts.map((alert, index) => ({
+			...alert,
+			index: index + 1
+		}))
 
-		// Get all dates and add next 5 dates with zero values
-		const allDates = new Set<string>()
-		Object.keys(alertsByDate).forEach(date => allDates.add(date))
-		
-		// Add next 5 dates if we have existing dates
-		if (allDates.size > 0) {
-			const lastDate = new Date(Math.max(...Array.from(allDates).map(d => new Date(d).getTime())))
-			for (let i = 1; i <= 5; i++) {
-				const nextDate = new Date(lastDate)
-				nextDate.setDate(nextDate.getDate() + i)
-				const nextDateStr = nextDate.toISOString().split('T')[0]
-				allDates.add(nextDateStr)
-				
-				// Initialize with zero values
-				if (!alertsByDate[nextDateStr]) {
-					alertsByDate[nextDateStr] = {
-						critical: 0,
-						high: 0,
-						medium: 0,
-						low: 0,
-						warning: 0
-					}
-				}
-			}
-		}
-
-		// Convert to chart format
-		const dates = Array.from(allDates).sort()
+		// Convert to chart format with actual telemetry values
 		return [
 			{
 				id: 'Critical',
-				data: dates.map((date) => ({
-					x: date,
-					y: alertsByDate[date]?.critical || 0
-				}))
+				data: alertsWithIndex
+					.filter((alert) => alert.severity === 'critical')
+					.map((alert) => ({
+						x: alert.index,
+						y:
+							alert.telemetry_data[
+								alert.sensor_type as keyof typeof alert.telemetry_data
+							] || 0
+					}))
 			},
 			{
 				id: 'High',
-				data: dates.map((date) => ({
-					x: date,
-					y: alertsByDate[date]?.high || 0
-				}))
+				data: alertsWithIndex
+					.filter((alert) => alert.severity === 'high')
+					.map((alert) => ({
+						x: alert.index,
+						y:
+							alert.telemetry_data[
+								alert.sensor_type as keyof typeof alert.telemetry_data
+							] || 0
+					}))
 			},
 			{
 				id: 'Medium',
-				data: dates.map((date) => ({
-					x: date,
-					y: alertsByDate[date]?.medium || 0
-				}))
+				data: alertsWithIndex
+					.filter((alert) => alert.severity === 'medium')
+					.map((alert) => ({
+						x: alert.index,
+						y:
+							alert.telemetry_data[
+								alert.sensor_type as keyof typeof alert.telemetry_data
+							] || 0
+					}))
 			},
 			{
 				id: 'Low',
-				data: dates.map((date) => ({
-					x: date,
-					y: alertsByDate[date]?.low || 0
-				}))
+				data: alertsWithIndex
+					.filter((alert) => alert.severity === 'low')
+					.map((alert) => ({
+						x: alert.index,
+						y:
+							alert.telemetry_data[
+								alert.sensor_type as keyof typeof alert.telemetry_data
+							] || 0
+					}))
 			},
 			{
 				id: 'Warning',
-				data: dates.map((date) => ({
-					x: date,
-					y: alertsByDate[date]?.warning || 0
-				}))
+				data: alertsWithIndex
+					.filter((alert) => alert.severity === 'warning')
+					.map((alert) => ({
+						x: alert.index,
+						y:
+							alert.telemetry_data[
+								alert.sensor_type as keyof typeof alert.telemetry_data
+							] || 0
+					}))
 			}
 		]
 	}, [filteredAlerts])
 
 	const timelineColors = [
-		{ color: 'red', shade: 500 },    // Critical
+		{ color: 'red', shade: 500 }, // Critical
 		{ color: 'orange', shade: 500 }, // High
 		{ color: 'yellow', shade: 500 }, // Medium
-		{ color: 'blue', shade: 500 },   // Low
-		{ color: 'amber', shade: 500 }   // Warning
+		{ color: 'blue', shade: 500 }, // Low
+		{ color: 'amber', shade: 500 } // Warning
 	]
 
 	const timelineDataValueFormatter = (value: number) => value.toLocaleString()
@@ -140,9 +134,7 @@ export const AlertsTimeline = ({
 	const emptyState = (
 		<div className="flex flex-col items-center justify-center w-full p-8 text-center">
 			<RiErrorWarningLine className="w-8 h-8 text-gray-500" />
-			<h3 className="mt-2 text-md font-medium text-gray-700">
-				No alerts data
-			</h3>
+			<h3 className="mt-2 text-md font-medium text-gray-700">No alerts data</h3>
 			<p className="mt-1 text-md text-gray-500">
 				Select different filters or time period
 			</p>
@@ -231,6 +223,19 @@ export const AlertsTimeline = ({
 						data={timelineData}
 						colors={timelineColors}
 						formatter={timelineDataValueFormatter}
+						tooltipFormator={(point: any) => (
+							<div className="border rounded bg-white shadow-sm p-1 flex space-x-1 items-center text-xs">
+								<RiLoader2Line
+									className="w-5 h-5"
+									style={{ color: point.color }}
+								/>
+								<span>{moment(Number(point.data.x)).format('MMM Do')}</span>:
+								<span className="font-semibold">
+									{timelineDataValueFormatter(Number(point.data.y))}{' '}
+									{point.id.split('.')[0]}{' '}
+								</span>
+							</div>
+						)}
 					/>
 				) : (
 					emptyState

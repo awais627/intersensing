@@ -15,7 +15,8 @@ export const LineChart = ({
 	enablePoints = true,
 	lineWidth = 3,
 	className,
-	abbreviate = true
+	abbreviate = true,
+	tooltipFormator
 }: LineChartProps) => {
 	if (!data) return <GLoading />
 
@@ -107,15 +108,22 @@ export const LineChart = ({
 				useMesh={true}
 				enableSlices={false}
 				theme={theme}
-				tooltip={({ point }) => (
-					<div className="border rounded bg-white shadow-sm p-1 flex space-x-1 items-center text-xs">
-						<RiLoader2Line className="w-5 h-5" style={{ color: point.color }} />
-						<span>{moment(Number(point.data.x)).format('MMM Do')}</span>:
-						<span className="font-semibold">
-							{formatter(Number(point.data.y))} {point.id.split('.')[0]}{' '}
-						</span>
-					</div>
-				)}
+				tooltip={({ point }) =>
+					tooltipFormator ? (
+						tooltipFormator(point)
+					) : (
+						<div className="border rounded bg-white shadow-sm p-1 flex space-x-1 items-center text-xs">
+							<RiLoader2Line
+								className="w-5 h-5"
+								style={{ color: point.color }}
+							/>
+							<span>{moment(Number(point.data.x)).format('MMM Do')}</span>:
+							<span className="font-semibold">
+								{formatter(Number(point.data.y))} {point.id.split('.')[0]}{' '}
+							</span>
+						</div>
+					)
+				}
 			/>
 		</div>
 	)

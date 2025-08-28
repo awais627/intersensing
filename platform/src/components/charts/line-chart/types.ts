@@ -14,4 +14,5 @@ export interface LineChartProps {
 	lineWidth?: number
 	className?: string
 	abbreviate?: boolean
+	tooltipFormator?: any
 }
