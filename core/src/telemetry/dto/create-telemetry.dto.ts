@@ -122,11 +122,11 @@ export class CreateTelemetryDto {
   'NC2.5': number;
 
   @ApiProperty({
-    description: 'Count value',
-    example: 8,
+    description: 'Machine Id',
+    example: 3,
     type: Number,
     minimum: 0
   })
   @IsNumber()
-  CNT: number;
+  machineId: number;
 }

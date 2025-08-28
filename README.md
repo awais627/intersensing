@@ -128,7 +128,7 @@ The telemetry data includes:
 - **Pressure** (hPa) - Atmospheric pressure
 - **PM1.0, PM2.5** (μg/m³) - Particulate matter
 - **NC0.5, NC1.0, NC2.5** (particles/cm³) - Particle counts
-- **CNT** - Count value
+- **machineId** - Machine Id
 
 ## 🧪 Testing
 

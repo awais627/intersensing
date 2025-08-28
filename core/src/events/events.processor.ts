@@ -36,7 +36,7 @@ export class EventsProcessor {
       "NC2.5": Math.random() * 10,
       createdAt: new Date(),
       updatedAt: new Date(),
-      CNT: Math.floor(Math.random() * 20),
+      machineId: Math.floor(Math.random() * 5) + 1,
     };
 
     // Save telemetry data

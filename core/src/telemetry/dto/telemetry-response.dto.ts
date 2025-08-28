@@ -86,10 +86,10 @@ export class TelemetryResponseDto {
   'NC2.5': number;
 
   @ApiProperty({
-    description: 'Count value',
-    example: 8
+    description: 'Machine Id',
+    example: 3
   })
-  CNT: number;
+  machineId: number;
 
   @ApiProperty({
     description: 'Record creation timestamp',

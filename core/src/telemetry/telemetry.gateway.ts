@@ -31,7 +31,7 @@ export class WebSocketTelemetryEvent {
       "NC0.5": 0.0,
       "NC1.0": 0.0,
       "NC2.5": 0.0,
-      CNT: 8,
+      machineId: 3,
     },
   })
   data: CreateTelemetryDto;

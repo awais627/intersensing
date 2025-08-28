@@ -57,7 +57,7 @@ export class TelemetryController {
           "NC0.5": 0.0,
           "NC1.0": 0.0,
           "NC2.5": 0.0,
-          CNT: 8,
+          machineId: 3,
         },
       },
     },
@@ -109,7 +109,7 @@ export class TelemetryController {
       "NC2.5": Math.random() * 10,
       createdAt: new Date(),
       updatedAt: new Date(),
-      CNT: Math.floor(Math.random() * 20),
+      machineId: Math.floor(Math.random() * 5) + 1,
     };
     return this.telemetryService.create(mockData);
   }
