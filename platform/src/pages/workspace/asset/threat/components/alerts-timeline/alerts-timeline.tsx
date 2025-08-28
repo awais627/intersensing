@@ -2,11 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { classNames } from 'utils'
 import { GSection, GTooltip } from 'components/basic-blocks'
 import { LineChart } from 'components/charts/line-chart'
-import {
-	RiErrorWarningLine,
-	RiLoader2Line,
-	RiQuestionLine
-} from 'react-icons/ri'
+import { RiErrorWarningLine, RiQuestionLine } from 'react-icons/ri'
 import { alertFilterOptions, alertTypeFilterOptions } from '../../constants'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
 import { Alert } from '../../../../../../services/telemetry'
@@ -222,20 +218,59 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 						lineWidth={5}
 						data={timelineData}
 						colors={timelineColors}
+						noBottomAxis
 						formatter={timelineDataValueFormatter}
-						tooltipFormator={(point: any) => (
-							<div className="border rounded bg-white shadow-sm p-1 flex space-x-1 items-center text-xs">
-								<RiLoader2Line
-									className="w-5 h-5"
-									style={{ color: point.color }}
-								/>
-								<span>{moment(Number(point.data.x)).format('MMM Do')}</span>:
-								<span className="font-semibold">
-									{timelineDataValueFormatter(Number(point.data.y))}{' '}
-									{point.id.split('.')[0]}{' '}
-								</span>
-							</div>
-						)}
+						tooltipFormator={(point: any) => {
+							// Find the corresponding alert data to get sensor type and other details
+							const alertIndex = point.data.x
+							const alertData = filteredAlerts[alertIndex - 1] // Convert back to array index
+
+							return (
+								<div className="border rounded bg-white shadow-sm p-2 flex flex-col space-y-1 text-xs min-w-[200px]">
+									<div className="flex items-center space-x-2">
+										<div
+											className="w-3 h-3 rounded-full"
+											style={{ backgroundColor: point.color }}
+										/>
+										<span className="font-semibold ">{point.id} Severity</span>
+									</div>
+									<div className="border-t pt-1">
+										<div className="flex justify-between">
+											<span className="text-gray-600">Sensor Type:</span>
+											<span className="font-medium  capitalize">
+												{alertData?.sensor_type || 'Unknown'}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Value:</span>
+											<span className="font-semibold ">
+												{timelineDataValueFormatter(Number(point.data.y))}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Threshold:</span>
+											<span className="font-medium ">
+												{alertData?.operator} {alertData?.threshold}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Machine:</span>
+											<span className="font-medium ">
+												{alertData?.machineId || 'Unknown'}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Time:</span>
+											<span className="font-medium ">
+												{moment(alertData?.triggered_at).format(
+													'MMM Do, HH:mm'
+												)}
+											</span>
+										</div>
+									</div>
+								</div>
+							)
+						}}
 					/>
 				) : (
 					emptyState
