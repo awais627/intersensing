@@ -34,8 +34,6 @@ export const LineChart = ({
 		}
 	}
 
-
-
 	return (
 		<div className={`${className} h-[250px]`}>
 			<ResponsiveLine
@@ -44,7 +42,6 @@ export const LineChart = ({
 				margin={{ top: 20, right: 0, bottom: 20, left: 40 }}
 				colors={formattedColors}
 				curve={'monotoneX'}
-
 				axisLeft={{
 					renderTick: (tick) => {
 						const value = formatter(tick.value).replace(',', '')
@@ -58,7 +55,9 @@ export const LineChart = ({
 									fontSize={10}
 									fill="var(--color-gray-500)"
 								>
-									{abbreviate ? formatNumberAbbreviation(Number(value) || 0, false, 1) : value}
+									{abbreviate
+										? formatNumberAbbreviation(Number(value) || 0, false, 1)
+										: value}
 								</text>
 							</g>
 						)
@@ -111,7 +110,7 @@ export const LineChart = ({
 				tooltip={({ point }) => (
 					<div className="border rounded bg-white shadow-sm p-1 flex space-x-1 items-center text-xs">
 						<RiLoader2Line className="w-5 h-5" style={{ color: point.color }} />
-						<span>{moment(point.data.x).format('MMM Do')}</span>:
+						<span>{moment(Number(point.data.x)).format('MMM Do')}</span>:
 						<span className="font-semibold">
 							{formatter(Number(point.data.y))} {point.id.split('.')[0]}{' '}
 						</span>

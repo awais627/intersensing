@@ -148,6 +148,7 @@ export const ThreadTrafficTimeline = ({
 						enablePoints={false}
 						className="h-[300px]"
 						lineWidth={5}
+						noBottomAxis
 						data={organizedTimelineData}
 						colors={timelineColors}
 						formatter={timelineDataValueFormatter}
