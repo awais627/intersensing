@@ -23,10 +23,10 @@ export class EventsProcessor {
     const mockData: ITelemetry = {
       id: generateId("tele"),
       timestamp: Date.now().toString(),
-      Temperature: 20 + Math.random() * 20,
-      Humidity: 40 + Math.random() * 30,
+      Temperature: Math.random() < 0.1 ? (Math.random() < 0.5 ? 5 + Math.random() * 5 : 35 + Math.random() * 15) : 10 + Math.random() * 25,
+      Humidity: Math.random() < 0.1 ? (Math.random() < 0.5 ? 15 + Math.random() * 10 : 75 + Math.random() * 10) : 30 + Math.random() * 40,
       TVOC: Math.floor(Math.random() * 100),
-      eCO2: 400 + Math.floor(Math.random() * 600),
+      eCO2: Math.random() < 0.1 ? 1000 + Math.floor(Math.random() * 500) : 400 + Math.floor(Math.random() * 400),
       "Raw H2": 10000 + Math.floor(Math.random() * 5000),
       "Raw Ethanol": 15000 + Math.floor(Math.random() * 8000),
       Pressure: 900 + Math.random() * 100,

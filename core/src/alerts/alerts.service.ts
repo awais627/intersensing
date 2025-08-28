@@ -3,6 +3,9 @@ import { Collection, ObjectId } from "mongodb";
 import { MongoService } from "../common/common/src/mongo.service";
 import { IAlert, IAlertRule } from "../common/interfaces/alert";
 import { ITelemetry } from "../common/interfaces/telemetry";
+import { TelemetryService } from "../common/common/src/services/telemetry.service";
+// import { TelemetryService } from "../common/common/src/services/telemetry.service";
+
 
 @Injectable()
 export class AlertsService {
@@ -11,42 +14,147 @@ export class AlertsService {
 
   private readonly defaultRules: IAlertRule[] = [
     {
-      rule_id: "temp-high-01",
+    // Low Temperature - Warning
+      rule_id: "temp-low-01",
       sensor_type: "Temperature",
-      threshold: 30,
-      operator: ">=",
-    //   persistence: "30s",
-      notify: ["email", "in-app"],
-      severity: "warning",
+      threshold: 10,
+      operator: "<",
+      notify: ["in-app", "email"],
+      severity: "critical",
       enabled: true,
     },
+    // High Temperature - Critical
+    {
+      rule_id: "temp-high-01",
+      sensor_type: "Temperature",
+      threshold: 35,
+      operator: ">=",
+      notify: ["in-app", "email"],
+      severity: "critical",
+      enabled: true,
+    },
+    // Low Humidity - Warning
     {
       rule_id: "humidity-low-01",
       sensor_type: "Humidity",
-      threshold: 20,
+      threshold: 30,
       operator: "<=",
-    //   persistence: "60s",
       notify: ["in-app"],
-      severity: "medium",
+      severity: "warning", // dry air discomfort
       enabled: true,
     },
+    // Low Humidity - Critical
+    {
+      rule_id: "humidity-low-02",
+      sensor_type: "Humidity",
+      threshold: 20,
+      operator: "<=",
+      notify: ["in-app", "email"],
+      severity: "critical", // risk to electronics / severe dryness
+      enabled: true,
+    },
+    // High Humidity - Warning
+    {
+      rule_id: "humidity-high-01",
+      sensor_type: "Humidity",
+      threshold: 65,
+      operator: ">=",
+      notify: ["in-app"],
+      severity: "warning", // uncomfortable / possible condensation
+      enabled: true,
+    },
+    // High Humidity - Critical
+    {
+      rule_id: "humidity-high-02",
+      sensor_type: "Humidity",
+      threshold: 75,
+      operator: ">=",
+      notify: ["in-app", "email", "sms"],
+      severity: "critical", // mold growth risk / damage to items
+      enabled: true,
+    },
+    // Moderate eCO2 - Warning
+    {
+      rule_id: "co2-warning-01",
+      sensor_type: "eCO2",
+      threshold: 700,
+      operator: ">=",
+      notify: ["in-app"],
+      severity: "warning",
+      enabled: true,
+    },
+    // High eCO2 - Warning
+    {
+      rule_id: "co2-warning-02",
+      sensor_type: "eCO2",
+      threshold: 1000,
+      operator: ">=",
+      notify: ["in-app", "email"],
+      severity: "warning",
+      enabled: true,
+    },
+    // Critical eCO2
     {
       rule_id: "co2-critical-01",
       sensor_type: "eCO2",
-      threshold: 800,
+      threshold: 1200,
       operator: ">=",
-    //   persistence: "10s",
-      notify: ["email", "in-app"],
+      notify: ["email", "in-app", "sms"],
       severity: "critical",
       enabled: true,
     },
   ];
 
-  constructor(private readonly mongoService: MongoService) {}
+  constructor(
+    private readonly mongoService: MongoService, 
+    private readonly telemetryService: TelemetryService,
+  ) {}
 
+  // async checkTelemetryForAlerts(telemetry: ITelemetry): Promise<IAlert[]> {
+  //   const triggeredAlerts: IAlert[] = [];
+  //   const rules = this.defaultRules;
+
+  //   for (const rule of rules) {
+  //     if (!rule.enabled) continue;
+
+  //     const sensorValue = telemetry[rule.sensor_type];
+  //     if (sensorValue === undefined || sensorValue === null) continue;
+
+  //     if (this.evaluateCondition(sensorValue, rule.threshold, rule.operator)) {
+  //       const alert: IAlert = {
+  //         rule_id: rule.rule_id,
+  //         sensor_type: rule.sensor_type,
+  //         threshold: rule.threshold,
+  //         operator: rule.operator,
+  //       //   persistence: rule.persistence,
+  //         notify: rule.notify,
+  //         severity: rule.severity,
+  //         triggered_at: new Date(),
+  //         telemetry_data: telemetry,
+  //         acknowledged: false,
+  //         createdAt: new Date(),
+  //         updatedAt: new Date(),
+  //       };
+
+  //       const savedAlert = await this.createAlert(alert);
+  //       triggeredAlerts.push(savedAlert);
+        
+  //       this.logger.warn(
+  //         `Alert triggered: ${rule.rule_id} - ${rule.sensor_type} ${rule.operator} ${rule.threshold} (actual: ${sensorValue})`
+  //       );
+  //     }
+  //   }
+
+  //   return triggeredAlerts;
+  // }
   async checkTelemetryForAlerts(telemetry: ITelemetry): Promise<IAlert[]> {
     const triggeredAlerts: IAlert[] = [];
-    const rules = this.defaultRules;
+
+    // Sort rules: highest threshold first
+    const rules = [...this.defaultRules].sort((a, b) => b.threshold - a.threshold);
+
+    // Keep track of sensors that already triggered
+    const triggeredSensors = new Set<string>();
 
     for (const rule of rules) {
       if (!rule.enabled) continue;
@@ -54,13 +162,15 @@ export class AlertsService {
       const sensorValue = telemetry[rule.sensor_type];
       if (sensorValue === undefined || sensorValue === null) continue;
 
+      // Skip if this sensor already triggered an alert
+      if (triggeredSensors.has(rule.sensor_type)) continue;
+
       if (this.evaluateCondition(sensorValue, rule.threshold, rule.operator)) {
         const alert: IAlert = {
           rule_id: rule.rule_id,
           sensor_type: rule.sensor_type,
           threshold: rule.threshold,
           operator: rule.operator,
-        //   persistence: rule.persistence,
           notify: rule.notify,
           severity: rule.severity,
           triggered_at: new Date(),
@@ -72,7 +182,9 @@ export class AlertsService {
 
         const savedAlert = await this.createAlert(alert);
         triggeredAlerts.push(savedAlert);
-        
+
+        triggeredSensors.add(rule.sensor_type); // prevent more alerts for same sensor
+
         this.logger.warn(
           `Alert triggered: ${rule.rule_id} - ${rule.sensor_type} ${rule.operator} ${rule.threshold} (actual: ${sensorValue})`
         );
@@ -328,5 +440,148 @@ export class AlertsService {
     }
     return this.alertsCollection;
   }
+
+  async getMachinesLatestStatus() {
+    const telemetryCol = await this.telemetryService.getCollection();
+    const alertsCol = await this.getAlertsCollection();
+
+    // Step 1: Get latest telemetry for each machine
+    const latestTelemetry = await telemetryCol.aggregate([
+      { $sort: { timestamp: -1 } },
+      {
+        $group: {
+          _id: "$machineId",
+          lastTelemetryAt: { $first: "$timestamp" },
+          telemetryId: { $first: "$_id" }
+        }
+      },
+    ]).toArray();
+
+    // Step 2: For each machine, check the latest alert by referenced telemetry ID
+    const results = [];
+    for (const { _id: machineId, lastTelemetryAt, telemetryId } of latestTelemetry) {
+      const latestAlert = await alertsCol.findOne(
+        { "telemetry_data._id": telemetryId },
+        { sort: { triggered_at: -1 } }
+      );
+
+      let status: "normal" | "warning" | "critical" = "normal";
+      if (latestAlert) {
+        if (latestAlert.severity === "warning") status = "warning";
+        else if (latestAlert.severity === "critical") status = "critical";
+      }
+
+      results.push({
+        machineId,
+        status,
+        lastTelemetryAt
+      });
+    }
+
+    return results;
+  }
+
+  async getTopOffendingStats(startDate?: string, endDate?: string) {
+    const collection = await this.getAlertsCollection();
+
+    const match: Record<string, any> = {};
+    if (startDate || endDate) {
+      match.triggered_at = {};
+      if (startDate) match.triggered_at.$gte = new Date(startDate);
+      if (endDate) match.triggered_at.$lte = new Date(endDate);
+    }
+
+    const [result] = await collection.aggregate([
+      { $match: match },
+      {
+        $facet: {
+          topMachines: [
+            // count per (machineId, severity)
+            {
+              $group: {
+                _id: {
+                  machineId: "$telemetry_data.machineId",
+                  severity: "$severity",
+                },
+                count: { $sum: 1 },
+              },
+            },
+            // pivot severities -> critical, warning
+            {
+              $group: {
+                _id: "$_id.machineId",
+                critical: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "critical"] }, "$count", 0],
+                  },
+                },
+                warning: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "warning"] }, "$count", 0],
+                  },
+                },
+                total: { $sum: "$count" },
+              },
+            },
+            // order by critical first, then warning, then total
+            { $sort: { critical: -1, warning: -1, total: -1 } },
+            {
+              $project: {
+                _id: 0,
+                machineId: "$_id",
+                critical: 1,
+                warning: 1,
+                total: 1,
+              },
+            },
+          ],
+          topParameters: [
+            // count per (sensor_type, severity)
+            {
+              $group: {
+                _id: { param: "$sensor_type", severity: "$severity" },
+                count: { $sum: 1 },
+              },
+            },
+            // pivot severities -> critical, warning
+            {
+              $group: {
+                _id: "$_id.param",
+                critical: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "critical"] }, "$count", 0],
+                  },
+                },
+                warning: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "warning"] }, "$count", 0],
+                  },
+                },
+                total: { $sum: "$count" },
+              },
+            },
+            // parameter breaches "most often" -> sort by total
+            { $sort: { total: -1, critical: -1, warning: -1 } },
+            {
+              $project: {
+                _id: 0,
+                parameter: "$_id",
+                critical: 1,
+                warning: 1,
+                total: 1,
+              },
+            },
+          ],
+        },
+      },
+    ]).toArray();
+
+    // Always return both arrays (fallback to empty if no alerts)
+    return {
+      topMachines: result?.topMachines ?? [],
+      topParameters: result?.topParameters ?? [],
+    };
+  }
+
 
 }

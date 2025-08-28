@@ -49,7 +49,7 @@ export class TelemetryService {
     return await collection.findOne({ _id: new ObjectId(id) });
   }
 
-  private async getCollection(): Promise<Collection<ITelemetry>> {
+  async getCollection(): Promise<Collection<ITelemetry>> {
     if (!this.collection) {
       const db = this.mongoService.DB;
       const existing = await db
