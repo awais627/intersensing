@@ -63,6 +63,16 @@ export interface MachineCount {
   machineId: string
 }
 
+export interface AlertCount {
+  count: number
+  type: string
+}
+
+export interface AlertCountsResponse {
+  data: AlertCount[]
+  date: string
+}
+
 export const TelemetryService = {
   // Get latest telemetry data
   async getLatest(): Promise<TelemetryData[]> {
@@ -79,6 +89,12 @@ export const TelemetryService = {
   // Get telemetry counts by machine
   async getCountsByMachine(): Promise<MachineCount[]> {
     const { data } = await ApiClient.client.get('/api/telemetry/count/by-machine')
+    return data
+  },
+
+  // Get alert counts by type
+  async getAlertCounts(): Promise<AlertCountsResponse> {
+    const { data } = await ApiClient.client.get('/api/alerts/counts')
     return data
   },
 

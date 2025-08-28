@@ -130,3 +130,72 @@ socket.on('telemetry:error', (response) => {
 - **Automatic Fallback**: Falls back to polling if WebSocket connection fails
 
 For detailed WebSocket documentation, see: **`WEBSOCKET_DOCUMENTATION.md`**
+
+## 🚀 REST API Endpoints
+
+### Base URL
+**API Base URL**: `http://localhost:3000/api`
+
+### Alerts API
+
+#### Get Alert Counts by Type
+
+**Endpoint**: `GET /api/alerts/counts`
+
+**Description**: Returns the total count of alerts grouped by severity type for a specific date.
+
+**Query Parameters**:
+- `date` (optional): Date in YYYY-MM-DD format. Defaults to current day if not provided.
+
+**Example Requests**:
+```bash
+# Get counts for current day
+GET /api/alerts/counts
+
+# Get counts for specific date
+GET /api/alerts/counts?date=2024-01-15
+```
+
+**Response Format**:
+```json
+{
+  "data": [
+    {
+      "count": 258,
+      "type": "warning"
+    },
+    {
+      "count": 234,
+      "type": "high"
+    },
+    {
+      "count": 156,
+      "type": "critical"
+    },
+    {
+      "count": 89,
+      "type": "medium"
+    },
+    {
+      "count": 45,
+      "type": "low"
+    }
+  ],
+  "date": "2024-01-15"
+}
+```
+
+**Response Fields**:
+- `data`: Array of alert count objects
+  - `count`: Number of alerts of this severity type
+  - `type`: Alert severity level (critical, high, warning, medium, low)
+- `date`: Date for which the counts were calculated (YYYY-MM-DD format)
+
+**Error Responses**:
+- `400 Bad Request`: Invalid date format provided
+- `500 Internal Server Error`: Database or server error
+
+**Notes**:
+- Severity types are always returned in the same order: critical, high, warning, medium, low
+- If no alerts exist for a severity type on the specified date, the count will be 0
+- The endpoint automatically handles timezone conversion and date range calculation (00:00:00 to 23:59:59 of the specified date)

@@ -1,6 +1,7 @@
 import { Controller, Get, Query, Param, Patch } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from "@nestjs/swagger";
 import { AlertsService } from "./alerts.service";
+import { AlertCountsResponseDto } from "./dto/alert-count.dto";
 
 @ApiTags("alerts")
 @Controller("api/alerts")
@@ -47,6 +48,27 @@ export class AlertsController {
   @ApiResponse({ status: 200, description: "Today's alerts retrieved successfully" })
   async getTodaysAlerts() {
     return await this.alertsService.getAlertsForDay(new Date());
+  }
+
+  @Get("counts")
+  @ApiOperation({ summary: "Get alert counts by type for a specific date" })
+  @ApiQuery({ name: "date", required: false, description: "Date in YYYY-MM-DD format (defaults to today)" })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Alert counts by type retrieved successfully",
+    type: AlertCountsResponseDto
+  })
+  async getAlertCountsByType(@Query("date") dateStr?: string): Promise<AlertCountsResponseDto> {
+    const date = dateStr ? new Date(dateStr) : new Date();
+    if (isNaN(date.getTime())) {
+      throw new Error("Invalid date format. Use YYYY-MM-DD");
+    }
+    const counts = await this.alertsService.getAlertCountsByType(date);
+    
+    return {
+      data: counts,
+      date: date.toISOString().split('T')[0] // Format as YYYY-MM-DD
+    };
   }
 
   @Patch(":id/acknowledge")

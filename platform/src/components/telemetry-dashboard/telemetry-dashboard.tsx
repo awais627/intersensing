@@ -19,7 +19,8 @@ export const TelemetryDashboard: React.FC = () => {
 		isConnected,
 		refresh,
 		refreshAlerts,
-		machineCounts
+		machineCounts,
+		alertCounts
 	} = useTelemetry()
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
@@ -226,6 +227,32 @@ export const TelemetryDashboard: React.FC = () => {
 		}))
 	}
 
+	const getAlertCountsData = () => {
+		if (!alertCounts?.data || !Array.isArray(alertCounts.data) || alertCounts.data.length === 0) {
+			return [
+				{
+					id: 'No Alerts',
+					value: 0,
+					color: 'gray',
+					variant: '900'
+				}
+			]
+		}
+
+		// Convert alert counts to the format expected by PieCard
+		return alertCounts.data.map((alertCount) => ({
+			id: alertCount.type.charAt(0).toUpperCase() + alertCount.type.slice(1),
+			value: alertCount.count,
+			color: 
+				alertCount.type === 'critical' ? 'red' :
+				alertCount.type === 'high' ? 'orange' :
+				alertCount.type === 'medium' ? 'yellow' :
+				alertCount.type === 'low' ? 'blue' :
+				'green',
+			variant: '900'
+		}))
+	}
+
 	if (error) {
 		return (
 			<div className="flex items-center justify-center h-64">
@@ -312,23 +339,87 @@ export const TelemetryDashboard: React.FC = () => {
 			{/* Charts Grid */}
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="h-full">
+					{/* Alert Counts Summary */}
+					{loading ? (
+						<div className="mb-3 p-2 bg-gray-50 rounded text-center">
+							<div className="text-sm text-gray-600">
+								<span className="inline-flex items-center gap-2">
+									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+									Loading alert counts...
+								</span>
+							</div>
+						</div>
+					) : alertCounts?.data && Array.isArray(alertCounts.data) && alertCounts.data.length > 0 ? (
+						<div className="mb-3 p-2 bg-gray-50 rounded text-center">
+							<div className="text-sm text-gray-600">
+								<span className="font-semibold text-red-600">
+									{alertCounts.data.reduce((sum, alert) => sum + alert.count, 0).toLocaleString()}
+								</span>
+								{' Total Alerts'}
+								{alertCounts.date && (
+									<>
+										{' • '}
+										<span className="font-semibold text-blue-600">
+											{new Date(alertCounts.date).toLocaleDateString()}
+										</span>
+									</>
+								)}
+							</div>
+						</div>
+					) : (
+						<div className="mb-3 p-2 bg-gray-50 rounded text-center">
+							<div className="text-sm text-gray-500">
+								No alert data available
+							</div>
+						</div>
+					)}
+					
 					<PieCard
 						containerClassName="h-full"
-						data={getAlertsData()}
-						label="Active Alerts by Sensor"
-						hasData={alerts.length > 0}
+						data={getAlertCountsData()}
+						label="Active Alerts by Severity"
+						hasData={alertCounts?.data && Array.isArray(alertCounts.data) && alertCounts.data.length > 0}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Recent alerts by sensor type and severity</p>
+								<p>Real-time alert counts by severity level</p>
 								<p className="text-xs text-gray-500">
-									Red: Critical, Orange: High, Yellow: Medium, Blue: Low
+									Red: Critical, Orange: High, Yellow: Medium, Blue: Low, Green: Warning
 								</p>
 								<p className="text-xs text-gray-400 mt-2">
-									Shows last 5 alerts from API + real-time updates
+									Updates automatically via WebSocket when new alerts arrive
+								</p>
+								<p className="text-xs text-blue-500 mt-1">
+									Click refresh button to manually update counts
 								</p>
 							</div>
 						}
 					/>
+					{/* Refresh button for alert counts */}
+					<div className="mt-2 text-center">
+						<button
+							onClick={refresh}
+							disabled={loading}
+							className={`px-3 py-1 text-xs rounded transition-colors ${
+								loading 
+									? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+									: 'bg-red-500 text-white hover:bg-red-600'
+							}`}
+							title="Refresh alert counts"
+						>
+							{loading ? '⏳ Loading...' : '🔄 Refresh Alerts'}
+						</button>
+						{/* Connection status indicator */}
+						<div className="mt-1 text-xs">
+							<span className={`inline-flex items-center gap-1 ${
+								isConnected ? 'text-green-600' : 'text-red-600'
+							}`}>
+								<div className={`w-2 h-2 rounded-full ${
+									isConnected ? 'bg-green-500' : 'bg-red-500'
+								}`} />
+								{isConnected ? 'Live Updates' : 'Offline'}
+							</span>
+						</div>
+					</div>
 				</div>
 				<div className="col-span-2 h-full">
 					<ThreadTrafficTimeline telemetryData={telemetryData} />

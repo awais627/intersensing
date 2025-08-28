@@ -148,6 +148,53 @@ export class AlertsService {
     );
   }
 
+  async getAlertCountsByType(date: Date): Promise<Array<{ count: number; type: string }>> {
+    const collection = await this.getAlertsCollection();
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const pipeline = [
+      {
+        $match: {
+          triggered_at: {
+            $gte: startOfDay,
+            $lte: endOfDay
+          }
+        }
+      },
+      {
+        $group: {
+          _id: "$severity",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          type: "$_id",
+          count: 1
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ];
+
+    const result = await collection.aggregate(pipeline).toArray();
+    
+    // Ensure all severity types are represented, even if count is 0
+    const severityTypes = ["critical", "high", "warning", "medium", "low"];
+    const countsMap = new Map(result.map(item => [item.type, item.count]));
+    
+    return severityTypes.map(type => ({
+      count: countsMap.get(type) || 0,
+      type
+    }));
+  }
+
   private async getAlertsCollection(): Promise<Collection<IAlert>> {
     if (!this.alertsCollection) {
       const db = this.mongoService.DB;
