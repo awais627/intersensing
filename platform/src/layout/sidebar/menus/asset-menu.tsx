@@ -1,8 +1,4 @@
-import {
-	RiAlertLine,
-	RiDonutChartLine,
-	RiFolderChartLine
-} from 'react-icons/ri'
+import { RiAlertLine, RiFolderChartLine } from 'react-icons/ri'
 import { GTransition } from 'components/basic-blocks'
 import { NavItem } from 'layout/sidebar/nav-item'
 import { SiOpentelemetry } from 'react-icons/si'
@@ -13,11 +9,6 @@ export const AssetMenu = () => {
 			<div>
 				<div>
 					<div className="pl-2">
-						<NavItem
-							label="Dashboard"
-							to={() => `/dashboard`}
-							icon={RiDonutChartLine}
-						/>
 						<NavItem
 							label="Telemetry"
 							to={() => `/telemetry`}
