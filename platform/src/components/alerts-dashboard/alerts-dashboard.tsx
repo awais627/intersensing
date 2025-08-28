@@ -7,7 +7,11 @@ import {
 	FaExclamationTriangle,
 	FaInfoCircle
 } from 'react-icons/fa'
-import { Alert, AlertService, RecentAlertsResponse, AlertSeverityCountsResponse } from 'services/telemetry'
+import {
+	Alert,
+	AlertService,
+	AlertSeverityCountsResponse
+} from 'services/telemetry'
 import { socketService } from 'services/socket'
 import { AlertsTimeline } from '../../pages/workspace/asset/threat/components/alerts-timeline'
 
@@ -32,15 +36,15 @@ export const AlertsDashboard: React.FC = () => {
 	const [totalPages, setTotalPages] = useState(1)
 	const [alertsPerPage] = useState(10)
 	const [totalAlertsCount, setTotalAlertsCount] = useState(0)
-	
+
 	// Severity counts for metrics - updated in real-time via socket
-	const [severityCounts, setSeverityCounts] = useState<AlertSeverityCountsResponse | null>(null)
+	const [severityCounts, setSeverityCounts] =
+		useState<AlertSeverityCountsResponse | null>(null)
 	const [severityCountsLoading, setSeverityCountsLoading] = useState(false)
-	
+
 	// Timeline data - last 25 records, updated in real-time
 	const [timelineAlerts, setTimelineAlerts] = useState<Alert[]>([])
 	const [timelineLoading, setTimelineLoading] = useState(false)
-
 
 	// Fetch alerts for current page (always exactly 10 records per page)
 	const fetchAlertsForPage = async (page: number = 1) => {
@@ -48,7 +52,7 @@ export const AlertsDashboard: React.FC = () => {
 			setAlertsLoading(true)
 			const offset = (page - 1) * alertsPerPage
 			const response = await AlertService.getRecentAlerts(alertsPerPage, offset)
-			
+
 			// Ensure we only set exactly the number of alerts for this page
 			// This prevents socket updates from affecting pagination
 			setAllAlerts(response.alerts.slice(0, alertsPerPage))
@@ -87,16 +91,12 @@ export const AlertsDashboard: React.FC = () => {
 		}
 	}
 
-
-
 	// Initialize alerts data
 	useEffect(() => {
 		fetchAlertsForPage(1)
 		fetchSeverityCounts(1) // Default to 1 day
 		fetchTimelineAlerts() // Fetch timeline alerts
 	}, [])
-
-
 
 	// Subscribe to real-time alerts updates
 	useEffect(() => {
@@ -109,7 +109,7 @@ export const AlertsDashboard: React.FC = () => {
 					resolved: newAlert.resolved || false,
 					machineId: newAlert.telemetry_data?.machineId || 'Unknown'
 				}
-				
+
 				// Update timeline alerts with new alert
 				setTimelineAlerts((prev) => {
 					const updated = [alertWithDefaults, ...prev]
@@ -127,10 +127,10 @@ export const AlertsDashboard: React.FC = () => {
 				// Update severity counts in real-time
 				setSeverityCounts((prev) => {
 					if (!prev) return prev
-					
+
 					// Create updated counts object
 					const updatedCounts = { ...prev }
-					
+
 					// Update the specific severity count
 					switch (newAlert.severity) {
 						case 'critical':
@@ -149,15 +149,15 @@ export const AlertsDashboard: React.FC = () => {
 							// Handle any other severity types
 							break
 					}
-					
+
 					// Update total count
 					updatedCounts.total += 1
-					
+
 					// Update resolved count if the alert is resolved
 					if (newAlert.resolved) {
 						updatedCounts.resolved += 1
 					}
-					
+
 					return updatedCounts
 				})
 
@@ -190,7 +190,7 @@ export const AlertsDashboard: React.FC = () => {
 					resolved: latestAlert.resolved || false,
 					machineId: latestAlert.telemetry_data?.machineId || 'Unknown'
 				}
-				
+
 				// Update timeline alerts with new alert
 				setTimelineAlerts((prev) => {
 					const updated = [alertWithDefaults, ...prev]
@@ -208,10 +208,10 @@ export const AlertsDashboard: React.FC = () => {
 				// Update severity counts in real-time
 				setSeverityCounts((prev) => {
 					if (!prev) return prev
-					
+
 					// Create updated counts object
 					const updatedCounts = { ...prev }
-					
+
 					// Update the specific severity count
 					switch (latestAlert.severity) {
 						case 'critical':
@@ -230,15 +230,15 @@ export const AlertsDashboard: React.FC = () => {
 							// Handle any other severity types
 							break
 					}
-					
+
 					// Update total count
 					updatedCounts.total += 1
-					
+
 					// Update resolved count if the alert is resolved
 					if (latestAlert.resolved) {
 						updatedCounts.resolved += 1
 					}
-					
+
 					return updatedCounts
 				})
 
@@ -279,12 +279,6 @@ export const AlertsDashboard: React.FC = () => {
 	// Get alert metrics from API data
 	const getAlertMetrics = () => {
 		if (!severityCounts) return []
-
-
-
-
-
-
 
 		return [
 			{
@@ -344,7 +338,6 @@ export const AlertsDashboard: React.FC = () => {
 		]
 	}
 
-
 	const handlePageChange = async (page: number) => {
 		if (page === currentPage) return
 		setCurrentPage(page)
@@ -388,56 +381,42 @@ export const AlertsDashboard: React.FC = () => {
 						? 'Connected to IoT Device'
 						: 'Disconnected from IoT Device'}
 				</span>
-
-
-
-				{/* Alerts Counter */}
-				{totalAlertsCount > 0 && (
-					<div className="flex items-center gap-2 ml-4">
-						<FaBell className="text-red-500" />
-						<span className="text-red-600 font-semibold">
-							{totalAlertsCount} Total Alerts
-						</span>
-					</div>
-				)}
 			</div>
 
 			{/* Alert Metrics */}
 			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
-				{severityCountsLoading ? (
-					// Loading skeleton for metrics
-					Array.from({ length: 6 }).map((_, index) => (
-						<div
-							key={index}
-							className="bg-white p-4 rounded-lg border border-card-border animate-pulse"
-						>
-							<div className="flex items-center justify-between mb-2">
-								<div className="w-5 h-5 bg-gray-300 rounded"></div>
-								<div className="w-20 h-3 bg-gray-300 rounded"></div>
-							</div>
-							<div className="w-16 h-8 bg-gray-300 rounded"></div>
-						</div>
-					))
-				) : (
-					metrics.map((metric, index) => {
-						const IconComponent = metric.icon
-						return (
+				{severityCountsLoading
+					? // Loading skeleton for metrics
+					  Array.from({ length: 6 }).map((_, index) => (
 							<div
 								key={index}
-								className="bg-white p-4 rounded-lg border border-card-border"
+								className="bg-white p-4 rounded-lg border border-card-border animate-pulse"
 							>
 								<div className="flex items-center justify-between mb-2">
-									<IconComponent className={`w-5 h-5 ${metric.color}`} />
-									<span className="text-xs text-gray-500">{metric.label}</span>
+									<div className="w-5 h-5 bg-gray-300 rounded"></div>
+									<div className="w-20 h-3 bg-gray-300 rounded"></div>
 								</div>
-								<div className="text-2xl font-bold ">{metric.value}</div>
+								<div className="w-16 h-8 bg-gray-300 rounded"></div>
 							</div>
-						)
-					})
-				)}
+					  ))
+					: metrics.map((metric, index) => {
+							const IconComponent = metric.icon
+							return (
+								<div
+									key={index}
+									className="bg-white p-4 rounded-lg border border-card-border"
+								>
+									<div className="flex items-center justify-between mb-2">
+										<IconComponent className={`w-5 h-5 ${metric.color}`} />
+										<span className="text-xs text-gray-500">
+											{metric.label}
+										</span>
+									</div>
+									<div className="text-2xl font-bold ">{metric.value}</div>
+								</div>
+							)
+					  })}
 			</div>
-
-
 
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="col-span-3 h-full">

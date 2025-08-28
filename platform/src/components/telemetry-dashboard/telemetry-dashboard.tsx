@@ -3,7 +3,7 @@ import { useTelemetry } from 'hooks/useTelemetry'
 import { AnalyticsItem } from 'components/analytics-item'
 import { PieCard } from 'components/pie-card'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
-import { FaBell, FaBug, FaLeaf, FaWind } from 'react-icons/fa'
+import { FaBug, FaLeaf, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
 import { Alert, TelemetryData } from 'services/telemetry'
@@ -296,25 +296,6 @@ export const TelemetryDashboard: React.FC = () => {
 						? 'Connected to IoT Device'
 						: 'Disconnected from IoT Device'}
 				</span>
-
-				{/* Machine ID Display */}
-				{latestData?.machineId && (
-					<div className="flex items-center gap-2 ml-4">
-						<span className="text-gray-600 font-medium">
-							Machine: {latestData.machineId}
-						</span>
-					</div>
-				)}
-
-				{/* Alerts Counter */}
-				{alerts.length > 0 && (
-					<div className="flex items-center gap-2 ml-4">
-						<FaBell className="text-red-500" />
-						<span className="text-red-600 font-semibold">
-							{alerts.length} Active Alerts
-						</span>
-					</div>
-				)}
 			</div>
 
 			<div className="flex py-2 items-stretch bg-white rounded-lg divide-x border border-card-border w-full">
