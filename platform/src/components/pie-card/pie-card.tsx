@@ -23,7 +23,8 @@ export const PieCard = (props: PieCardProps) => {
 		infoTooltip,
 		isFilteringByCampaign = false,
 		containerClassName,
-		hasData
+		hasData,
+		totalValue
 	} = props
 
 	const tooltipMessage = isFilteringByCampaign
@@ -61,6 +62,7 @@ export const PieCard = (props: PieCardProps) => {
 										data={data}
 										currencyValue={currencyValue}
 										currency={'usd'}
+										totalValue={totalValue}
 									/>
 								</div>
 								<div className="w-1/2 ml-2">

@@ -12,6 +12,7 @@ export interface PieCardProps {
 	noData?: boolean
 	containerClassName?: string
 	hasData?: boolean
+	totalValue?: string
 }
 
 export interface item {

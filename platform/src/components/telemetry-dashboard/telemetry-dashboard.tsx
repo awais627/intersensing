@@ -385,9 +385,13 @@ export const TelemetryDashboard: React.FC = () => {
 						data={getTemperatureData()}
 						label="Real-time Temperature Trend"
 						hasData={telemetryData.length > 0}
+						totalValue={telemetryData.length > 0 ? (telemetryData.reduce((sum, item) => sum + item.Temperature, 0) / telemetryData.length).toFixed(1) + '°C' : '0°C'}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Real-time temperature measurements</p>
+								<p>Individual device temperature readings</p>
+								<p className="text-xs text-gray-500">
+									Center shows average temperature
+								</p>
 								<p className="text-xs text-gray-500">
 									Green: Optimal, Yellow: Warm, Red: Hot
 								</p>
@@ -401,9 +405,13 @@ export const TelemetryDashboard: React.FC = () => {
 						data={getHumidityData()}
 						label="Real-time Humidity Trend"
 						hasData={telemetryData.length > 0}
+						totalValue={telemetryData.length > 0 ? (telemetryData.reduce((sum, item) => sum + item.Humidity, 0) / telemetryData.length).toFixed(1) + '%' : '0%'}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Real-time humidity measurements</p>
+								<p>Individual device humidity readings</p>
+								<p className="text-xs text-gray-500">
+									Center shows average humidity
+								</p>
 								<p className="text-xs text-gray-500">
 									Green: Optimal, Yellow: Low, Red: High
 								</p>
@@ -417,9 +425,13 @@ export const TelemetryDashboard: React.FC = () => {
 						data={getAirQualityData()}
 						label="Real-time Air Quality (eCO2)"
 						hasData={telemetryData.length > 0}
+						totalValue={telemetryData.length > 0 ? (telemetryData.reduce((sum, item) => sum + item['eCO2'], 0) / telemetryData.length).toFixed(0) + ' ppm' : '0 ppm'}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Real-time eCO2 measurements</p>
+								<p>Individual device eCO2 readings</p>
+								<p className="text-xs text-gray-500">
+									Center shows average eCO2 levels
+								</p>
 								<p className="text-xs text-gray-500">
 									Green: Good, Yellow: Moderate, Red: Poor
 								</p>

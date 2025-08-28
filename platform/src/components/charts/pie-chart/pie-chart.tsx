@@ -34,13 +34,9 @@ export const PieChart = ({
 						justifyContent: 'center'
 					}}
 				>
-					{currencyValue
-						? totalValue
-							? formatSpendWithCurrency(totalValue, currency)
-							: formatSpendWithCurrency(total, currency)
-						: totalValue
-						? totalValue
-						: formatNumber(total)}
+					{totalValue || (currencyValue
+						? formatSpendWithCurrency(total, currency)
+						: formatNumber(total))}
 				</text>
 				<text
 					x={centerX}
@@ -53,7 +49,7 @@ export const PieChart = ({
 						fontSize: '0.75rem'
 					}}
 				>
-					Total
+					{totalValue ? 'Average' : 'Total'}
 				</text>
 			</>
 		)
