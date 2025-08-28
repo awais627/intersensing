@@ -54,8 +54,13 @@ export const AlertsDashboard: React.FC = () => {
 		if (isConnected) {
 			socketService.subscribeToAlerts((newAlert) => {
 				console.log('🚨 New real-time alert received:', newAlert)
-				setAllAlerts((prev) => [newAlert, ...prev])
-				setActiveNotifications((prev) => [newAlert, ...prev])
+				// Ensure resolved property exists
+				const alertWithDefaults = {
+					...newAlert,
+					resolved: newAlert.resolved || false
+				}
+				setAllAlerts((prev) => [alertWithDefaults, ...prev])
+				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
@@ -77,7 +82,12 @@ export const AlertsDashboard: React.FC = () => {
 			const latestAlert = alerts[0]
 			if (!activeNotifications.find((n) => n._id === latestAlert._id)) {
 				console.log('🚨 Adding new alert notification:', latestAlert)
-				setActiveNotifications((prev) => [latestAlert, ...prev])
+				// Ensure resolved property exists
+				const alertWithDefaults = {
+					...latestAlert,
+					resolved: latestAlert.resolved || false
+				}
+				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
@@ -265,7 +275,7 @@ export const AlertsDashboard: React.FC = () => {
 
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="col-span-3 h-full">
-					<AlertsTimeline telemetryData={[]} />
+					<AlertsTimeline alerts={allAlerts} />
 				</div>
 			</div>
 

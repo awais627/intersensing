@@ -12,6 +12,8 @@ export interface Alert {
   telemetry_data: TelemetryData
   acknowledged: boolean
   acknowledged_at?: string | Date
+  resolved: boolean
+  resolved_at?: string | Date
   createdAt: string | Date
   updatedAt: string | Date
 }
@@ -114,5 +116,10 @@ export const AlertService = {
   // Acknowledge an alert
   async ackAlert(alertId: string): Promise<void> {
     await ApiClient.client.patch(`/api/alerts/${alertId}/acknowledge`)
+  },
+
+  // Resolve an alert
+  async resolveAlert(alertId: string): Promise<void> {
+    await ApiClient.client.patch(`/api/alerts/${alertId}/resolve`)
   }
 }

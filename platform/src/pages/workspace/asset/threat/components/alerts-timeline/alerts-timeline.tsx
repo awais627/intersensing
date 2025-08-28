@@ -3,69 +3,137 @@ import { classNames } from 'utils'
 import { GSection, GTooltip } from 'components/basic-blocks'
 import { LineChart } from 'components/charts/line-chart'
 import { RiErrorWarningLine, RiQuestionLine } from 'react-icons/ri'
-import { cardFilterOptions } from '../../constants'
+import { alertFilterOptions, alertTypeFilterOptions } from '../../constants'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
-import { TelemetryData } from '../../../../../../services/telemetry'
+import { Alert } from '../../../../../../services/telemetry'
 
 export const AlertsTimeline = ({
-	telemetryData
+	alerts
 }: {
-	telemetryData: TelemetryData[]
+	alerts: Alert[]
 }) => {
 	const [type, setType] = useState<'DAY' | 'WEEK' | 'MONTH'>('DAY')
-	const [selectedMetric, setSelectedMetric] = useState<{
+	const [selectedSeverity, setSelectedSeverity] = useState<{
 		name: string
 		type: string
-	}>(cardFilterOptions[0])
+	}>(alertFilterOptions[0])
+	const [selectedAlertType, setSelectedAlertType] = useState<{
+		name: string
+		type: string
+	}>(alertTypeFilterOptions[0])
 
-	// demo timeline data
+	// Filter alerts based on selected severity and type
+	const filteredAlerts = useMemo(() => {
+		let filtered = alerts
 
-	// example mapping
-	const mappedData = [
-		{
-			id: 'Temperature',
-			data: telemetryData.map((d) => ({
-				x: d.timestamp, // or new Date(d.timestamp).toISOString().slice(0, 10)
-				y: d.Temperature
-			}))
-		},
-		{
-			id: 'Humidity',
-			data: telemetryData.map((d) => ({
-				x: d.timestamp,
-				y: d.Humidity
-			}))
-		},
-		{
-			id: 'Pressure',
-			data: telemetryData.map((d) => ({
-				x: d.timestamp,
-				y: d.Pressure
-			}))
+		// Filter by severity
+		if (selectedSeverity.type !== 'all') {
+			if (selectedSeverity.type === 'resolved') {
+				filtered = filtered.filter(alert => alert.resolved)
+			} else {
+				filtered = filtered.filter(alert => alert.severity === selectedSeverity.type)
+			}
 		}
+
+		// Filter by alert type
+		if (selectedAlertType.type !== 'all') {
+			filtered = filtered.filter(alert => alert.sensor_type === selectedAlertType.type)
+		}
+
+		return filtered
+	}, [alerts, selectedSeverity, selectedAlertType])
+
+	// Group alerts by date for timeline visualization
+	const timelineData = useMemo(() => {
+		const alertsByDate = filteredAlerts.reduce((acc, alert) => {
+			const date = new Date(alert.triggered_at).toISOString().split('T')[0]
+			if (!acc[date]) {
+				acc[date] = {
+					critical: 0,
+					high: 0,
+					medium: 0,
+					low: 0,
+					warning: 0
+				}
+			}
+			acc[date][alert.severity as keyof (typeof acc)[typeof date]]++
+			return acc
+		}, {} as Record<string, { critical: number; high: number; medium: number; low: number; warning: number }>)
+
+		// Get all dates and add next 5 dates with zero values
+		const allDates = new Set<string>()
+		Object.keys(alertsByDate).forEach(date => allDates.add(date))
+		
+		// Add next 5 dates if we have existing dates
+		if (allDates.size > 0) {
+			const lastDate = new Date(Math.max(...Array.from(allDates).map(d => new Date(d).getTime())))
+			for (let i = 1; i <= 5; i++) {
+				const nextDate = new Date(lastDate)
+				nextDate.setDate(nextDate.getDate() + i)
+				const nextDateStr = nextDate.toISOString().split('T')[0]
+				allDates.add(nextDateStr)
+				
+				// Initialize with zero values
+				if (!alertsByDate[nextDateStr]) {
+					alertsByDate[nextDateStr] = {
+						critical: 0,
+						high: 0,
+						medium: 0,
+						low: 0,
+						warning: 0
+					}
+				}
+			}
+		}
+
+		// Convert to chart format
+		const dates = Array.from(allDates).sort()
+		return [
+			{
+				id: 'Critical',
+				data: dates.map((date) => ({
+					x: date,
+					y: alertsByDate[date]?.critical || 0
+				}))
+			},
+			{
+				id: 'High',
+				data: dates.map((date) => ({
+					x: date,
+					y: alertsByDate[date]?.high || 0
+				}))
+			},
+			{
+				id: 'Medium',
+				data: dates.map((date) => ({
+					x: date,
+					y: alertsByDate[date]?.medium || 0
+				}))
+			},
+			{
+				id: 'Low',
+				data: dates.map((date) => ({
+					x: date,
+					y: alertsByDate[date]?.low || 0
+				}))
+			},
+			{
+				id: 'Warning',
+				data: dates.map((date) => ({
+					x: date,
+					y: alertsByDate[date]?.warning || 0
+				}))
+			}
+		]
+	}, [filteredAlerts])
+
+	const timelineColors = [
+		{ color: 'red', shade: 500 },    // Critical
+		{ color: 'orange', shade: 500 }, // High
+		{ color: 'yellow', shade: 500 }, // Medium
+		{ color: 'blue', shade: 500 },   // Low
+		{ color: 'amber', shade: 500 }   // Warning
 	]
-
-	const { organizedTimelineData, timelineColors } = useMemo(() => {
-		const temperature = mappedData.filter((d) => d.id === 'Temperature')
-		const humidity = mappedData.filter((d) => d.id === 'Humidity')
-		const pressure = mappedData.filter((d) => d.id === 'Pressure')
-
-		return {
-			organizedTimelineData:
-				selectedMetric.type === 'humidity'
-					? humidity
-					: selectedMetric.type === 'temperature'
-					? temperature
-					: pressure,
-			timelineColors: [
-				selectedMetric.type === 'humidity'
-					? { color: 'blue', shade: 500 }
-					: selectedMetric.type === 'temperature'
-					? { color: 'red', shade: 500 }
-					: { color: 'amber', shade: 500 }
-			]
-		}
-	}, [selectedMetric, telemetryData])
 
 	const timelineDataValueFormatter = (value: number) => value.toLocaleString()
 
@@ -73,10 +141,10 @@ export const AlertsTimeline = ({
 		<div className="flex flex-col items-center justify-center w-full p-8 text-center">
 			<RiErrorWarningLine className="w-8 h-8 text-gray-500" />
 			<h3 className="mt-2 text-md font-medium text-gray-700">
-				No traffic data
+				No alerts data
 			</h3>
 			<p className="mt-1 text-md text-gray-500">
-				Select a different time period
+				Select different filters or time period
 			</p>
 		</div>
 	)
@@ -86,23 +154,35 @@ export const AlertsTimeline = ({
 			<GSection containerClassName="border border-card-border h-[400px] -mb-6">
 				<div className="flex justify-between items-center h-full">
 					<div className="flex flex-row items-center gap-x-1 text-xl font-bold">
-						Real-time trend
+						Alerts Timeline
 						<GTooltip
 							content={
 								<div className="flex flex-col font-normal">
-									Timeline of live number of {selectedMetric.name.toLowerCase()}
+									Timeline of alerts by severity and sensor type
 								</div>
 							}
 						>
 							<RiQuestionLine className="w-3.5 h-3.5 text-t-dark" />
 						</GTooltip>
 					</div>
-					<div className="flex items-center justify-end">
+					<div className="flex items-center justify-end gap-4">
+						{/* Severity Filter */}
 						<div className="pr-4">
 							<AvailableMetrics
-								availableMetrics={cardFilterOptions}
-								selectedMetric={selectedMetric}
-								setSelectedMetric={setSelectedMetric}
+								availableMetrics={alertFilterOptions}
+								selectedMetric={selectedSeverity}
+								setSelectedMetric={setSelectedSeverity}
+								assetId=""
+								page="threat"
+								card="device"
+							/>
+						</div>
+						{/* Alert Type Filter */}
+						<div className="pr-4">
+							<AvailableMetrics
+								availableMetrics={alertTypeFilterOptions}
+								selectedMetric={selectedAlertType}
+								setSelectedMetric={setSelectedAlertType}
 								assetId=""
 								page="threat"
 								card="device"
@@ -143,12 +223,12 @@ export const AlertsTimeline = ({
 						</div>
 					</div>
 				</div>
-				{telemetryData?.length ? (
+				{filteredAlerts.length > 0 ? (
 					<LineChart
 						enablePoints={false}
 						className="h-[300px]"
 						lineWidth={5}
-						data={organizedTimelineData}
+						data={timelineData}
 						colors={timelineColors}
 						formatter={timelineDataValueFormatter}
 					/>

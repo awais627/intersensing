@@ -32,6 +32,27 @@ export const cardFilterOptions = [
 	{ name: 'Humidity', type: 'humidity' }
 ]
 
+export const alertFilterOptions = [
+	{ name: 'All Alerts', type: 'all' },
+	{ name: 'Critical', type: 'critical' },
+	{ name: 'High', type: 'high' },
+	{ name: 'Medium', type: 'medium' },
+	{ name: 'Low', type: 'low' },
+	{ name: 'Warning', type: 'warning' },
+	{ name: 'Resolved', type: 'resolved' }
+]
+
+export const alertTypeFilterOptions = [
+	{ name: 'All Types', type: 'all' },
+	{ name: 'Temperature', type: 'Temperature' },
+	{ name: 'Humidity', type: 'Humidity' },
+	{ name: 'Pressure', type: 'Pressure' },
+	{ name: 'Air Quality', type: 'eCO2' },
+	{ name: 'TVOC', type: 'TVOC' },
+	{ name: 'PM1.0', type: 'PM1.0' },
+	{ name: 'PM2.5', type: 'PM2.5' }
+]
+
 export const repeatedClicksFilterOptions = [
 	{ name: 'IP address', type: 'ip' },
 	{ name: 'Device', type: 'device' }
