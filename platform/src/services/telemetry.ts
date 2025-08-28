@@ -1,7 +1,24 @@
 import { ApiClient } from './api-client'
 
+export interface Alert {
+  _id?: string
+  rule_id: string
+  sensor_type: string
+  threshold: number
+  operator: '>=' | '<=' | '>' | '<' | '==' | '!='
+  notify: string[]
+  severity: 'low' | 'medium' | 'high' | 'critical' | 'warning'
+  triggered_at: string | Date
+  telemetry_data: TelemetryData
+  resolved: boolean
+  resolved_at?: string | Date
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
 export interface TelemetryData {
   _id: string
+  id: string
   timestamp: string
   Temperature: number
   Humidity: number
@@ -16,8 +33,8 @@ export interface TelemetryData {
   'NC1.0': number
   'NC2.5': number
   CNT: number
-  createdAt: string
-  updatedAt: string
+  createdAt: string | Date
+  updatedAt: string | Date
 }
 
 export interface CreateTelemetryDto {

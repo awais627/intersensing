@@ -22,10 +22,10 @@ export class EventsProcessor {
     const mockData: ITelemetry = {
       id: generateId("tele"),
       timestamp: Date.now().toString(),
-      Temperature: 20 + Math.random() * 20, 
+      Temperature: 20 + Math.random() * 20,
       Humidity: 40 + Math.random() * 30,
       TVOC: Math.floor(Math.random() * 100),
-      eCO2: 400 + Math.floor(Math.random() * 600), 
+      eCO2: 400 + Math.floor(Math.random() * 600),
       "Raw H2": 10000 + Math.floor(Math.random() * 5000),
       "Raw Ethanol": 15000 + Math.floor(Math.random() * 8000),
       Pressure: 900 + Math.random() * 100,
@@ -43,11 +43,12 @@ export class EventsProcessor {
     const savedTelemetry = await this.telemetryService.create(mockData);
 
     // Check for alerts
-    const triggeredAlerts = await this.alertsService.checkTelemetryForAlerts(mockData);
-    
+    const triggeredAlerts =
+      await this.alertsService.checkTelemetryForAlerts(mockData);
+
     // Broadcast telemetry data to connected clients
-    this.telemetryGateway.broadcastTelemetryUpdate(savedTelemetry);
-    
+    this.telemetryGateway.broadcastTelemetryUpdate(mockData);
+
     // Broadcast alerts if any were triggered
     if (triggeredAlerts.length > 0) {
       for (const alert of triggeredAlerts) {

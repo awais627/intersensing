@@ -1,6 +1,6 @@
 import { GSection } from 'components/basic-blocks'
 import { GNewTooltip } from 'components/basic-blocks/g-tooltip/g-new-tooltip'
-import { RiGlobalLine, RiQuestionLine } from 'react-icons/ri'
+import { RiQuestionLine } from 'react-icons/ri'
 import { top10Options } from '../../constants'
 import { PercentageBadge } from '../../../../../../components/analytics-item/percentage-badge'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
@@ -8,6 +8,7 @@ import { TelemetryData } from '../../../../../../services/telemetry'
 
 // Helper function to format numbers with appropriate precision
 const formatNumber = (value: number, unit: string): string => {
+	if (!value) return `${0} ${unit}`
 	if (unit === '°C' || unit === 'hPa') {
 		return `${value.toFixed(2)} ${unit}`
 	}
@@ -51,11 +52,11 @@ export const Top10 = ({
 
 		// Select a metric based on index to show variety
 		const selectedMetric = metrics[index % metrics.length]
-		
+
 		return {
 			entity: selectedMetric.name,
 			type: getTypeForMetric(selectedMetric.name),
-			rate: formatNumber(selectedMetric.value, selectedMetric.unit),
+			rate: formatNumber(selectedMetric?.value, selectedMetric?.unit),
 			timestamp: item.timestamp
 		}
 	})
@@ -99,9 +100,12 @@ export const Top10 = ({
 
 // Helper function to determine type for each metric
 const getTypeForMetric = (metricName: string): string => {
-	if (['Temperature', 'Humidity', 'Pressure'].includes(metricName)) return 'environmental'
-	if (['TVOC', 'eCO2', 'Raw H2', 'Raw Ethanol'].includes(metricName)) return 'airQuality'
-	if (['PM1.0', 'PM2.5', 'NC0.5', 'NC1.0', 'NC2.5'].includes(metricName)) return 'particulate'
+	if (['Temperature', 'Humidity', 'Pressure'].includes(metricName))
+		return 'environmental'
+	if (['TVOC', 'eCO2', 'Raw H2', 'Raw Ethanol'].includes(metricName))
+		return 'airQuality'
+	if (['PM1.0', 'PM2.5', 'NC0.5', 'NC1.0', 'NC2.5'].includes(metricName))
+		return 'particulate'
 	return 'sensor'
 }
 

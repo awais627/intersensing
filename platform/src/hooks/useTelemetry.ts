@@ -1,26 +1,44 @@
 import { useState, useEffect, useCallback } from 'react'
-import { TelemetryService, TelemetryData } from 'services/telemetry'
+import { TelemetryService, TelemetryData, Alert } from 'services/telemetry'
 import { socketService } from 'services/socket'
 
 export const useTelemetry = () => {
   const [telemetryData, setTelemetryData] = useState<TelemetryData[]>([])
   const [latestData, setLatestData] = useState<TelemetryData | null>(null)
+  const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+
+  // Helper function to format dates consistently
+  const formatDate = (date: string | Date): Date => {
+    return typeof date === 'string' ? new Date(date) : date
+  }
 
   // Fetch latest telemetry data
   const fetchLatestData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
+      console.log('🔄 Fetching latest telemetry data...')
       const data = await TelemetryService.getLatest()
-      setTelemetryData(data)
-      if (data.length > 0) {
-        setLatestData(data[0])
+      console.log('📊 Fetched telemetry data:', data)
+      
+      // Ensure dates are properly formatted
+      const formattedData = data.map(item => ({
+        ...item,
+        createdAt: formatDate(item.createdAt),
+        updatedAt: formatDate(item.updatedAt)
+      }))
+      
+      setTelemetryData(formattedData)
+      if (formattedData.length > 0) {
+        setLatestData(formattedData[0])
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch telemetry data')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch telemetry data'
+      console.error('❌ Error fetching telemetry data:', errorMessage)
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -31,11 +49,23 @@ export const useTelemetry = () => {
     try {
       setLoading(true)
       setError(null)
+      console.log('🎲 Generating mock telemetry data...')
       const newData = await TelemetryService.generateMock()
-      setTelemetryData(prev => [newData, ...prev.slice(0, 9)]) // Keep only latest 10
-      setLatestData(newData)
+      console.log('🎲 Generated mock data:', newData)
+      
+      // Ensure dates are properly formatted
+      const formattedData = {
+        ...newData,
+        createdAt: formatDate(newData.createdAt),
+        updatedAt: formatDate(newData.updatedAt)
+      }
+      
+      setTelemetryData(prev => [formattedData, ...prev.slice(0, 19)]) // Keep only latest 20
+      setLatestData(formattedData)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate mock data')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate mock data'
+      console.error('❌ Error generating mock data:', errorMessage)
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -43,38 +73,77 @@ export const useTelemetry = () => {
 
   // Connect to WebSocket and subscribe to real-time updates
   useEffect(() => {
+    console.log('🔌 Setting up WebSocket connection...')
     const socket = socketService.connect()
     
     socket.on('connect', () => {
+      console.log('✅ WebSocket connected in hook')
       setIsConnected(true)
-      console.log('Connected to telemetry WebSocket')
     })
 
     socket.on('disconnect', () => {
+      console.log('❌ WebSocket disconnected in hook')
       setIsConnected(false)
-      console.log('Disconnected from telemetry WebSocket')
     })
 
     // Subscribe to telemetry updates
     socketService.subscribeToTelemetry((newData: TelemetryData) => {
-      setTelemetryData(prev => [newData, ...prev.slice(0, 9)]) // Keep only latest 10
-      setLatestData(newData)
+      console.log('📊 Hook received new telemetry data:', newData)
+      
+      // Ensure dates are properly formatted
+      const formattedData = {
+        ...newData,
+        createdAt: formatDate(newData.createdAt),
+        updatedAt: formatDate(newData.updatedAt)
+      }
+      
+      setTelemetryData(prev => [formattedData, ...prev.slice(0, 19)]) // Keep only latest 20
+      setLatestData(formattedData)
     })
 
+    // Subscribe to alert updates
+    socketService.subscribeToAlerts((newAlert: Alert) => {
+      console.log('🚨 Hook received new alert:', newAlert)
+      
+      // Ensure dates are properly formatted
+      const formattedAlert = {
+        ...newAlert,
+        triggered_at: formatDate(newAlert.triggered_at),
+        createdAt: formatDate(newAlert.createdAt),
+        updatedAt: formatDate(newAlert.updatedAt),
+        telemetry_data: {
+          ...newAlert.telemetry_data,
+          createdAt: formatDate(newAlert.telemetry_data.createdAt),
+          updatedAt: formatDate(newAlert.telemetry_data.updatedAt)
+        }
+      }
+      
+      setAlerts(prev => [formattedAlert, ...prev.slice(0, 9)]) // Keep only latest 10 alerts
+    })
+
+    // Test connection after a short delay
+    setTimeout(() => {
+      socketService.testConnection()
+    }, 1000)
+
     return () => {
+      console.log('🧹 Cleaning up WebSocket connections...')
       socketService.unsubscribeFromTelemetry()
+      socketService.unsubscribeFromAlerts()
       socketService.disconnect()
     }
   }, [])
 
   // Initial data fetch
   useEffect(() => {
+    console.log('🚀 Initial data fetch...')
     fetchLatestData()
   }, [fetchLatestData])
 
   return {
     telemetryData,
     latestData,
+    alerts,
     loading,
     error,
     isConnected,

@@ -1,23 +1,55 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTelemetry } from 'hooks/useTelemetry'
 import { AnalyticsItem } from 'components/analytics-item'
 import { PieCard } from 'components/pie-card'
+import { AlertNotification } from 'components/alert-notification'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
-import { FaLeaf, FaWind } from 'react-icons/fa'
+import { FaLeaf, FaWind, FaBell, FaBug } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 import { getEntriesData } from '../../pages/workspace/asset/threat/utils'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
+import { Alert, TelemetryData } from 'services/telemetry'
+import { socketService } from 'services/socket'
 
 export const TelemetryDashboard: React.FC = () => {
 	const {
 		telemetryData,
 		latestData,
-		loading,
+		alerts,
 		error,
 		isConnected,
-		generateMockData,
 		refresh
 	} = useTelemetry()
+
+	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
+
+	// Handle new alerts and show notifications
+	useEffect(() => {
+		if (alerts.length > 0) {
+			const latestAlert = alerts[0]
+			if (!activeNotifications.find(n => n._id === latestAlert._id)) {
+				console.log('🚨 Adding new alert notification:', latestAlert)
+				setActiveNotifications(prev => [latestAlert, ...prev])
+				
+				// Auto-remove notification after 10 seconds
+				setTimeout(() => {
+					setActiveNotifications(prev => prev.filter(n => n._id !== latestAlert._id))
+				}, 10000)
+			}
+		}
+	}, [alerts, activeNotifications])
+
+	const closeNotification = (alertId: string) => {
+		setActiveNotifications(prev => prev.filter(n => n._id !== alertId))
+	}
+
+	const testWebSocketConnection = () => {
+		console.log('🧪 Testing WebSocket connection...')
+		socketService.testConnection()
+		console.log('📊 Current telemetry data count:', telemetryData.length)
+		console.log('🚨 Current alerts count:', alerts.length)
+		console.log('🔌 Connection status:', isConnected)
+	}
 
 	const metrics = [
 		{
@@ -62,18 +94,22 @@ export const TelemetryDashboard: React.FC = () => {
 		}
 	]
 
-	const getAirQualityData = () => {
-		if (!telemetryData.length) return []
+	const getAlertsData = () => {
+		if (!alerts.length) return []
 
-		const aqiData = telemetryData.map((item) => ({
-			id: item._id,
-			label: new Date(item.createdAt).toLocaleTimeString(),
-			value: item['eCO2'],
-			color:
-				item['eCO2'] > 600 ? 'red' : item['eCO2'] > 400 ? 'amber' : 'primary'
-		}))
+		const alertsData = alerts.map((alert) => {
+			const currentValue = alert.telemetry_data?.[alert.sensor_type as keyof TelemetryData] || 0
+			return {
+				id: alert._id || Math.random().toString(),
+				label: alert.sensor_type,
+				value: typeof currentValue === 'number' ? currentValue : 0,
+				color: alert.severity === 'critical' ? 'red' : 
+					   alert.severity === 'high' ? 'orange' : 
+					   alert.severity === 'medium' ? 'yellow' : 'blue'
+			}
+		})
 
-		return aqiData.slice(0, 5) // Show last 5 readings
+		return alertsData.slice(0, 5) // Show last 5 alerts
 	}
 
 	const getTemperatureData = () => {
@@ -108,6 +144,20 @@ export const TelemetryDashboard: React.FC = () => {
 		return humidityData.slice(0, 5) // Show last 5 readings
 	}
 
+	const getAirQualityData = () => {
+		if (!telemetryData.length) return []
+
+		const aqiData = telemetryData.map((item) => ({
+			id: item._id,
+			label: new Date(item.createdAt).toLocaleTimeString(),
+			value: item['eCO2'],
+			color:
+				item['eCO2'] > 600 ? 'red' : item['eCO2'] > 400 ? 'amber' : 'primary'
+		}))
+
+		return aqiData.slice(0, 5) // Show last 5 readings
+	}
+
 	if (error) {
 		return (
 			<div className="flex items-center justify-center h-64">
@@ -126,6 +176,15 @@ export const TelemetryDashboard: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-center flex-col gap-6 w-full">
+			{/* Alert Notifications */}
+			{activeNotifications.map((alert) => (
+				<AlertNotification
+					key={alert._id}
+					alert={alert}
+					onClose={() => closeNotification(alert._id || '')}
+				/>
+			))}
+
 			<div className="flex items-center gap-2 text-sm">
 				<div
 					className={`w-5 h-5 rounded-full ${
@@ -143,7 +202,18 @@ export const TelemetryDashboard: React.FC = () => {
 						? 'Connected to IoT Device'
 						: 'Disconnected from IoT Device'}
 				</span>
+				
+				{/* Alerts Counter */}
+				{alerts.length > 0 && (
+					<div className="flex items-center gap-2 ml-4">
+						<FaBell className="text-red-500" />
+						<span className="text-red-600 font-semibold">
+							{alerts.length} Active Alerts
+						</span>
+					</div>
+				)}
 			</div>
+
 			<div className="flex py-2 items-stretch bg-white rounded-lg divide-x border border-card-border w-full">
 				{metrics.map((metric, index) => {
 					const IconComponent = metric.icon
@@ -176,14 +246,14 @@ export const TelemetryDashboard: React.FC = () => {
 				<div className="h-full">
 					<PieCard
 						containerClassName="h-full"
-						data={getAirQualityData()}
-						label="Air Quality (eCO2) Trend"
-						hasData={telemetryData.length > 0}
+						data={getAlertsData()}
+						label="Active Alerts by Sensor"
+						hasData={alerts.length > 0}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Recent eCO2 measurements over time</p>
+								<p>Recent alerts by sensor type and severity</p>
 								<p className="text-xs text-gray-500">
-									Green: Good, Yellow: Moderate, Red: Poor
+									Red: Critical, Orange: High, Yellow: Medium, Blue: Low
 								</p>
 							</div>
 						}
@@ -193,6 +263,7 @@ export const TelemetryDashboard: React.FC = () => {
 					<ThreadTrafficTimeline telemetryData={telemetryData} />
 				</div>
 			</div>
+
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="h-full">
 					<PieCard
@@ -217,11 +288,11 @@ export const TelemetryDashboard: React.FC = () => {
 					<PieCard
 						containerClassName="h-full"
 						data={getTemperatureData()}
-						label="Temperature Trend"
+						label="Real-time Temperature Trend"
 						hasData={telemetryData.length > 0}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Recent temperature measurements</p>
+								<p>Real-time temperature measurements</p>
 								<p className="text-xs text-gray-500">
 									Green: Optimal, Yellow: Warm, Red: Hot
 								</p>
@@ -233,11 +304,11 @@ export const TelemetryDashboard: React.FC = () => {
 					<PieCard
 						containerClassName="h-full"
 						data={getHumidityData()}
-						label="Humidity Trend"
+						label="Real-time Humidity Trend"
 						hasData={telemetryData.length > 0}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Recent humidity measurements</p>
+								<p>Real-time humidity measurements</p>
 								<p className="text-xs text-gray-500">
 									Green: Optimal, Yellow: Low, Red: High
 								</p>
@@ -246,41 +317,86 @@ export const TelemetryDashboard: React.FC = () => {
 					/>
 				</div>
 				<div className="h-full">
-					<div className="bg-white p-4 rounded-lg border h-full">
-						<h3 className="text-lg font-semibold mb-4">Device Status</h3>
-						<div className="space-y-3">
-							<div className="flex justify-between">
-								<span>PM1.0:</span>
-								<span className="font-semibold">
-									{latestData?.['PM1.0']?.toFixed(2) || 0} μg/m³
-								</span>
+					<PieCard
+						containerClassName="h-full"
+						data={getAirQualityData()}
+						label="Real-time Air Quality (eCO2)"
+						hasData={telemetryData.length > 0}
+						infoTooltip={
+							<div className="flex flex-col">
+								<p>Real-time eCO2 measurements</p>
+								<p className="text-xs text-gray-500">
+									Green: Good, Yellow: Moderate, Red: Poor
+								</p>
 							</div>
-							<div className="flex justify-between">
-								<span>PM2.5:</span>
-								<span className="font-semibold">
-									{latestData?.['PM2.5']?.toFixed(2) || 0} μg/m³
-								</span>
-							</div>
-							<div className="flex justify-between">
-								<span>Raw H2:</span>
-								<span className="font-semibold">
-									{latestData?.['Raw H2']?.toLocaleString() || 0}
-								</span>
-							</div>
-							<div className="flex justify-between">
-								<span>Raw Ethanol:</span>
-								<span className="font-semibold">
-									{latestData?.['Raw Ethanol']?.toLocaleString() || 0}
-								</span>
-							</div>
-							<div className="flex justify-between">
-								<span>CNT:</span>
-								<span className="font-semibold">{latestData?.CNT || 0}</span>
-							</div>
-						</div>
+						}
+					/>
+				</div>
+			</div>
+
+			{/* Device Status Panel */}
+			<div className="w-full bg-white p-6 rounded-lg border">
+				<h3 className="text-xl font-semibold mb-4">Device Status & Raw Sensor Data</h3>
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">PM1.0</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['PM1.0']?.toFixed(2) || 0} μg/m³
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">PM2.5</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['PM2.5']?.toFixed(2) || 0} μg/m³
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">Raw H2</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['Raw H2']?.toLocaleString() || 0}
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">Raw Ethanol</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['Raw Ethanol']?.toLocaleString() || 0}
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">NC0.5</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['NC0.5']?.toFixed(2) || 0}
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">NC1.0</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['NC1.0']?.toFixed(2) || 0}
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">NC2.5</span>
+						<p className="text-lg font-semibold">
+							{latestData?.['NC2.5']?.toFixed(2) || 0}
+						</p>
+					</div>
+					<div className="text-center p-3 bg-gray-50 rounded">
+						<span className="text-sm text-gray-600">CNT</span>
+						<p className="text-lg font-semibold">
+							{latestData?.CNT || 0}
+						</p>
 					</div>
 				</div>
 			</div>
+
+			{/* Debug Button */}
+			<button
+				onClick={testWebSocketConnection}
+				className="fixed bottom-4 right-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+				title="Test WebSocket Connection"
+			>
+				<FaBug className="w-6 h-6" />
+			</button>
 		</div>
 	)
 }

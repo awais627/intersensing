@@ -192,7 +192,7 @@ export class TelemetryGateway {
 
   // Method to broadcast telemetry updates to all connected clients
   broadcastTelemetryUpdate(telemetry: any): void {
-    this.server.emit("telemetry:new", telemetry);
+    this.server.emit("telemetry:new", { data: telemetry });
   }
 
   // Method to broadcast alerts to all connected clients
