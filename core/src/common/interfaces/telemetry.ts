@@ -13,7 +13,12 @@ export interface ITelemetry {
   "NC0.5": number;
   "NC1.0": number;
   "NC2.5": number;
-  machineId: number;
+  machineId: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface MachineCount {
+  machineId: string;
+  count: number;
 }

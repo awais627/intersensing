@@ -63,4 +63,42 @@ export class TelemetryService {
     }
     return this.collection;
   }
+
+  async getCountsByMachine(
+    machineIds?: string,
+    start?: string,
+    end?: string
+  ): Promise<{ machineId: string; count: number }[]> {
+    const match: any = {};
+
+    if (machineIds) {
+      const ids = machineIds.split(",").map(id => id.trim());
+      match.machineId = { $in: ids };
+    }
+
+    if (start || end) {
+      match.createdAt = {};
+      if (start) match.createdAt.$gte = new Date(start);
+      if (end) match.createdAt.$lte = new Date(end);
+    }
+    const collection = await this.getCollection();
+    return (await collection
+      .aggregate<{ machineId: string; count: number }>([
+        { $match: match },
+        {
+          $group: {
+            _id: "$machineId",
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            machineId: "$_id",
+            count: 1
+          }
+        }
+      ])
+      .toArray());
+  }
 }

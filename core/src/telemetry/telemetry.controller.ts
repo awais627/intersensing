@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
@@ -18,11 +19,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiQuery,
 } from "@nestjs/swagger";
 import { CreateTelemetryDto } from "./dto/create-telemetry.dto";
 import { TelemetryResponseDto } from "./dto/telemetry-response.dto";
 import { TelemetryService } from "../common/common/src/services/telemetry.service";
-import { ITelemetry } from "../common/interfaces/telemetry";
+import { ITelemetry, MachineCount } from "../common/interfaces/telemetry";
 import { generateId } from "../common/utils";
 
 @ApiTags("telemetry")
@@ -109,7 +111,8 @@ export class TelemetryController {
       "NC2.5": Math.random() * 10,
       createdAt: new Date(),
       updatedAt: new Date(),
-      machineId: Math.floor(Math.random() * 5) + 1,
+      machineId: `sn-sd${String(Math.floor(Math.random() * 5) + 1).padStart(3, "0")}`,
+
     };
     return this.telemetryService.create(mockData);
   }
@@ -197,4 +200,52 @@ export class TelemetryController {
   async remove(@Param("id") id: string) {
     return this.telemetryService.remove(id);
   }
+  // Define return type
+
+
+  @Get("count/by-machine")
+  @ApiOperation({
+    summary: "Get telemetry counts per machine",
+    description:
+      "Returns the number of telemetry records per machine. If machineIds are provided, filters by those IDs; otherwise, returns counts for all machines.",
+  })
+  @ApiQuery({
+    name: "machineIds",
+    description: "Comma-separated list of machine IDs. Optional — if not provided, counts for all machines will be returned.",
+    example: "sn-sd001,sn-sd004",
+    required: false,
+  })
+  @ApiQuery({
+    name: "start",
+    description: "Start date/time (ISO 8601 or timestamp) for filtering",
+    example: "2025-08-01T00:00:00Z",
+    required: false,
+  })
+  @ApiQuery({
+    name: "end",
+    description: "End date/time (ISO 8601 or timestamp) for filtering",
+    example: "2025-08-28T23:59:59Z",
+    required: false,
+  })
+  @ApiOkResponse({
+    description: "Counts retrieved successfully",
+    schema: {
+      example: [
+        { machineId: "sn-sd001", count: 28 },
+        { machineId: "sn-sd004", count: 12 }
+      ]
+    },
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid query parameters",
+  })
+  async getCountsByMachine(
+    @Query("machineIds") machineIds?: string,
+    @Query("start") start?: string,
+    @Query("end") end?: string
+  ): Promise<MachineCount[]> {
+    return this.telemetryService.getCountsByMachine(machineIds, start, end);
+  }
 }
+
+
