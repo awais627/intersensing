@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTelemetry } from 'hooks/useTelemetry'
 import { AnalyticsItem } from 'components/analytics-item'
 import { PieCard } from 'components/pie-card'
-import { AlertNotification } from 'components/alert-notification'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
-import { FaLeaf, FaWind, FaBell, FaBug, FaTimes, FaSync } from 'react-icons/fa'
+import { FaBell, FaBug, FaLeaf, FaSync, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 import { getEntriesData } from '../../pages/workspace/asset/threat/utils'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
@@ -30,20 +29,22 @@ export const TelemetryDashboard: React.FC = () => {
 	useEffect(() => {
 		if (alerts.length > 0) {
 			const latestAlert = alerts[0]
-			if (!activeNotifications.find(n => n._id === latestAlert._id)) {
+			if (!activeNotifications.find((n) => n._id === latestAlert._id)) {
 				console.log('🚨 Adding new alert notification:', latestAlert)
-				setActiveNotifications(prev => [latestAlert, ...prev])
-				
+				setActiveNotifications((prev) => [latestAlert, ...prev])
+
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
-					setActiveNotifications(prev => prev.filter(n => n._id !== latestAlert._id))
+					setActiveNotifications((prev) =>
+						prev.filter((n) => n._id !== latestAlert._id)
+					)
 				}, 10000)
 			}
 		}
 	}, [alerts, activeNotifications])
 
 	const closeNotification = (alertId: string) => {
-		setActiveNotifications(prev => prev.filter(n => n._id !== alertId))
+		setActiveNotifications((prev) => prev.filter((n) => n._id !== alertId))
 	}
 
 	const removeAllNotifications = () => {
@@ -114,14 +115,20 @@ export const TelemetryDashboard: React.FC = () => {
 		if (!alerts.length) return []
 
 		const alertsData = alerts.map((alert) => {
-			const currentValue = alert.telemetry_data?.[alert.sensor_type as keyof TelemetryData] || 0
+			const currentValue =
+				alert.telemetry_data?.[alert.sensor_type as keyof TelemetryData] || 0
 			return {
 				id: alert._id || Math.random().toString(),
 				label: alert.sensor_type,
 				value: typeof currentValue === 'number' ? currentValue : 0,
-				color: alert.severity === 'critical' ? 'red' : 
-					   alert.severity === 'high' ? 'orange' : 
-					   alert.severity === 'medium' ? 'yellow' : 'blue'
+				color:
+					alert.severity === 'critical'
+						? 'red'
+						: alert.severity === 'high'
+						? 'orange'
+						: alert.severity === 'medium'
+						? 'yellow'
+						: 'blue'
 			}
 		})
 
@@ -192,31 +199,6 @@ export const TelemetryDashboard: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-center flex-col gap-6 w-full">
-			{/* Alert Notifications - Stacked with compact spacing */}
-			<div className="fixed top-4 right-4 z-50 space-y-2">
-				{activeNotifications.map((alert, index) => (
-					<div key={alert._id} className="notification-container">
-						<AlertNotification
-							alert={alert}
-							onClose={() => closeNotification(alert._id || '')}
-						/>
-					</div>
-				))}
-			</div>
-
-			{/* Remove All Notifications Button - Positioned above notifications */}
-			{activeNotifications.length > 1 && (
-				<button
-					onClick={removeAllNotifications}
-					className="fixed top-4 right-4 z-50 px-3 py-1 bg-gray-600 text-white text-xs rounded-full hover:bg-gray-700 transition-colors flex items-center gap-1"
-					title="Remove all notifications"
-					style={{ transform: 'translateY(-40px)' }}
-				>
-					<FaTimes className="w-3 h-3" />
-					Clear All
-				</button>
-			)}
-
 			<div className="flex items-center gap-2 text-sm">
 				<div
 					className={`w-5 h-5 rounded-full ${
@@ -234,7 +216,7 @@ export const TelemetryDashboard: React.FC = () => {
 						? 'Connected to IoT Device'
 						: 'Disconnected from IoT Device'}
 				</span>
-				
+
 				{/* Alerts Counter */}
 				{alerts.length > 0 && (
 					<div className="flex items-center gap-2 ml-4">
@@ -284,7 +266,9 @@ export const TelemetryDashboard: React.FC = () => {
 							className="p-1 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
 							title="Refresh alerts"
 						>
-							<FaSync className={`w-4 h-4 ${alertsLoading ? 'animate-spin' : ''}`} />
+							<FaSync
+								className={`w-4 h-4 ${alertsLoading ? 'animate-spin' : ''}`}
+							/>
 						</button>
 					</div>
 					<PieCard
@@ -382,7 +366,9 @@ export const TelemetryDashboard: React.FC = () => {
 
 			{/* Device Status Panel */}
 			<div className="w-full bg-white p-6 rounded-lg border">
-				<h3 className="text-xl font-semibold mb-4">Device Status & Raw Sensor Data</h3>
+				<h3 className="text-xl font-semibold mb-4">
+					Device Status & Raw Sensor Data
+				</h3>
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 					<div className="text-center p-3 bg-gray-50 rounded">
 						<span className="text-sm text-gray-600">PM1.0</span>
@@ -428,9 +414,7 @@ export const TelemetryDashboard: React.FC = () => {
 					</div>
 					<div className="text-center p-3 bg-gray-50 rounded">
 						<span className="text-sm text-gray-600">CNT</span>
-						<p className="text-lg font-semibold">
-							{latestData?.CNT || 0}
-						</p>
+						<p className="text-lg font-semibold">{latestData?.CNT || 0}</p>
 					</div>
 				</div>
 			</div>
