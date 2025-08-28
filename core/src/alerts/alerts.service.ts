@@ -65,7 +65,7 @@ export class AlertsService {
           severity: rule.severity,
           triggered_at: new Date(),
           telemetry_data: telemetry,
-          resolved: false,
+          acknowledged: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -125,14 +125,23 @@ export class AlertsService {
       .toArray();
   }
 
-  async resolveAlert(alertId: string): Promise<void> {
+  async getRecentAlertsByAcknowledgment(acknowledged: boolean, limit: number = 50): Promise<IAlert[]> {
+    const collection = await this.getAlertsCollection();
+    return await collection
+      .find({ acknowledged })
+      .sort({ triggered_at: -1 })
+      .limit(limit)
+      .toArray();
+  }
+
+  async ackAlert(alertId: string): Promise<void> {
     const collection = await this.getAlertsCollection();
     await collection.updateOne(
       { _id: alertId } as any,
       {
         $set: {
-          resolved: true,
-          resolved_at: new Date(),
+          acknowledged: true,
+          acknowledged_at: new Date(),
           updatedAt: new Date(),
         }
       }

@@ -10,8 +10,8 @@ export interface Alert {
   severity: 'low' | 'medium' | 'high' | 'critical' | 'warning'
   triggered_at: string | Date
   telemetry_data: TelemetryData
-  resolved: boolean
-  resolved_at?: string | Date
+  acknowledged: boolean
+  acknowledged_at?: string | Date
   createdAt: string | Date
   updatedAt: string | Date
 }
@@ -111,8 +111,8 @@ export const AlertService = {
     return data
   },
 
-  // Resolve an alert
-  async resolveAlert(alertId: string): Promise<void> {
-    await ApiClient.client.patch(`/api/alerts/${alertId}/resolve`)
+  // Acknowledge an alert
+  async ackAlert(alertId: string): Promise<void> {
+    await ApiClient.client.patch(`/api/alerts/${alertId}/acknowledge`)
   }
 }

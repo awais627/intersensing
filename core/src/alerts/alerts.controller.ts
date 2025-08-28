@@ -15,6 +15,22 @@ export class AlertsController {
     return await this.alertsService.getRecentAlerts(limit ? parseInt(limit.toString()) : 50);
   }
 
+  @Get("acknowledged")
+  @ApiOperation({ summary: "Get recent acknowledged alerts" })
+  @ApiQuery({ name: "limit", required: false, type: Number })
+  @ApiResponse({ status: 200, description: "Recent acknowledged alerts retrieved successfully" })
+  async getRecentAcknowledgedAlerts(@Query("limit") limit?: number) {
+    return await this.alertsService.getRecentAlertsByAcknowledgment(true, limit ? parseInt(limit.toString()) : 50);
+  }
+
+  @Get("unacknowledged")
+  @ApiOperation({ summary: "Get recent unacknowledged alerts" })
+  @ApiQuery({ name: "limit", required: false, type: Number })
+  @ApiResponse({ status: 200, description: "Recent unacknowledged alerts retrieved successfully" })
+  async getRecentUnacknowledgedAlerts(@Query("limit") limit?: number) {
+    return await this.alertsService.getRecentAlertsByAcknowledgment(false, limit ? parseInt(limit.toString()) : 50);
+  }
+
   @Get("day/:date")
   @ApiOperation({ summary: "Get alerts for a specific day" })
   @ApiResponse({ status: 200, description: "Daily alerts retrieved successfully" })
@@ -33,11 +49,11 @@ export class AlertsController {
     return await this.alertsService.getAlertsForDay(new Date());
   }
 
-  @Patch(":id/resolve")
-  @ApiOperation({ summary: "Resolve an alert" })
-  @ApiResponse({ status: 200, description: "Alert resolved successfully" })
-  async resolveAlert(@Param("id") id: string) {
-    await this.alertsService.resolveAlert(id);
-    return { message: "Alert resolved successfully" };
+  @Patch(":id/acknowledge")
+  @ApiOperation({ summary: "Acknowledged an alert" })
+  @ApiResponse({ status: 200, description: "Alert acknowledged successfully" })
+  async ackAlert(@Param("id") id: string) {
+    await this.alertsService.ackAlert(id);
+    return { message: "Alert acknowledged successfully" };
   }
 }
