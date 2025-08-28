@@ -3,7 +3,7 @@ import { useTelemetry } from 'hooks/useTelemetry'
 import { AnalyticsItem } from 'components/analytics-item'
 import { PieCard } from 'components/pie-card'
 import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
-import { FaBug, FaLeaf, FaWind } from 'react-icons/fa'
+import { FaLeaf, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
 import { Alert, TelemetryData } from 'services/telemetry'
@@ -428,81 +428,6 @@ export const TelemetryDashboard: React.FC = () => {
 					/>
 				</div>
 			</div>
-
-			{/* Device Status Panel */}
-			<div className="w-full bg-white p-6 rounded-lg border">
-				<h3 className="text-xl font-semibold mb-4">
-					Device Status & Raw Sensor Data
-				</h3>
-				{latestData?.machineId && (
-					<div className="mb-4 p-3 font-bold rounded-lg border ">
-						<span className="text-sm text-primary-500 font-medium">
-							Machine ID:
-						</span>
-						<span className="ml-2 text-lg font-semibold text-primary-800">
-							{latestData.machineId}
-						</span>
-					</div>
-				)}
-
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">PM1.0</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['PM1.0']?.toFixed(2) || 0} μg/m³
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">PM2.5</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['PM2.5']?.toFixed(2) || 0} μg/m³
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">Raw H2</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['Raw H2']?.toLocaleString() || 0}
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">Raw Ethanol</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['Raw Ethanol']?.toLocaleString() || 0}
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">NC0.5</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['NC0.5']?.toFixed(2) || 0}
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">NC1.0</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['NC1.0']?.toFixed(2) || 0}
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">NC2.5</span>
-						<p className="text-lg font-semibold">
-							{latestData?.['NC2.5']?.toFixed(2) || 0}
-						</p>
-					</div>
-					<div className="text-center p-3 bg-gray-50 rounded">
-						<span className="text-sm text-gray-600">CNT</span>
-						<p className="text-lg font-semibold">{latestData?.CNT || 0}</p>
-					</div>
-				</div>
-			</div>
-
-			{/* Debug Button */}
-			<button
-				onClick={testWebSocketConnection}
-				className="fixed bottom-4 right-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-				title="Test WebSocket Connection"
-			>
-				<FaBug className="w-6 h-6" />
-			</button>
 		</div>
 	)
 }
