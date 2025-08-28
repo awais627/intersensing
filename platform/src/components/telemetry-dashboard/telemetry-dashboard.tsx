@@ -118,8 +118,13 @@ export const TelemetryDashboard: React.FC = () => {
 			const currentValue =
 				alert.telemetry_data?.[alert.sensor_type as keyof TelemetryData] || 0
 			return {
-				id: alert.telemetry_data?.machineId || alert._id || Math.random().toString(),
-				label: `${alert.telemetry_data?.machineId || 'Unknown'} - ${alert.sensor_type}`,
+				id:
+					alert.telemetry_data?.machineId ||
+					alert._id ||
+					Math.random().toString(),
+				label: `${alert.telemetry_data?.machineId || 'Unknown'} - ${
+					alert.sensor_type
+				}`,
 				value: typeof currentValue === 'number' ? currentValue : 0,
 				color:
 					alert.severity === 'critical'
@@ -140,7 +145,9 @@ export const TelemetryDashboard: React.FC = () => {
 
 		const tempData = telemetryData.map((item) => ({
 			id: item.machineId || item._id,
-			label: `${item.machineId || 'Unknown'} - ${new Date(item.createdAt).toLocaleTimeString()}`,
+			label: `${item.machineId || 'Unknown'} - ${new Date(
+				item.createdAt
+			).toLocaleTimeString()}`,
 			value: item.Temperature,
 			color:
 				item.Temperature > 25
@@ -158,7 +165,9 @@ export const TelemetryDashboard: React.FC = () => {
 
 		const humidityData = telemetryData.map((item) => ({
 			id: item.machineId || item._id,
-			label: `${item.machineId || 'Unknown'} - ${new Date(item.createdAt).toLocaleTimeString()}`,
+			label: `${item.machineId || 'Unknown'} - ${new Date(
+				item.createdAt
+			).toLocaleTimeString()}`,
 			value: item.Humidity,
 			color:
 				item.Humidity > 70 ? 'red' : item.Humidity > 40 ? 'amber' : 'primary'
@@ -172,7 +181,9 @@ export const TelemetryDashboard: React.FC = () => {
 
 		const aqiData = telemetryData.map((item) => ({
 			id: item.machineId || item._id,
-			label: `${item.machineId || 'Unknown'} - ${new Date(item.createdAt).toLocaleTimeString()}`,
+			label: `${item.machineId || 'Unknown'} - ${new Date(
+				item.createdAt
+			).toLocaleTimeString()}`,
 			value: item['eCO2'],
 			color:
 				item['eCO2'] > 600 ? 'red' : item['eCO2'] > 400 ? 'amber' : 'primary'
@@ -263,8 +274,6 @@ export const TelemetryDashboard: React.FC = () => {
 					)
 				})}
 			</div>
-
-
 
 			{/* Charts Grid */}
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
@@ -368,9 +377,13 @@ export const TelemetryDashboard: React.FC = () => {
 					Device Status & Raw Sensor Data
 				</h3>
 				{latestData?.machineId && (
-					<div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-						<span className="text-sm text-blue-600 font-medium">Machine ID:</span>
-						<span className="ml-2 text-lg font-semibold text-blue-800">{latestData.machineId}</span>
+					<div className="mb-4 p-3 font-bold rounded-lg border ">
+						<span className="text-sm text-primary-500 font-medium">
+							Machine ID:
+						</span>
+						<span className="ml-2 text-lg font-semibold text-primary-800">
+							{latestData.machineId}
+						</span>
 					</div>
 				)}
 
