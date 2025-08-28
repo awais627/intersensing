@@ -6,6 +6,7 @@ import { ThreatPage } from './pages/workspace/asset/threat/threat-page'
 import { PageNotFound } from './pages/pagenotfound'
 import { MainLayout } from './layout'
 import { TelemetryPage } from './pages/workspace/asset/threat/telemetry-page'
+import { AlertsPage } from './pages/workspace/asset/threat/alerts-page'
 
 export const App = () => {
 	return (
@@ -19,6 +20,7 @@ export const App = () => {
 					<MainLayout>
 						<Routes>
 							<Route path="telemetry" element={<TelemetryPage />} />
+							<Route path="alerts" element={<AlertsPage />} />
 							<Route path="dashboard" element={<ThreatPage />} />
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>
