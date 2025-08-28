@@ -16,6 +16,7 @@ export interface Alert {
   resolved_at?: string | Date
   createdAt: string | Date
   updatedAt: string | Date
+  machineId?: string
 }
 
 export interface TelemetryData {
@@ -37,6 +38,7 @@ export interface TelemetryData {
   CNT: number
   createdAt: string | Date
   updatedAt: string | Date
+  machineId?: string
 }
 
 export interface CreateTelemetryDto {

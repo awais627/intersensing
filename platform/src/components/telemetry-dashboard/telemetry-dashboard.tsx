@@ -118,8 +118,8 @@ export const TelemetryDashboard: React.FC = () => {
 			const currentValue =
 				alert.telemetry_data?.[alert.sensor_type as keyof TelemetryData] || 0
 			return {
-				id: alert._id || Math.random().toString(),
-				label: alert.sensor_type,
+				id: alert.telemetry_data?.machineId || alert._id || Math.random().toString(),
+				label: `${alert.telemetry_data?.machineId || 'Unknown'} - ${alert.sensor_type}`,
 				value: typeof currentValue === 'number' ? currentValue : 0,
 				color:
 					alert.severity === 'critical'
@@ -139,8 +139,8 @@ export const TelemetryDashboard: React.FC = () => {
 		if (!telemetryData.length) return []
 
 		const tempData = telemetryData.map((item) => ({
-			id: item._id,
-			label: new Date(item.createdAt).toLocaleTimeString(),
+			id: item.machineId || item._id,
+			label: `${item.machineId || 'Unknown'} - ${new Date(item.createdAt).toLocaleTimeString()}`,
 			value: item.Temperature,
 			color:
 				item.Temperature > 25
@@ -157,8 +157,8 @@ export const TelemetryDashboard: React.FC = () => {
 		if (!telemetryData.length) return []
 
 		const humidityData = telemetryData.map((item) => ({
-			id: item._id,
-			label: new Date(item.createdAt).toLocaleTimeString(),
+			id: item.machineId || item._id,
+			label: `${item.machineId || 'Unknown'} - ${new Date(item.createdAt).toLocaleTimeString()}`,
 			value: item.Humidity,
 			color:
 				item.Humidity > 70 ? 'red' : item.Humidity > 40 ? 'amber' : 'primary'
@@ -171,8 +171,8 @@ export const TelemetryDashboard: React.FC = () => {
 		if (!telemetryData.length) return []
 
 		const aqiData = telemetryData.map((item) => ({
-			id: item._id,
-			label: new Date(item.createdAt).toLocaleTimeString(),
+			id: item.machineId || item._id,
+			label: `${item.machineId || 'Unknown'} - ${new Date(item.createdAt).toLocaleTimeString()}`,
 			value: item['eCO2'],
 			color:
 				item['eCO2'] > 600 ? 'red' : item['eCO2'] > 400 ? 'amber' : 'primary'
@@ -217,6 +217,15 @@ export const TelemetryDashboard: React.FC = () => {
 						: 'Disconnected from IoT Device'}
 				</span>
 
+				{/* Machine ID Display */}
+				{latestData?.machineId && (
+					<div className="flex items-center gap-2 ml-4">
+						<span className="text-gray-600 font-medium">
+							Machine: {latestData.machineId}
+						</span>
+					</div>
+				)}
+
 				{/* Alerts Counter */}
 				{alerts.length > 0 && (
 					<div className="flex items-center gap-2 ml-4">
@@ -254,6 +263,8 @@ export const TelemetryDashboard: React.FC = () => {
 					)
 				})}
 			</div>
+
+
 
 			{/* Charts Grid */}
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
@@ -356,6 +367,13 @@ export const TelemetryDashboard: React.FC = () => {
 				<h3 className="text-xl font-semibold mb-4">
 					Device Status & Raw Sensor Data
 				</h3>
+				{latestData?.machineId && (
+					<div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+						<span className="text-sm text-blue-600 font-medium">Machine ID:</span>
+						<span className="ml-2 text-lg font-semibold text-blue-800">{latestData.machineId}</span>
+					</div>
+				)}
+
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 					<div className="text-center p-3 bg-gray-50 rounded">
 						<span className="text-sm text-gray-600">PM1.0</span>

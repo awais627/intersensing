@@ -30,6 +30,7 @@ export const AlertsDashboard: React.FC = () => {
 	const [totalPages, setTotalPages] = useState(1)
 	const [alertsPerPage] = useState(10)
 
+
 	// Fetch all alerts for pagination
 	const fetchAllAlerts = async (page: number = 1) => {
 		try {
@@ -44,10 +45,14 @@ export const AlertsDashboard: React.FC = () => {
 		}
 	}
 
+
+
 	// Initialize alerts data
 	useEffect(() => {
 		fetchAllAlerts(currentPage)
 	}, [currentPage])
+
+
 
 	// Subscribe to real-time alerts updates
 	useEffect(() => {
@@ -57,7 +62,8 @@ export const AlertsDashboard: React.FC = () => {
 				// Ensure resolved property exists
 				const alertWithDefaults = {
 					...newAlert,
-					resolved: newAlert.resolved || false
+					resolved: newAlert.resolved || false,
+					machineId: newAlert.telemetry_data?.machineId || 'Unknown'
 				}
 				setAllAlerts((prev) => [alertWithDefaults, ...prev])
 				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
@@ -85,7 +91,8 @@ export const AlertsDashboard: React.FC = () => {
 				// Ensure resolved property exists
 				const alertWithDefaults = {
 					...latestAlert,
-					resolved: latestAlert.resolved || false
+					resolved: latestAlert.resolved || false,
+					machineId: latestAlert.telemetry_data?.machineId || 'Unknown'
 				}
 				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
@@ -243,6 +250,8 @@ export const AlertsDashboard: React.FC = () => {
 						: 'Disconnected from IoT Device'}
 				</span>
 
+
+
 				{/* Alerts Counter */}
 				{allAlerts.length > 0 && (
 					<div className="flex items-center gap-2 ml-4">
@@ -273,6 +282,8 @@ export const AlertsDashboard: React.FC = () => {
 				})}
 			</div>
 
+
+
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="col-span-3 h-full">
 					<AlertsTimeline alerts={allAlerts} />
@@ -295,6 +306,9 @@ export const AlertsDashboard: React.FC = () => {
 					<table className="min-w-full divide-y divide-gray-200">
 						<thead className="bg-gray-50">
 							<tr>
+								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+									Machine ID
+								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
 									Severity
 								</th>
@@ -321,6 +335,9 @@ export const AlertsDashboard: React.FC = () => {
 						<tbody className="bg-white divide-y divide-gray-200">
 							{getPaginatedAlerts().map((alert) => (
 								<tr key={alert._id} className="hover:bg-gray-50">
+									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+										{alert.machineId || 'Unknown'}
+									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<span
 											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -381,7 +398,7 @@ export const AlertsDashboard: React.FC = () => {
 					<div className="flex items-center justify-between mt-4">
 						<div className="text-sm text-gray-700">
 							Showing {(currentPage - 1) * alertsPerPage + 1} to{' '}
-							{Math.min(currentPage * alertsPerPage, allAlerts.length)} of{' '}
+							{Math.min(currentPage * alertsPerPage, getPaginatedAlerts().length)} of{' '}
 							{allAlerts.length} results
 						</div>
 						<div className="flex space-x-2">
