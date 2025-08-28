@@ -33,11 +33,11 @@ export class AlertsController {
     return await this.alertsService.getAlertsForDay(new Date());
   }
 
-  @Patch(":id/resolve")
-  @ApiOperation({ summary: "Resolve an alert" })
-  @ApiResponse({ status: 200, description: "Alert resolved successfully" })
-  async resolveAlert(@Param("id") id: string) {
-    await this.alertsService.resolveAlert(id);
-    return { message: "Alert resolved successfully" };
+  @Patch(":id/acknowledge")
+  @ApiOperation({ summary: "Acknowledged an alert" })
+  @ApiResponse({ status: 200, description: "Alert acknowledged successfully" })
+  async ackAlert(@Param("id") id: string) {
+    await this.alertsService.ackAlert(id);
+    return { message: "Alert acknowledged successfully" };
   }
 }

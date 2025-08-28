@@ -9,8 +9,8 @@ export interface IAlert {
   severity: "low" | "medium" | "high" | "critical" | "warning";
   triggered_at: Date;
   telemetry_data: any; // The telemetry data that triggered the alert
-  resolved: boolean;
-  resolved_at?: Date;
+  acknowledged: boolean;
+  acknowledged_at?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
