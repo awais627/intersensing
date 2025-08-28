@@ -25,24 +25,33 @@ export const AlertsDashboard: React.FC = () => {
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
 	const [alertsLoading, setAlertsLoading] = useState(false)
+	// Paginated table data - always exactly 10 records per page
+	// New real-time alerts are added to the top, oldest records are removed
 	const [allAlerts, setAllAlerts] = useState<Alert[]>([])
 	const [currentPage, setCurrentPage] = useState(1)
 	const [totalPages, setTotalPages] = useState(1)
 	const [alertsPerPage] = useState(10)
 	const [totalAlertsCount, setTotalAlertsCount] = useState(0)
+	
+	// Severity counts for metrics
 	const [severityCounts, setSeverityCounts] = useState<AlertSeverityCountsResponse | null>(null)
 	const [severityCountsLoading, setSeverityCountsLoading] = useState(false)
+	
+	// Timeline data - last 25 records, updated in real-time
 	const [timelineAlerts, setTimelineAlerts] = useState<Alert[]>([])
 	const [timelineLoading, setTimelineLoading] = useState(false)
 
 
-	// Fetch alerts for current page
+	// Fetch alerts for current page (always exactly 10 records per page)
 	const fetchAlertsForPage = async (page: number = 1) => {
 		try {
 			setAlertsLoading(true)
 			const offset = (page - 1) * alertsPerPage
 			const response = await AlertService.getRecentAlerts(alertsPerPage, offset)
-			setAllAlerts(response.alerts)
+			
+			// Ensure we only set exactly the number of alerts for this page
+			// This prevents socket updates from affecting pagination
+			setAllAlerts(response.alerts.slice(0, alertsPerPage))
 			setTotalAlertsCount(response.totalCount)
 			setTotalPages(Math.ceil(response.totalCount / alertsPerPage))
 		} catch (err) {
@@ -100,15 +109,23 @@ export const AlertsDashboard: React.FC = () => {
 					resolved: newAlert.resolved || false,
 					machineId: newAlert.telemetry_data?.machineId || 'Unknown'
 				}
-				setAllAlerts((prev) => [alertWithDefaults, ...prev])
-				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
-
+				
 				// Update timeline alerts with new alert
 				setTimelineAlerts((prev) => {
 					const updated = [alertWithDefaults, ...prev]
 					// Keep only last 25 alerts for timeline
 					return updated.slice(0, 25)
 				})
+
+				// Add new alert to top of current page data (maintain 10-record limit)
+				setAllAlerts((prev) => {
+					const updated = [alertWithDefaults, ...prev]
+					// Keep only the first 10 records to maintain pagination
+					return updated.slice(0, alertsPerPage)
+				})
+
+				// Update active notifications
+				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
@@ -122,7 +139,7 @@ export const AlertsDashboard: React.FC = () => {
 		return () => {
 			socketService.unsubscribeFromAlerts()
 		}
-	}, [isConnected])
+	}, [isConnected, alertsPerPage])
 
 	// Handle new alerts and show notifications
 	useEffect(() => {
@@ -136,14 +153,23 @@ export const AlertsDashboard: React.FC = () => {
 					resolved: latestAlert.resolved || false,
 					machineId: latestAlert.telemetry_data?.machineId || 'Unknown'
 				}
-				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
-
+				
 				// Update timeline alerts with new alert
 				setTimelineAlerts((prev) => {
 					const updated = [alertWithDefaults, ...prev]
 					// Keep only last 25 alerts for timeline
 					return updated.slice(0, 25)
 				})
+
+				// Add new alert to top of current page data (maintain 10-record limit)
+				setAllAlerts((prev) => {
+					const updated = [alertWithDefaults, ...prev]
+					// Keep only the first 10 records to maintain pagination
+					return updated.slice(0, alertsPerPage)
+				})
+
+				// Update active notifications
+				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
@@ -153,7 +179,7 @@ export const AlertsDashboard: React.FC = () => {
 				}, 10000)
 			}
 		}
-	}, [alerts, activeNotifications])
+	}, [alerts, activeNotifications, alertsPerPage])
 
 	const handleRefreshAlerts = async () => {
 		await fetchAlertsForPage(currentPage)
