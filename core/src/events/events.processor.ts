@@ -18,7 +18,8 @@ export class EventsProcessor {
   ) {}
 
   @Process(QueueEvents.MOCK.ADD_MOCK_DATA)
-  async handleConvertToPdf(job: Job) {
+  async handleMockData(job: Job) {
+
     const mockData: ITelemetry = {
       id: generateId("tele"),
       timestamp: Date.now().toString(),
@@ -36,7 +37,7 @@ export class EventsProcessor {
       "NC2.5": Math.random() * 10,
       createdAt: new Date(),
       updatedAt: new Date(),
-      machineId: Math.floor(Math.random() * 5) + 1,
+      machineId: `sn-sd${String(Math.floor(Math.random() * 5) + 1).padStart(3, "0")}`,
     };
 
     // Save telemetry data
