@@ -86,7 +86,7 @@ export const ThreadTrafficTimeline = ({
 			<GSection containerClassName="border border-card-border h-[400px] -mb-6">
 				<div className="flex justify-between items-center h-full">
 					<div className="flex flex-row items-center gap-x-1 text-xl font-bold">
-						Real-time Temperature trend
+						Real-time trend
 						<GTooltip
 							content={
 								<div className="flex flex-col font-normal">
