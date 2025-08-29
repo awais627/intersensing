@@ -1,4 +1,4 @@
-import { RiAlertLine, RiFolderChartLine } from 'react-icons/ri'
+import { RiAlertLine, RiFolderChartLine, RiSettings3Line } from 'react-icons/ri'
 import { GTransition } from 'components/basic-blocks'
 import { NavItem } from 'layout/sidebar/nav-item'
 import { SiOpentelemetry } from 'react-icons/si'
@@ -15,6 +15,7 @@ export const AssetMenu = () => {
 							icon={SiOpentelemetry}
 						/>
 						<NavItem label="Alerts" to={() => `/alerts`} icon={RiAlertLine} />
+						<NavItem label="Rules" to={() => `/rules`} icon={RiSettings3Line} />
 					</div>
 					<div className="pl-2">
 						<NavItem
