@@ -51,10 +51,10 @@ export const BarChart = ({
 			<ResponsiveBar
 				data={data}
 				margin={{
-					top: 0,
+					top: 0, 
 					right: 10,
-					bottom: vertical ? 20 : -10,
-					left: leftPadding
+					bottom: vertical ? 40 : 30, 
+					left: leftPadding 
 				}}
 				indexBy={index}
 				layout={layout}
@@ -68,12 +68,23 @@ export const BarChart = ({
 				enableLabel={false}
 				padding={barPadding}
 				theme={theme}
-				axisLeft={
-					hideAxisLeft
-						? null
-						: { ticksPosition: 'after', tickSize: 0, tickPadding: 10 }
-				}
-				axisBottom={vertical ? { format: axisBottomFormat } : null}
+
+				axisLeft={{
+					ticksPosition: 'after',
+					tickSize: 0,
+					tickPadding: 10,
+					legend: 'Count',
+					legendPosition: 'middle',
+					legendOffset: -35,        
+				}}
+				axisBottom={{
+					tickSize: 0,
+					tickPadding: 5,
+					legend: 'Machines',
+					legendPosition: 'middle',
+					legendOffset: 30,         
+				}}
+
 				enableGridX={!vertical}
 				enableGridY={vertical}
 				tooltip={({ id, data, color }) => (

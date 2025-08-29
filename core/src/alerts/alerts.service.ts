@@ -273,7 +273,7 @@ export class AlertsService {
     high: number;
     medium: number;
     low: number;
-    resolved: number;
+    acknowledged: number;
     total: number;
     dateRange: { start: string; end: string };
   }> {
@@ -310,7 +310,7 @@ export class AlertsService {
     const severityCounts = new Map(severityResult.map(item => [item._id, item.count]));
 
     // Get acknowledged count
-    const resolvedCount = await collection.countDocuments({
+    const acknowledgedCount = await collection.countDocuments({
       ...dateFilter,
       acknowledged: true
     });
@@ -324,7 +324,7 @@ export class AlertsService {
       high: severityCounts.get("high") || 0,
       medium: severityCounts.get("medium") || 0,
       low: severityCounts.get("low") || 0,
-      resolved: resolvedCount,
+      acknowledged: acknowledgedCount,
       total: totalCount,
       dateRange: {
         start: startDate.toISOString().split('T')[0],

@@ -35,7 +35,7 @@ export class AlertSeverityCountsDto {
     description: "Number of resolved alerts",
     example: 20
   })
-  resolved: number;
+  acknowledged: number;
 
   @ApiProperty({
     description: "Total number of alerts in the date range",
