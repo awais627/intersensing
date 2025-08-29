@@ -139,8 +139,8 @@ export const AlertsDashboard: React.FC = () => {
 						case 'high':
 							updatedCounts.high += 1
 							break
-						case 'warning':
-							updatedCounts.warning += 1
+						case 'catastrophic':
+							updatedCounts.catastrophic += 1
 							break
 						case 'low':
 							updatedCounts.low += 1
@@ -154,8 +154,8 @@ export const AlertsDashboard: React.FC = () => {
 					updatedCounts.total += 1
 
 					// Update resolved count if the alert is resolved
-					if (newAlert.resolved) {
-						updatedCounts.resolved += 1
+					if (newAlert.acknowledged) {
+						updatedCounts.acknowledged += 1
 					}
 
 					return updatedCounts
@@ -220,8 +220,8 @@ export const AlertsDashboard: React.FC = () => {
 						case 'high':
 							updatedCounts.high += 1
 							break
-						case 'warning':
-							updatedCounts.warning += 1
+						case 'catastrophic':
+							updatedCounts.catastrophic += 1
 							break
 						case 'low':
 							updatedCounts.low += 1
@@ -235,8 +235,8 @@ export const AlertsDashboard: React.FC = () => {
 					updatedCounts.total += 1
 
 					// Update resolved count if the alert is resolved
-					if (latestAlert.resolved) {
-						updatedCounts.resolved += 1
+					if (latestAlert.acknowledged) {
+						updatedCounts.acknowledged += 1
 					}
 
 					return updatedCounts
@@ -300,10 +300,10 @@ export const AlertsDashboard: React.FC = () => {
 				color: 'text-orange-600'
 			},
 			{
-				label: 'Warning Alerts',
-				key: 'warning',
-				tooltip: 'Number of warning alerts',
-				value: severityCounts.warning,
+				label: 'Catastrophic Alerts',
+				key: 'catastrophic',
+				tooltip: 'Number of catastrophic alerts',
+				value: severityCounts.catastrophic,
 				icon: FaClock,
 				unit: '',
 				color: 'text-amber-600'
@@ -318,10 +318,10 @@ export const AlertsDashboard: React.FC = () => {
 				color: 'text-blue-600'
 			},
 			{
-				label: 'Resolved Alerts',
-				key: 'resolved',
-				tooltip: 'Number of resolved alerts',
-				value: severityCounts.resolved,
+				label: 'Acknowledged Alerts',
+				key: 'acknowledged',
+				tooltip: 'Number of acknowledged alerts',
+				value: severityCounts.acknowledged,
 				icon: FaCheckCircle,
 				unit: '',
 				color: 'text-green-600'
@@ -499,7 +499,7 @@ export const AlertsDashboard: React.FC = () => {
 													? 'bg-orange-100 text-orange-800'
 													: alert.severity === 'medium'
 													? 'bg-yellow-100 text-yellow-800'
-													: alert.severity === 'warning'
+													: alert.severity === 'catastrophic'
 													? 'bg-amber-100 text-amber-800'
 													: 'bg-blue-100 text-blue-800'
 											}`}

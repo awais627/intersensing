@@ -76,9 +76,9 @@ export interface AlertCountsResponse {
 export interface AlertSeverityCountsResponse {
 	critical: number
 	high: number
-	warning: number
+	catastrophic: number
 	low: number
-	resolved: number
+	acknowledged: number
 	total: number
 	dateRange: {
 		start: string
