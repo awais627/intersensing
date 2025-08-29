@@ -54,7 +54,7 @@ export const RepeatedClicksPanel = ({ data }: { data: TopOffendersResponse | nul
               layout="vertical"
               containerClassName="h-[294px]"
               leftPadding={40}
-              barPadding={0.9}
+              barPadding={0.4}
               hideAxisLeft={false}
               keys={keys}
               stacked
