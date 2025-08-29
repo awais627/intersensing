@@ -4,7 +4,7 @@ import { ApiConfig } from 'config'
 const client = axios.create({
 	baseURL:
 		process.env.NODE_ENV === 'production'
-			? 'https://139.59.67.175'
+			? 'https://intersensing.hubextech.com'
 			: ApiConfig.API_BASE_URL
 })
 
