@@ -83,7 +83,6 @@ export const RepeatedClicksPanel = ({ data }: { data: TopOffendersResponse | nul
           </div>
         </div>
 
-        <span className="text-sm absolute right-0 bottom-[12px]">Machines</span>
       </div>
     </GSection>
   )
