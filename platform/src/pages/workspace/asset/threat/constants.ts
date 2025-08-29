@@ -37,8 +37,7 @@ export const alertFilterOptions = [
 	{ name: 'High', type: 'high' },
 	{ name: 'Medium', type: 'medium' },
 	{ name: 'Low', type: 'low' },
-	{ name: 'Warning', type: 'warning' },
-	{ name: 'Resolved', type: 'resolved' }
+	{ name: 'Catastrophic', type: 'catastrophic' }
 ]
 
 export const alertTypeFilterOptions = [

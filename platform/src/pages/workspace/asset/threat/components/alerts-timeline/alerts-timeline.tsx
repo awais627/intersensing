@@ -53,7 +53,6 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 			index: index + 1
 		}))
 
-		// Convert to chart format with actual telemetry values
 		return [
 			{
 				id: 'Critical',
@@ -104,9 +103,9 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 					}))
 			},
 			{
-				id: 'Warning',
+				id: 'Catastrophic',
 				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'warning')
+					.filter((alert) => alert.severity === 'catastrophic')
 					.map((alert) => ({
 						x: alert.index,
 						y:

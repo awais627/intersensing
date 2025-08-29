@@ -9,6 +9,7 @@ import { TelemetryPage } from './pages/workspace/asset/threat/telemetry-page'
 import { AlertsPage } from './pages/workspace/asset/threat/alerts-page'
 import { RulesPage } from './pages/workspace/asset/rules/rules-page'
 import { SettingsPage } from './pages/workspace/settings/settings-page'
+import { TeamPage } from './pages/workspace/team/team-page'
 
 export const App = () => {
 	return (
@@ -25,6 +26,7 @@ export const App = () => {
 							<Route path="alerts" element={<AlertsPage />} />
 							<Route path="rules" element={<RulesPage />} />
 							<Route path="settings" element={<SettingsPage />} />
+							<Route path="team" element={<TeamPage />} />
 							<Route path="dashboard" element={<ThreatPage />} />
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>

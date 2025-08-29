@@ -421,7 +421,6 @@ export const AlertsDashboard: React.FC = () => {
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="col-span-3 h-full">
 					<div className="flex justify-between items-center mb-4">
-						<h3 className="text-lg font-semibold">Alerts Timeline</h3>
 						<button
 							onClick={fetchTimelineAlerts}
 							disabled={timelineLoading}

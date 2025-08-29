@@ -96,9 +96,8 @@ export const Sidebar = () => {
 					)}
 					<div className="pt-4">
 						<NavItem
-							disabled
 							label="Team"
-							to={() => '/admin/team'}
+							to={() => '/team'}
 							icon={LuUser}
 						/>
 						{/*<UserHeader />*/}

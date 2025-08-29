@@ -127,28 +127,28 @@ export const TelemetryDashboard: React.FC = () => {
 				id: 'Critical',
 				label: 'Critical',
 				value: tempParameter.critical,
-				color: 'orange',
+				color: 'yellow',
 				variant: '900'
 			},
 			{
 				id: 'High',
 				label: 'High',
 				value: tempParameter.high,
-				color: 'orange',
+				color: 'yellow',
 				variant: '800'
 			},
 			{
 				id: 'Medium',
 				label: 'Medium',
 				value: tempParameter.medium,
-				color: 'orange',
+				color: 'yellow',
 				variant: '700'
 			},
 			{
 				id: 'Low',
 				label: 'Low',
 				value: tempParameter.low,
-				color: 'orange',
+				color: 'yellow',
 				variant: '600'
 			}
 		]
@@ -167,28 +167,28 @@ export const TelemetryDashboard: React.FC = () => {
 				id: 'Critical',
 				label: 'Critical',
 				value: humidityParameter.critical,
-				color: 'orange',
+				color: 'blue',
 				variant: '900'
 			},
 			{
 				id: 'High',
 				label: 'High',
 				value: humidityParameter.high,
-				color: 'orange',
+				color: 'blue',
 				variant: '800'
 			},
 			{
 				id: 'Medium',
 				label: 'Medium',
 				value: humidityParameter.medium,
-				color: 'orange',
+				color: 'blue',
 				variant: '700'
 			},
 			{
 				id: 'Low',
 				label: 'Low',
 				value: humidityParameter.low,
-				color: 'orange',
+				color: 'blue',
 				variant: '600'
 			}
 		]
@@ -279,20 +279,14 @@ export const TelemetryDashboard: React.FC = () => {
 		}
 
 		// Convert alert counts to the format expected by PieCard
-		return alertCounts.data.map((alertCount) => ({
+		return alertCounts.data.map((alertCount, index) => ({
 			id: alertCount.type.charAt(0).toUpperCase() + alertCount.type.slice(1),
 			value: alertCount.count,
-			color:
-				alertCount.type === 'critical'
-					? 'red'
-					: alertCount.type === 'high'
-					? 'orange'
-					: alertCount.type === 'medium'
-					? 'yellow'
-					: alertCount.type === 'low'
-					? 'blue'
-					: 'green',
-			variant: '900'
+			color: 'red',
+			variant: (700 - index * 100 > 0
+				? 700 - index * 100
+				: 100
+			).toLocaleString()
 		}))
 	}
 
@@ -413,16 +407,6 @@ export const TelemetryDashboard: React.FC = () => {
 							topOffenders?.topParameters &&
 							topOffenders.topParameters.length > 0
 						}
-						totalValue={
-							topOffenders?.topParameters &&
-							topOffenders.topParameters.length > 0
-								? (
-										topOffenders.topParameters.find(
-											(p) => p.parameter === 'Temperature'
-										)?.total || 0
-								  ).toString()
-								: '0'
-						}
 						infoTooltip={
 							<div className="flex flex-col">
 								<p>Total temperature alerts across all machines</p>
@@ -446,16 +430,6 @@ export const TelemetryDashboard: React.FC = () => {
 							topOffenders?.topParameters &&
 							topOffenders.topParameters.length > 0
 						}
-						totalValue={
-							topOffenders?.topParameters &&
-							topOffenders.topParameters.length > 0
-								? (
-										topOffenders.topParameters.find(
-											(p) => p.parameter === 'Humidity'
-										)?.total || 0
-								  ).toString()
-								: '0'
-						}
 						infoTooltip={
 							<div className="flex flex-col">
 								<p>Total humidity alerts across all machines</p>
@@ -478,16 +452,6 @@ export const TelemetryDashboard: React.FC = () => {
 						hasData={
 							topOffenders?.topParameters &&
 							topOffenders.topParameters.length > 0
-						}
-						totalValue={
-							topOffenders?.topParameters &&
-							topOffenders.topParameters.length > 0
-								? (
-										topOffenders.topParameters.find(
-											(p) => p.parameter === 'eCO2'
-										)?.total || 0
-								  ).toString()
-								: '0'
 						}
 						infoTooltip={
 							<div className="flex flex-col">

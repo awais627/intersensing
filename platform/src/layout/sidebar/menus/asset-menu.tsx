@@ -24,6 +24,7 @@ export const AssetMenu = () => {
 							disabled
 							to={() => `/`}
 							icon={RiFolderChartLine}
+							tooltip="Coming Soon"
 						/>
 					</div>
 				</div>
