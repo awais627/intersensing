@@ -200,7 +200,7 @@ export class TelemetryGateway {
     this.server.emit("alert:new", {
       success: true,
       data: alert,
-      message: `Alert triggered: ${alert.rule_id} - ${alert.sensor_type} ${alert.operator} ${alert.threshold}`,
+      message: `Alert triggered: ${alert.sensor_type} deviation of ${alert.deviation_percentage}% (${alert.deviation_type}) - Severity: ${alert.severity}`,
       severity: alert.severity,
       timestamp: alert.triggered_at,
     });

@@ -2,6 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class AlertSeverityCountsDto {
   @ApiProperty({
+    description: "Number of catastrophic severity alerts",
+    example: 5
+  })
+  catastrophic: number;
+
+  @ApiProperty({
     description: "Number of critical severity alerts",
     example: 15
   })
@@ -14,10 +20,10 @@ export class AlertSeverityCountsDto {
   high: number;
 
   @ApiProperty({
-    description: "Number of warning alerts",
+    description: "Number of medium severity alerts",
     example: 40
   })
-  warning: number;
+  medium: number;
 
   @ApiProperty({
     description: "Number of low severity alerts",

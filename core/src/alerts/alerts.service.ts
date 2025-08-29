@@ -1,108 +1,31 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Collection, ObjectId } from "mongodb";
+import { Collection } from "mongodb";
 import { MongoService } from "../common/common/src/mongo.service";
-import { IAlert, IAlertRule } from "../common/interfaces/alert";
+import { IAlert, ISensorOptimalRange, IDeviationThreshold } from "../common/interfaces/alert";
 import { ITelemetry } from "../common/interfaces/telemetry";
 import { TelemetryService } from "../common/common/src/services/telemetry.service";
-// import { TelemetryService } from "../common/common/src/services/telemetry.service";
-
 
 @Injectable()
 export class AlertsService {
   private readonly logger = new Logger(AlertsService.name);
   private alertsCollection: Collection<IAlert> | null = null;
 
-  private readonly defaultRules: IAlertRule[] = [
-    {
-    // Low Temperature - Warning
-      rule_id: "temp-low-01",
-      sensor_type: "Temperature",
-      threshold: 10,
-      operator: "<",
-      notify: ["in-app", "email"],
-      severity: "critical",
-      enabled: true,
-    },
-    // High Temperature - Critical
-    {
-      rule_id: "temp-high-01",
-      sensor_type: "Temperature",
-      threshold: 35,
-      operator: ">=",
-      notify: ["in-app", "email"],
-      severity: "critical",
-      enabled: true,
-    },
-    // Low Humidity - Warning
-    {
-      rule_id: "humidity-low-01",
-      sensor_type: "Humidity",
-      threshold: 30,
-      operator: "<=",
-      notify: ["in-app"],
-      severity: "warning", // dry air discomfort
-      enabled: true,
-    },
-    // Low Humidity - Critical
-    {
-      rule_id: "humidity-low-02",
-      sensor_type: "Humidity",
-      threshold: 20,
-      operator: "<=",
-      notify: ["in-app", "email"],
-      severity: "critical", // risk to electronics / severe dryness
-      enabled: true,
-    },
-    // High Humidity - Warning
-    {
-      rule_id: "humidity-high-01",
-      sensor_type: "Humidity",
-      threshold: 65,
-      operator: ">=",
-      notify: ["in-app"],
-      severity: "warning", // uncomfortable / possible condensation
-      enabled: true,
-    },
-    // High Humidity - Critical
-    {
-      rule_id: "humidity-high-02",
-      sensor_type: "Humidity",
-      threshold: 75,
-      operator: ">=",
-      notify: ["in-app", "email", "sms"],
-      severity: "critical", // mold growth risk / damage to items
-      enabled: true,
-    },
-    // Moderate eCO2 - Warning
-    {
-      rule_id: "co2-warning-01",
-      sensor_type: "eCO2",
-      threshold: 700,
-      operator: ">=",
-      notify: ["in-app"],
-      severity: "warning",
-      enabled: true,
-    },
-    // High eCO2 - Warning
-    {
-      rule_id: "co2-warning-02",
-      sensor_type: "eCO2",
-      threshold: 1000,
-      operator: ">=",
-      notify: ["in-app", "email"],
-      severity: "warning",
-      enabled: true,
-    },
-    // Critical eCO2
-    {
-      rule_id: "co2-critical-01",
-      sensor_type: "eCO2",
-      threshold: 1200,
-      operator: ">=",
-      notify: ["email", "in-app", "sms"],
-      severity: "critical",
-      enabled: true,
-    },
+  private readonly sensorOptimalRanges: ISensorOptimalRange[] = [
+    { sensor_type: "Temperature", min: 18, max: 27, unit: "°C", enabled: true, },
+    { sensor_type: "Humidity", min: 40, max: 60, unit: "%", enabled: true, },
+    { sensor_type: "eCO2", min: 400, max: 600, unit: "ppm", enabled: true, },
+    { sensor_type: "TVOC", min: 0, max: 220, unit: "ppb", enabled: true, },
+    { sensor_type: "Pressure", min: 980, max: 1030, unit: "hPa", enabled: true, },
+    { sensor_type: "PM1.0", min: 0, max: 15, unit: "μg/m³", enabled: true, },
+    { sensor_type: "PM2.5", min: 0, max: 25, unit: "μg/m³", enabled: true, },
+  ];
+
+  private readonly deviationThresholds: IDeviationThreshold[] = [
+    { severity: "low", deviation_percentage: 10, notify: ["in-app"], },
+    { severity: "medium", deviation_percentage: 25, notify: ["in-app"], },
+    { severity: "high", deviation_percentage: 50, notify: ["in-app", "email"], },
+    { severity: "critical", deviation_percentage: 75, notify: ["in-app", "email"], },
+    { severity: "catastrophic", deviation_percentage: 90, notify: ["in-app", "email", "sms"], },
   ];
 
   constructor(
@@ -110,100 +33,79 @@ export class AlertsService {
     private readonly telemetryService: TelemetryService,
   ) {}
 
-  // async checkTelemetryForAlerts(telemetry: ITelemetry): Promise<IAlert[]> {
-  //   const triggeredAlerts: IAlert[] = [];
-  //   const rules = this.defaultRules;
-
-  //   for (const rule of rules) {
-  //     if (!rule.enabled) continue;
-
-  //     const sensorValue = telemetry[rule.sensor_type];
-  //     if (sensorValue === undefined || sensorValue === null) continue;
-
-  //     if (this.evaluateCondition(sensorValue, rule.threshold, rule.operator)) {
-  //       const alert: IAlert = {
-  //         rule_id: rule.rule_id,
-  //         sensor_type: rule.sensor_type,
-  //         threshold: rule.threshold,
-  //         operator: rule.operator,
-  //       //   persistence: rule.persistence,
-  //         notify: rule.notify,
-  //         severity: rule.severity,
-  //         triggered_at: new Date(),
-  //         telemetry_data: telemetry,
-  //         acknowledged: false,
-  //         createdAt: new Date(),
-  //         updatedAt: new Date(),
-  //       };
-
-  //       const savedAlert = await this.createAlert(alert);
-  //       triggeredAlerts.push(savedAlert);
-        
-  //       this.logger.warn(
-  //         `Alert triggered: ${rule.rule_id} - ${rule.sensor_type} ${rule.operator} ${rule.threshold} (actual: ${sensorValue})`
-  //       );
-  //     }
-  //   }
-
-  //   return triggeredAlerts;
-  // }
   async checkTelemetryForAlerts(telemetry: ITelemetry): Promise<IAlert[]> {
     const triggeredAlerts: IAlert[] = [];
 
-    // Sort rules: highest threshold first
-    const rules = [...this.defaultRules].sort((a, b) => b.threshold - a.threshold);
+    for (const sensorRange of this.sensorOptimalRanges) {
+      if (!sensorRange.enabled) continue;
 
-    // Keep track of sensors that already triggered
-    const triggeredSensors = new Set<string>();
+      const sensorValue = telemetry[sensorRange.sensor_type];
+      if (sensorValue === undefined || sensorValue === null || isNaN(sensorValue)) continue;
 
-    for (const rule of rules) {
-      if (!rule.enabled) continue;
+      const deviationAnalysis = this.calculateDeviation(sensorValue, sensorRange);
+      if (!deviationAnalysis) continue;
 
-      const sensorValue = telemetry[rule.sensor_type];
-      if (sensorValue === undefined || sensorValue === null) continue;
+      const severityLevel = this.getSeverityLevel(deviationAnalysis.deviation_percentage);
+      if (!severityLevel) continue;
 
-      // Skip if this sensor already triggered an alert
-      if (triggeredSensors.has(rule.sensor_type)) continue;
+      const alert: IAlert = {
+        rule_id: `${sensorRange.sensor_type.toLowerCase()}-${deviationAnalysis.deviation_type}-${severityLevel.severity}`,
+        sensor_type: sensorRange.sensor_type,
+        actual_value: sensorValue,
+        optimal_range: { min: sensorRange.min, max: sensorRange.max },
+        deviation_percentage: deviationAnalysis.deviation_percentage,
+        deviation_type: deviationAnalysis.deviation_type,
+        notify: severityLevel.notify,
+        severity: severityLevel.severity,
+        triggered_at: new Date(),
+        telemetry_data: telemetry,
+        acknowledged: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      if (this.evaluateCondition(sensorValue, rule.threshold, rule.operator)) {
-        const alert: IAlert = {
-          rule_id: rule.rule_id,
-          sensor_type: rule.sensor_type,
-          threshold: rule.threshold,
-          operator: rule.operator,
-          notify: rule.notify,
-          severity: rule.severity,
-          triggered_at: new Date(),
-          telemetry_data: telemetry,
-          acknowledged: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
+      const savedAlert = await this.createAlert(alert);
+      triggeredAlerts.push(savedAlert);
 
-        const savedAlert = await this.createAlert(alert);
-        triggeredAlerts.push(savedAlert);
-
-        triggeredSensors.add(rule.sensor_type); // prevent more alerts for same sensor
-
-        this.logger.warn(
-          `Alert triggered: ${rule.rule_id} - ${rule.sensor_type} ${rule.operator} ${rule.threshold} (actual: ${sensorValue})`
-        );
-      }
+      this.logger.warn(
+        `Alert triggered: ${alert.rule_id} - ${sensorRange.sensor_type} value ${sensorValue}${sensorRange.unit || ''} is ${deviationAnalysis.deviation_percentage.toFixed(1)}% ${deviationAnalysis.deviation_type.replace('_', ' ')} the optimal range [${sensorRange.min}-${sensorRange.max}${sensorRange.unit || ''}]`
+      );
     }
 
     return triggeredAlerts;
   }
 
-  private evaluateCondition(value: number, threshold: number, operator: string): boolean {
-    switch (operator) {
-      case ">=": return value >= threshold;
-      case "<=": return value <= threshold;
-      case ">": return value > threshold;
-      case "<": return value < threshold;
-      case "==": return value === threshold;
-      case "!=": return value !== threshold;
-      default: return false;
+  private calculateDeviation(value: number, range: ISensorOptimalRange): { deviation_percentage: number; deviation_type: "above_max" | "below_min" } | null {
+    const { min, max } = range;
+
+    if (value >= min && value <= max) {
+      return null; 
     }
+
+    let deviation_percentage: number;
+    let deviation_type: "above_max" | "below_min";
+
+    if (value > max) {
+      deviation_percentage = ((value - max) / max) * 100; 
+      deviation_type = "above_max";
+    } else {
+      deviation_percentage = ((min - value) / min) * 100; 
+      deviation_type = "below_min";
+    }
+
+    return { deviation_percentage, deviation_type };
+  }
+
+  private getSeverityLevel(deviationPercentage: number): IDeviationThreshold | null {
+    const sortedThresholds = [...this.deviationThresholds].sort((a, b) => b.deviation_percentage - a.deviation_percentage);
+    
+    for (const threshold of sortedThresholds) {
+      if (deviationPercentage >= threshold.deviation_percentage) {
+        return threshold;
+      }
+    }
+
+    return null; 
   }
 
   async createAlert(alert: IAlert): Promise<IAlert> {
@@ -243,10 +145,8 @@ export class AlertsService {
       }
     };
 
-    // Get total count for the day
     const totalCount = await collection.countDocuments(dateFilter);
     
-    // Get alerts for the day
     const alerts = await collection.find(dateFilter).sort({ triggered_at: -1 }).toArray();
     
     return {
@@ -269,10 +169,8 @@ export class AlertsService {
   async getRecentAlertsWithCounts(limit: number = 50, offset: number = 0): Promise<{ alerts: IAlert[]; totalCount: number; returnedCount: number; limit: number }> {
     const collection = await this.getAlertsCollection();
     
-    // Get total count of all alerts
     const totalCount = await collection.countDocuments();
     
-    // Get recent alerts with limit and offset
     const alerts = await collection
       .find()
       .sort({ triggered_at: -1 })
@@ -354,8 +252,7 @@ export class AlertsService {
 
     const result = await collection.aggregate(pipeline).toArray();
     
-    // Ensure all severity types are represented, even if count is 0
-    const severityTypes = ["critical", "high", "warning", "medium", "low"];
+    const severityTypes = ["catastrophic", "critical", "high", "medium", "low"];
     const countsMap = new Map(result.map(item => [item.type, item.count]));
     
     return severityTypes.map(type => ({
@@ -365,9 +262,10 @@ export class AlertsService {
   }
 
   async getAlertCountsBySeverityAndStatus(days: number = 1): Promise<{
+    catastrophic: number;
     critical: number;
     high: number;
-    warning: number;
+    medium: number;
     low: number;
     resolved: number;
     total: number;
@@ -415,9 +313,10 @@ export class AlertsService {
     const totalCount = await collection.countDocuments(dateFilter);
 
     return {
+      catastrophic: severityCounts.get("catastrophic") || 0,
       critical: severityCounts.get("critical") || 0,
       high: severityCounts.get("high") || 0,
-      warning: severityCounts.get("warning") || 0,
+      medium: severityCounts.get("medium") || 0,
       low: severityCounts.get("low") || 0,
       resolved: resolvedCount,
       total: totalCount,
@@ -445,7 +344,6 @@ export class AlertsService {
     const telemetryCol = await this.telemetryService.getCollection();
     const alertsCol = await this.getAlertsCollection();
 
-    // Step 1: Get latest telemetry for each machine
     const latestTelemetry = await telemetryCol.aggregate([
       { $sort: { timestamp: -1 } },
       {
@@ -457,7 +355,6 @@ export class AlertsService {
       },
     ]).toArray();
 
-    // Step 2: For each machine, check the latest alert by referenced telemetry ID
     const results = [];
     for (const { _id: machineId, lastTelemetryAt, telemetryId } of latestTelemetry) {
       const latestAlert = await alertsCol.findOne(
@@ -467,8 +364,11 @@ export class AlertsService {
 
       let status: "normal" | "warning" | "critical" = "normal";
       if (latestAlert) {
-        if (latestAlert.severity === "warning") status = "warning";
-        else if (latestAlert.severity === "critical") status = "critical";
+        if (["low", "medium"].includes(latestAlert.severity)) {
+          status = "warning";
+        } else if (["high", "critical", "catastrophic"].includes(latestAlert.severity)) {
+          status = "critical";
+        }
       }
 
       results.push({
@@ -479,6 +379,46 @@ export class AlertsService {
     }
 
     return results;
+  }
+
+
+  getSensorOptimalRanges(): ISensorOptimalRange[] {
+    return this.sensorOptimalRanges;
+  }
+
+  getSensorOptimalRange(sensorType: string): ISensorOptimalRange | undefined {
+    return this.sensorOptimalRanges.find(range => range.sensor_type === sensorType);
+  }
+
+  updateSensorOptimalRange(sensorType: string, min: number, max: number, enabled?: boolean): boolean {
+    const range = this.sensorOptimalRanges.find(range => range.sensor_type === sensorType);
+    if (range) {
+      range.min = min;
+      range.max = max;
+      if (enabled !== undefined) {
+        range.enabled = enabled;
+      }
+      this.logger.log(`Updated optimal range for ${sensorType}: [${min}, ${max}]`);
+      return true;
+    }
+    return false;
+  }
+
+  getDeviationThresholds(): IDeviationThreshold[] {
+    return this.deviationThresholds;
+  }
+
+  updateDeviationThreshold(severity: string, deviationPercentage: number, notify?: string[]): boolean {
+    const threshold = this.deviationThresholds.find(t => t.severity === severity);
+    if (threshold) {
+      threshold.deviation_percentage = deviationPercentage;
+      if (notify) {
+        threshold.notify = notify;
+      }
+      this.logger.log(`Updated deviation threshold for ${severity}: ${deviationPercentage}%`);
+      return true;
+    }
+    return false;
   }
 
   async getTopOffendingStats(startDate?: string, endDate?: string) {
@@ -506,68 +446,101 @@ export class AlertsService {
                 count: { $sum: 1 },
               },
             },
-            // pivot severities -> critical, warning
+            // pivot severities -> critical, catastrophic
             {
               $group: {
                 _id: "$_id.machineId",
+                catastrophic: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "catastrophic"] }, "$count", 0],
+                  },
+                },
                 critical: {
                   $sum: {
                     $cond: [{ $eq: ["$_id.severity", "critical"] }, "$count", 0],
                   },
                 },
-                warning: {
+                high: {
                   $sum: {
-                    $cond: [{ $eq: ["$_id.severity", "warning"] }, "$count", 0],
+                    $cond: [{ $eq: ["$_id.severity", "high"] }, "$count", 0],
+                  },
+                },
+                medium: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "medium"] }, "$count", 0],
+                  },
+                },
+                low: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "low"] }, "$count", 0],
                   },
                 },
                 total: { $sum: "$count" },
               },
             },
-            // order by critical first, then warning, then total
-            { $sort: { critical: -1, warning: -1, total: -1 } },
+            // order by catastrophic first, then critical, then high, then total
+            { $sort: { catastrophic: -1, critical: -1, high: -1, medium: -1, low: -1, total: -1 } },
             {
               $project: {
                 _id: 0,
                 machineId: "$_id",
+                catastrophic: 1,
                 critical: 1,
-                warning: 1,
+                high: 1,
+                medium: 1,
+                low: 1,
                 total: 1,
               },
             },
           ],
           topParameters: [
-            // count per (sensor_type, severity)
             {
               $group: {
                 _id: { param: "$sensor_type", severity: "$severity" },
                 count: { $sum: 1 },
               },
             },
-            // pivot severities -> critical, warning
             {
               $group: {
                 _id: "$_id.param",
+                catastrophic: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "catastrophic"] }, "$count", 0],
+                  },
+                },
                 critical: {
                   $sum: {
                     $cond: [{ $eq: ["$_id.severity", "critical"] }, "$count", 0],
                   },
                 },
-                warning: {
+                high: {
                   $sum: {
-                    $cond: [{ $eq: ["$_id.severity", "warning"] }, "$count", 0],
+                    $cond: [{ $eq: ["$_id.severity", "high"] }, "$count", 0],
+                  },
+                },
+                medium: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "medium"] }, "$count", 0],
+                  },
+                },
+                low: {
+                  $sum: {
+                    $cond: [{ $eq: ["$_id.severity", "low"] }, "$count", 0],
                   },
                 },
                 total: { $sum: "$count" },
               },
             },
-            // parameter breaches "most often" -> sort by total
-            { $sort: { total: -1, critical: -1, warning: -1 } },
+            { $sort: { total: -1, catastrophic: -1, critical: -1, high: -1, medium: -1, low:-1 } },
             {
               $project: {
                 _id: 0,
                 parameter: "$_id",
+                catastrophic: 1,
                 critical: 1,
-                warning: 1,
+                high: 1,
+                medium: 1,
+                low: 1,
                 total: 1,
               },
             },
@@ -575,13 +548,9 @@ export class AlertsService {
         },
       },
     ]).toArray();
-
-    // Always return both arrays (fallback to empty if no alerts)
     return {
       topMachines: result?.topMachines ?? [],
       topParameters: result?.topParameters ?? [],
     };
   }
-
-
 }
