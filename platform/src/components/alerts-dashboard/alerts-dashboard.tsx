@@ -78,11 +78,11 @@ export const AlertsDashboard: React.FC = () => {
 		}
 	}
 
-	// Fetch last 25 alerts for timeline
+	// Fetch last 200 alerts for timeline
 	const fetchTimelineAlerts = async () => {
 		try {
 			setTimelineLoading(true)
-			const response = await AlertService.getRecentAlerts(100, 0) // Get last 25 alerts
+			const response = await AlertService.getRecentAlerts(200, 0) // Get last 200 alerts
 			setTimelineAlerts(response.alerts)
 		} catch (err) {
 			console.error('Error fetching timeline alerts:', err)
@@ -113,8 +113,8 @@ export const AlertsDashboard: React.FC = () => {
 				// Update timeline alerts with new alert
 				setTimelineAlerts((prev) => {
 					const updated = [alertWithDefaults, ...prev]
-					// Keep only last 25 alerts for timeline
-					return updated.slice(0, 50)
+					// Keep only last 200 alerts for timeline
+					return updated.slice(0, 200)
 				})
 
 				// Add new alert to top of current page data (maintain 10-record limit)
@@ -194,8 +194,8 @@ export const AlertsDashboard: React.FC = () => {
 				// Update timeline alerts with new alert
 				setTimelineAlerts((prev) => {
 					const updated = [alertWithDefaults, ...prev]
-					// Keep only last 25 alerts for timeline
-					return updated.slice(0, 25)
+					// Keep only last 200 alerts for timeline
+					return updated.slice(0, 200)
 				})
 
 				// Add new alert to top of current page data (maintain 10-record limit)

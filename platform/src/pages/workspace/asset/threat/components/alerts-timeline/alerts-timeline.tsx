@@ -9,6 +9,7 @@ import { Alert } from '../../../../../../services/telemetry'
 import moment from 'moment/moment'
 
 export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
+	// Component now handles up to 200 alerts for comprehensive timeline view
 	const [type, setType] = useState<'DAY' | 'WEEK' | 'MONTH'>('DAY')
 	const [selectedSeverity, setSelectedSeverity] = useState<{
 		name: string
@@ -44,7 +45,7 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 		return filtered
 	}, [alerts, selectedSeverity, selectedAlertType])
 
-	// Create timeline data with actual telemetry values
+	// Create timeline data with actual telemetry values (supports up to 200 alerts)
 	const timelineData = useMemo(() => {
 		// Create sequential index mapping for alerts
 		const alertsWithIndex = filteredAlerts.map((alert, index) => ({
