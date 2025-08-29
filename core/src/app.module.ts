@@ -15,7 +15,10 @@ import { AppController } from "./telemetry/app.controller";
     }),
     BullModule.forRoot({
       redis: {
-        host: "redis://default:WLC2j4A5XTSVtLYckE6HIt7ZqKl8Cfm9@redis-16508.c1.us-central1-2.gce.redns.redis-cloud.com:16508",
+        host: process.env.REDIS_HOST || "localhost",
+        port: parseInt(process.env.REDIS_PORT) || 6379,
+        password: process.env.REDIS_PASSWORD,
+        db: parseInt(process.env.REDIS_DB) || 0,
       },
       defaultJobOptions: {
         attempts: 3,
