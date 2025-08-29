@@ -2,7 +2,10 @@ import axios from 'axios'
 import { ApiConfig } from 'config'
 
 const client = axios.create({
-	baseURL: ApiConfig.API_BASE_URL
+	baseURL:
+		process.env.NODE_ENV === 'production'
+			? 'http://139.59.67.175:9000'
+			: ApiConfig.API_BASE_URL
 })
 
 let TOKEN: string | null = null

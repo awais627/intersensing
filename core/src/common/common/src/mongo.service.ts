@@ -8,7 +8,7 @@ dotenv.config();
 export class MongoService implements OnModuleInit, OnModuleDestroy {
   private readonly mongoUrl =
     "mongodb+srv://muhammadawais:vkl1Phd92yEJLHOR@cluster0.0wi6ueg.mongodb.net/";
-  private readonly defaultDbName = "iot-telemetry";
+  private readonly defaultDbName = "iot-telemetry-production";
   private isConnected = false;
 
   private _mainClient: MongoClient | null = null;

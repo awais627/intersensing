@@ -6,6 +6,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import { TelemetryModule } from "./telemetry/telemetry.module";
 import { EventsModule } from "./events/events.module";
 import { AlertsModule } from "./alerts/alerts.module";
+import { AppController } from "./telemetry/app.controller";
 
 @Module({
   imports: [
@@ -35,5 +36,6 @@ import { AlertsModule } from "./alerts/alerts.module";
     EventsModule,
     AlertsModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
