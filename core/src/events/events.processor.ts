@@ -41,16 +41,16 @@ export class EventsProcessor {
 
         switch (severity) {
           case "normal":
-            return min + Math.random() * gap;
+            return Math.max(0, min + Math.random() * gap);
 
           case "lowhigh": {
             const dev = (0.10 + Math.random() * 0.40) * gap;
-            return Math.random() < 0.5 ? min - dev : max + dev;
+            return Math.max(0, Math.random() < 0.5 ? min - dev : max + dev);
           }
 
           case "severe": {
             const dev = (0.75 + Math.random() * 0.50) * gap;
-            return Math.random() < 0.5 ? min - dev : max + dev;
+            return Math.max(0, Math.random() < 0.5 ? min - dev : max + dev);
           }
         }
       }
