@@ -6,7 +6,7 @@ import { WiBarometer, WiHumidity, WiThermometer } from 'react-icons/wi'
 import { FaLeaf, FaWind } from 'react-icons/fa'
 import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/components/traffic-timeline'
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
-import { Alert, TelemetryData } from 'services/telemetry'
+import { Alert } from 'services/telemetry'
 import { socketService } from 'services/socket'
 
 export const TelemetryDashboard: React.FC = () => {
@@ -20,7 +20,8 @@ export const TelemetryDashboard: React.FC = () => {
 		refresh,
 		refreshAlerts,
 		machineCounts,
-		alertCounts
+		alertCounts,
+		topOffenders
 	} = useTelemetry()
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
@@ -112,92 +113,131 @@ export const TelemetryDashboard: React.FC = () => {
 		}
 	]
 
-	const getAlertsData = () => {
-		if (!alerts.length) return []
-
-		const alertsData = alerts.map((alert) => {
-			const currentValue =
-				alert.telemetry_data?.[alert.sensor_type as keyof TelemetryData] || 0
-			return {
-				id:
-					alert.telemetry_data?.machineId ||
-					alert._id ||
-					Math.random().toString(),
-				label: `${alert.telemetry_data?.machineId || 'Unknown'} - ${
-					alert.sensor_type
-				}`,
-				value: typeof currentValue === 'number' ? currentValue : 0,
-				color:
-					alert.severity === 'critical'
-						? 'red'
-						: alert.severity === 'high'
-						? 'orange'
-						: alert.severity === 'medium'
-						? 'yellow'
-						: 'blue'
-			}
-		})
-
-		return alertsData.slice(0, 5) // Show last 5 alerts
-	}
-
 	const getTemperatureData = () => {
-		if (!telemetryData.length) return []
+		if (!topOffenders?.topParameters) return []
 
-		const tempData = telemetryData.map((item) => ({
-			id: item.machineId || item._id,
-			label: `${item.machineId || 'Unknown'} - ${new Date(
-				item.createdAt
-			).toLocaleTimeString()}`,
-			value: item.Temperature,
-			color:
-				item.Temperature > 25
-					? 'red'
-					: item.Temperature > 20
-					? 'amber'
-					: 'primary'
-		}))
+		const tempParameter = topOffenders.topParameters.find(
+			(p) => p.parameter === 'Temperature'
+		)
+		if (!tempParameter) return []
 
-		return tempData.slice(0, 5) // Show last 5 readings
+		return [
+			{
+				id: 'Critical',
+				label: 'Critical',
+				value: tempParameter.critical,
+				color: 'orange',
+				variant: '900'
+			},
+			{
+				id: 'High',
+				label: 'High',
+				value: tempParameter.high,
+				color: 'orange',
+				variant: '800'
+			},
+			{
+				id: 'Medium',
+				label: 'Medium',
+				value: tempParameter.medium,
+				color: 'orange',
+				variant: '700'
+			},
+			{
+				id: 'Low',
+				label: 'Low',
+				value: tempParameter.low,
+				color: 'orange',
+				variant: '600'
+			}
+		]
 	}
 
 	const getHumidityData = () => {
-		if (!telemetryData.length) return []
+		if (!topOffenders?.topParameters) return []
 
-		const humidityData = telemetryData.map((item) => ({
-			id: item.machineId || item._id,
-			label: `${item.machineId || 'Unknown'} - ${new Date(
-				item.createdAt
-			).toLocaleTimeString()}`,
-			value: item.Humidity,
-			color:
-				item.Humidity > 70 ? 'red' : item.Humidity > 40 ? 'amber' : 'primary'
-		}))
+		const humidityParameter = topOffenders.topParameters.find(
+			(p) => p.parameter === 'Humidity'
+		)
+		if (!humidityParameter) return []
 
-		return humidityData.slice(0, 5) // Show last 5 readings
+		return [
+			{
+				id: 'Critical',
+				label: 'Critical',
+				value: humidityParameter.critical,
+				color: 'orange',
+				variant: '900'
+			},
+			{
+				id: 'High',
+				label: 'High',
+				value: humidityParameter.high,
+				color: 'orange',
+				variant: '800'
+			},
+			{
+				id: 'Medium',
+				label: 'Medium',
+				value: humidityParameter.medium,
+				color: 'orange',
+				variant: '700'
+			},
+			{
+				id: 'Low',
+				label: 'Low',
+				value: humidityParameter.low,
+				color: 'orange',
+				variant: '600'
+			}
+		]
 	}
 
 	const getAirQualityData = () => {
-		if (!telemetryData.length) return []
+		if (!topOffenders?.topParameters) return []
 
-		const aqiData = telemetryData.map((item) => ({
-			id: item.machineId || item._id,
-			label: `${item.machineId || 'Unknown'} - ${new Date(
-				item.createdAt
-			).toLocaleTimeString()}`,
-			value: item['eCO2'],
-			color:
-				item['eCO2'] > 600 ? 'red' : item['eCO2'] > 400 ? 'amber' : 'primary'
-		}))
+		const eco2Parameter = topOffenders.topParameters.find(
+			(p) => p.parameter === 'eCO2'
+		)
+		if (!eco2Parameter) return []
 
-		return aqiData.slice(0, 5) // Show last 5 readings
+		return [
+			{
+				id: 'Critical',
+				label: 'Critical',
+				value: eco2Parameter.critical,
+				color: 'orange',
+				variant: '900'
+			},
+			{
+				id: 'High',
+				label: 'High',
+				value: eco2Parameter.high,
+				color: 'orange',
+				variant: '800'
+			},
+			{
+				id: 'Medium',
+				label: 'Medium',
+				value: eco2Parameter.medium,
+				color: 'orange',
+				variant: '700'
+			},
+			{
+				id: 'Low',
+				label: 'Low',
+				value: eco2Parameter.low,
+				color: 'orange',
+				variant: '600'
+			}
+		]
 	}
 
 	const getMachineCountsData = () => {
 		if (
-			!machineCounts ||
-			!Array.isArray(machineCounts) ||
-			machineCounts.length === 0
+			!topOffenders?.topMachines ||
+			!Array.isArray(topOffenders.topMachines) ||
+			topOffenders.topMachines.length === 0
 		) {
 			return [
 				{
@@ -209,21 +249,15 @@ export const TelemetryDashboard: React.FC = () => {
 			]
 		}
 
-		// Convert machine counts to the format expected by PieCard
-		return machineCounts.map((machine: any, index: number) => ({
+		// Convert top machines to the format expected by PieCard
+		return topOffenders.topMachines.map((machine, index) => ({
 			id: machine.machineId,
-			value: machine.count,
-			color:
-				index === 0
-					? 'blue'
-					: index === 1
-					? 'blue'
-					: index === 2
-					? 'blue'
-					: index === 3
-					? 'blue'
-					: 'blue',
-			variant: (100 * (index + 1)).toLocaleString()
+			value: machine.total,
+			color: 'red',
+			variant: (700 - index * 100 > 0
+				? 700 - index * 100
+				: 100
+			).toLocaleString()
 		}))
 	}
 
@@ -364,11 +398,19 @@ export const TelemetryDashboard: React.FC = () => {
 					<PieCard
 						containerClassName="h-full"
 						data={getMachineCountsData()}
-						label="Sensor Categories"
-						hasData={true}
+						label="Top Alert Machines"
+						hasData={
+							topOffenders?.topMachines && topOffenders.topMachines.length > 0
+						}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Temperature, Humidity, Air Quality</p>
+								<p>Machines with highest alert counts</p>
+								<p className="text-xs text-gray-500">
+									Red: Most alerts, Orange: Second most, Yellow: Third most
+								</p>
+								<p className="text-xs text-blue-500 mt-1">
+									Data from top-offenders API
+								</p>
 							</div>
 						}
 					/>
@@ -383,17 +425,30 @@ export const TelemetryDashboard: React.FC = () => {
 					<PieCard
 						containerClassName="h-full"
 						data={getTemperatureData()}
-						label="Real-time Temperature Trend"
-						hasData={telemetryData.length > 0}
-						totalValue={telemetryData.length > 0 ? (telemetryData.reduce((sum, item) => sum + item.Temperature, 0) / telemetryData.length).toFixed(1) + '°C' : '0°C'}
+						label="Temperature Alert Count"
+						hasData={
+							topOffenders?.topParameters &&
+							topOffenders.topParameters.length > 0
+						}
+						totalValue={
+							topOffenders?.topParameters &&
+							topOffenders.topParameters.length > 0
+								? (
+										topOffenders.topParameters.find(
+											(p) => p.parameter === 'Temperature'
+										)?.total || 0
+								  ).toString()
+								: '0'
+						}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Individual device temperature readings</p>
+								<p>Total temperature alerts across all machines</p>
 								<p className="text-xs text-gray-500">
-									Center shows average temperature
+									Center shows total temperature alerts
 								</p>
-								<p className="text-xs text-gray-500">
-									Green: Optimal, Yellow: Warm, Red: Hot
+								<p className="text-xs text-gray-500">Red: High alert count</p>
+								<p className="text-xs text-blue-500 mt-1">
+									Data from top-offenders API
 								</p>
 							</div>
 						}
@@ -403,17 +458,30 @@ export const TelemetryDashboard: React.FC = () => {
 					<PieCard
 						containerClassName="h-full"
 						data={getHumidityData()}
-						label="Real-time Humidity Trend"
-						hasData={telemetryData.length > 0}
-						totalValue={telemetryData.length > 0 ? (telemetryData.reduce((sum, item) => sum + item.Humidity, 0) / telemetryData.length).toFixed(1) + '%' : '0%'}
+						label="Humidity Alert Count"
+						hasData={
+							topOffenders?.topParameters &&
+							topOffenders.topParameters.length > 0
+						}
+						totalValue={
+							topOffenders?.topParameters &&
+							topOffenders.topParameters.length > 0
+								? (
+										topOffenders.topParameters.find(
+											(p) => p.parameter === 'Humidity'
+										)?.total || 0
+								  ).toString()
+								: '0'
+						}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Individual device humidity readings</p>
+								<p>Total humidity alerts across all machines</p>
 								<p className="text-xs text-gray-500">
-									Center shows average humidity
+									Center shows total humidity alerts
 								</p>
-								<p className="text-xs text-gray-500">
-									Green: Optimal, Yellow: Low, Red: High
+								<p className="text-xs text-gray-500">Blue: High alert count</p>
+								<p className="text-xs text-blue-500 mt-1">
+									Data from top-offenders API
 								</p>
 							</div>
 						}
@@ -423,17 +491,32 @@ export const TelemetryDashboard: React.FC = () => {
 					<PieCard
 						containerClassName="h-full"
 						data={getAirQualityData()}
-						label="Real-time Air Quality (eCO2)"
-						hasData={telemetryData.length > 0}
-						totalValue={telemetryData.length > 0 ? (telemetryData.reduce((sum, item) => sum + item['eCO2'], 0) / telemetryData.length).toFixed(0) + ' ppm' : '0 ppm'}
+						label="eCO2 Alert Count"
+						hasData={
+							topOffenders?.topParameters &&
+							topOffenders.topParameters.length > 0
+						}
+						totalValue={
+							topOffenders?.topParameters &&
+							topOffenders.topParameters.length > 0
+								? (
+										topOffenders.topParameters.find(
+											(p) => p.parameter === 'eCO2'
+										)?.total || 0
+								  ).toString()
+								: '0'
+						}
 						infoTooltip={
 							<div className="flex flex-col">
-								<p>Individual device eCO2 readings</p>
+								<p>Total eCO2 alerts across all machines</p>
 								<p className="text-xs text-gray-500">
-									Center shows average eCO2 levels
+									Center shows total eCO2 alerts
 								</p>
 								<p className="text-xs text-gray-500">
-									Green: Good, Yellow: Moderate, Red: Poor
+									Orange: High alert count
+								</p>
+								<p className="text-xs text-blue-500 mt-1">
+									Data from top-offenders API
 								</p>
 							</div>
 						}

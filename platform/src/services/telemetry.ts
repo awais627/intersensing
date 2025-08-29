@@ -100,6 +100,27 @@ export interface DailyAlertsResponse {
   date: string
 }
 
+export interface TopOffendersResponse {
+  topMachines: Array<{
+    catastrophic: number
+    critical: number
+    high: number
+    medium: number
+    low: number
+    total: number
+    machineId: string
+  }>
+  topParameters: Array<{
+    catastrophic: number
+    critical: number
+    high: number
+    medium: number
+    low: number
+    total: number
+    parameter: string
+  }>
+}
+
 export const TelemetryService = {
   // Get latest telemetry data
   async getLatest(): Promise<TelemetryData[]> {
@@ -186,6 +207,12 @@ export const AlertService = {
   // Get alert severity and status counts
   async getAlertSeverityCounts(days: number = 1): Promise<AlertSeverityCountsResponse> {
     const { data } = await ApiClient.client.get(`/api/alerts/severity-counts?days=${days}`)
+    return data
+  },
+
+  // Get top offenders
+  async getTopOffenders(): Promise<TopOffendersResponse> {
+    const { data } = await ApiClient.client.get('/api/alerts/top-offenders')
     return data
   },
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { TelemetryService, TelemetryData, Alert, AlertService, MachineCount, AlertCountsResponse } from 'services/telemetry'
+import { TelemetryService, TelemetryData, Alert, AlertService, MachineCount, AlertCountsResponse, TopOffendersResponse } from 'services/telemetry'
 import { socketService } from 'services/socket'
 
 export const useTelemetry = () => {
@@ -8,6 +8,7 @@ export const useTelemetry = () => {
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [machineCounts, setMachineCounts] = useState<MachineCount[]>([])
   const [alertCounts, setAlertCounts] = useState<AlertCountsResponse | null>(null)
+  const [topOffenders, setTopOffenders] = useState<TopOffendersResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -96,6 +97,19 @@ export const useTelemetry = () => {
     } catch (err) {
       console.error('❌ Error fetching alert counts:', err)
       // Don't set error for alert counts, just log it
+    }
+  }, [])
+
+  // Fetch top offenders
+  const fetchTopOffenders = useCallback(async () => {
+    try {
+      console.log('🏆 Fetching top offenders...')
+      const offenders = await AlertService.getTopOffenders()
+      console.log('🏆 Fetched top offenders:', offenders)
+      setTopOffenders(offenders)
+    } catch (err) {
+      console.error('❌ Error fetching top offenders:', err)
+      // Don't set error for top offenders, just log it
     }
   }, [])
 
@@ -203,7 +217,8 @@ export const useTelemetry = () => {
     fetchRecentAlerts()
     fetchMachineCounts()
     fetchAlertCounts()
-  }, [fetchLatestData, fetchRecentAlerts, fetchMachineCounts, fetchAlertCounts])
+    fetchTopOffenders()
+  }, [fetchLatestData, fetchRecentAlerts, fetchMachineCounts, fetchAlertCounts, fetchTopOffenders])
 
   return {
     telemetryData,
@@ -217,6 +232,7 @@ export const useTelemetry = () => {
     refresh: fetchLatestData,
     refreshAlerts: fetchRecentAlerts,
     machineCounts,
-    alertCounts
+    alertCounts,
+    topOffenders
   }
 }
