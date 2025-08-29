@@ -9,7 +9,7 @@ export class EventsCronService {
 
   constructor(private readonly eventsService: EventsService) {}
 
-  @Cron(CronExpression.EVERY_30_SECONDS) // Every 2 seconds
+  @Cron(CronExpression.EVERY_5_SECONDS) // Every 2 seconds
   async handleCron() {
     this.jobCounter++;
 
