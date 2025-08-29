@@ -1,5 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Collection } from "mongodb";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Collection, ObjectId } from "mongodb";
 import { MongoService } from "../common/common/src/mongo.service";
 import { IAlert, ISensorOptimalRange, IDeviationThreshold } from "../common/interfaces/alert";
 import { ITelemetry } from "../common/interfaces/telemetry";
@@ -204,16 +204,21 @@ export class AlertsService {
 
   async ackAlert(alertId: string): Promise<void> {
     const collection = await this.getAlertsCollection();
-    await collection.updateOne(
-      { _id: alertId } as any,
+    const result = await collection.updateOne(
+      {  _id: new ObjectId(alertId) } as any,     // ← wrap here
       {
         $set: {
           acknowledged: true,
           acknowledged_at: new Date(),
           updatedAt: new Date(),
-        }
+        },
       }
     );
+
+    // optional sanity check
+    if (result.matchedCount === 0) {
+      throw new NotFoundException(`Alert ${alertId} not found`);
+    }
   }
 
   async getAlertCountsByType(date: Date): Promise<Array<{ count: number; type: string }>> {
@@ -304,10 +309,10 @@ export class AlertsService {
     const severityResult = await collection.aggregate(severityPipeline).toArray();
     const severityCounts = new Map(severityResult.map(item => [item._id, item.count]));
 
-    // Get resolved count
+    // Get acknowledged count
     const resolvedCount = await collection.countDocuments({
       ...dateFilter,
-      resolved: true
+      acknowledged: true
     });
 
     // Get total count

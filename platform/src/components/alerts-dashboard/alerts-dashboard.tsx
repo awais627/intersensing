@@ -265,21 +265,21 @@ export const AlertsDashboard: React.FC = () => {
 		await fetchTimelineAlerts() // Refresh timeline alerts as well
 	}
 
-	const handleResolveAlert = async (alertId: string) => {
-		try {
-			await AlertService.resolveAlert(alertId)
-			// Update local state
-			setAllAlerts((prev) =>
-				prev.map((alert) =>
-					alert._id === alertId
-						? { ...alert, resolved: true, resolved_at: new Date() }
-						: alert
-				)
-			)
-		} catch (err) {
-			console.error('Error resolving alert:', err)
-		}
+	const handleAckAlert = async (alertId: string) => {
+	try {
+		await AlertService.ackAlert(alertId);
+
+		setAllAlerts(prev =>
+		prev.map(alert =>
+			alert._id === alertId
+			? { ...alert, acknowledged: true, acknowledged_at: new Date() }
+			: alert
+		)
+		);
+	} catch (err) {
+		console.error('Error acknowledging alert:', err);
 	}
+	};
 	// Get alert metrics from API data
 	const getAlertMetrics = () => {
 		if (!severityCounts) return []
@@ -521,18 +521,18 @@ export const AlertsDashboard: React.FC = () => {
 									<td className="px-6 py-4 whitespace-nowrap">
 										<span
 											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-												alert.resolved
+												alert.acknowledged
 													? 'bg-green-100 text-green-800'
 													: 'bg-red-100 text-red-800'
 											}`}
 										>
-											{alert.resolved ? 'Resolved' : 'Active'}
+											{alert.acknowledged ? 'Acknowledged' : 'Active'}
 										</span>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										{!alert.resolved && (
+										{!alert.acknowledged && (
 											<button
-												onClick={() => handleResolveAlert(alert._id!)}
+												onClick={() => handleAckAlert(alert._id!)}
 												className="text-indigo-600 hover:text-indigo-900"
 											>
 												Acknowledge
