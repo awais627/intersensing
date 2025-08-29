@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, useNavigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './App.css'
@@ -17,6 +17,8 @@ const queryClient = new QueryClient({
 })
 
 const RootApp = () => {
+	const navigate = useNavigate()
+	const pathname = window?.location?.pathname
 	useEffect(() => {
 		const metaTag = document.querySelector("meta[name='viewport']")
 		if (metaTag) {
@@ -28,6 +30,9 @@ const RootApp = () => {
 			} else {
 				metaTag.setAttribute('content', 'width=device-width, initial-scale=1')
 			}
+		}
+		if (!pathname || pathname === '/') {
+			navigate('/telemetry')
 		}
 	}, [])
 

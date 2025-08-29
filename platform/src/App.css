@@ -523,38 +523,6 @@ select:invalid {
 	z-index: 10000009 !important;
 }
 
-.react-datepicker__header {
-	background-color: var(--color-gray-200);
-}
-
-.react-datepicker__today-button {
-	border-radius: 0.3rem;
-	color: var(--color-text-default);
-	background-color: var(--color-gray-200);
-}
-
-.react-datepicker {
-	font-size: 0.8rem;
-	background-color: var(--background);
-	border: 0;
-}
-.react-datepicker__day-name,
-.react-datepicker__current-month,
-.react-datepicker__day {
-	color: var(--color-text-default);
-}
-
-.react-datepicker__day:hover,
-.react-datepicker__day--selected,
-.react-datepicker__day--keyboard-selected,
-.react-datepicker__month-text--keyboard-selected,
-.react-datepicker__quarter-text--keyboard-selected,
-.react-datepicker__year-text--keyboard-selected {
-	border-radius: 0.3rem;
-	background-color: var(--color-gray-200);
-	color: var(--color-text-default);
-}
-
 .flip {
 	-webkit-transform: scaleX(-1);
 	transform: scaleX(-1);
