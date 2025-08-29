@@ -82,14 +82,15 @@ export class AlertsService {
       return null; 
     }
 
+    const rangeWidth = max - min;
     let deviation_percentage: number;
     let deviation_type: "above_max" | "below_min";
 
     if (value > max) {
-      deviation_percentage = ((value - max) / max) * 100; 
+      deviation_percentage = ((value - max) / rangeWidth) * 100;
       deviation_type = "above_max";
     } else {
-      deviation_percentage = ((min - value) / min) * 100; 
+      deviation_percentage = ((min - value) / rangeWidth) * 100;
       deviation_type = "below_min";
     }
 
