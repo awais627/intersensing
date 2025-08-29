@@ -53,9 +53,13 @@ export const AlertsDashboard: React.FC = () => {
 			const offset = (page - 1) * alertsPerPage
 			const response = await AlertService.getRecentAlerts(alertsPerPage, offset)
 
-			// Ensure we only set exactly the number of alerts for this page
-			// This prevents socket updates from affecting pagination
-			setAllAlerts(response.alerts.slice(0, alertsPerPage))
+		    // Map historical alerts to include machineId
+			const alertsWithMachineId = response.alerts.map(alert => ({
+			...alert,
+			machineId: alert.telemetry_data?.machineId || alert.machineId || 'Unknown'
+			}))
+			setAllAlerts(alertsWithMachineId.slice(0, alertsPerPage))
+			// setAllAlerts(response.alerts.slice(0, alertsPerPage))
 			setTotalAlertsCount(response.totalCount)
 			setTotalPages(Math.ceil(response.totalCount / alertsPerPage))
 		} catch (err) {
@@ -282,13 +286,22 @@ export const AlertsDashboard: React.FC = () => {
 
 		return [
 			{
+				label: 'Catastrophic Alerts',
+				key: 'catastrophic',
+				tooltip: 'Number of catastrophic alerts',
+				value: severityCounts.catastrophic,
+				icon: FaClock,
+				unit: '',
+				color: 'text-red-600'
+			},
+			{
 				label: 'Critical Alerts',
 				key: 'critical',
 				tooltip: 'Number of critical severity alerts',
 				value: severityCounts.critical,
 				icon: FaExclamationTriangle,
 				unit: '',
-				color: 'text-red-600'
+				color: 'text-orange-600'
 			},
 			{
 				label: 'High Alerts',
@@ -297,17 +310,9 @@ export const AlertsDashboard: React.FC = () => {
 				value: severityCounts.high,
 				icon: FaBell,
 				unit: '',
-				color: 'text-orange-600'
-			},
-			{
-				label: 'Catastrophic Alerts',
-				key: 'catastrophic',
-				tooltip: 'Number of catastrophic alerts',
-				value: severityCounts.catastrophic,
-				icon: FaClock,
-				unit: '',
 				color: 'text-amber-600'
 			},
+
 			{
 				label: 'Low Alerts',
 				key: 'low',
@@ -471,9 +476,6 @@ export const AlertsDashboard: React.FC = () => {
 									Rule ID
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Threshold
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
 									Triggered At
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -512,9 +514,6 @@ export const AlertsDashboard: React.FC = () => {
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm ">
 										{alert.rule_id}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm ">
-										{alert.operator} {alert.threshold}
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm">
 										{new Date(alert.triggered_at).toLocaleString()}
