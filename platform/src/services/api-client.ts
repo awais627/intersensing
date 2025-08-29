@@ -4,7 +4,7 @@ import { ApiConfig } from 'config'
 const client = axios.create({
 	baseURL:
 		process.env.NODE_ENV === 'production'
-			? 'http://139.59.67.175:9000'
+			? 'https://139.59.67.175'
 			: ApiConfig.API_BASE_URL
 })
 
