@@ -88,8 +88,7 @@ export const Sidebar = () => {
 									className="settings-bar"
 									label="Settings"
 									activeText={'/settings'}
-									disabled
-									to={() => '/'}
+									to={() => '/settings'}
 									icon={RiListSettingsLine}
 								/>
 							</div>
