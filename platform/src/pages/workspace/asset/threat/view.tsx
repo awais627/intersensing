@@ -82,7 +82,7 @@ export const ThreatPageView = ({}) => {
 			</div>
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
 				<div className="col-span-1 h-full">
-					<RepeatedClicksPanel />
+					<RepeatedClicksPanel data={null} />
 				</div>
 				<div className="col-span-2 h-full">
 					<SourceMapCard />
