@@ -537,7 +537,7 @@ export const AlertsDashboard: React.FC = () => {
 												onClick={() => handleResolveAlert(alert._id!)}
 												className="text-indigo-600 hover:text-indigo-900"
 											>
-												Resolve
+												Acknowledge
 											</button>
 										)}
 									</td>

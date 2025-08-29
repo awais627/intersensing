@@ -8,6 +8,7 @@ import { ThreadTrafficTimeline } from '../../pages/workspace/asset/threat/compon
 import { Top10 } from '../../pages/workspace/asset/threat/components/top-10'
 import { Alert } from 'services/telemetry'
 import { socketService } from 'services/socket'
+import { RepeatedClicksPanel } from '../../pages/workspace/asset/threat/components/repeated-clicks-panel'
 
 export const TelemetryDashboard: React.FC = () => {
 	const {
@@ -394,26 +395,8 @@ export const TelemetryDashboard: React.FC = () => {
 			</div>
 
 			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
-				<div className="h-full">
-					<PieCard
-						containerClassName="h-full"
-						data={getMachineCountsData()}
-						label="Top Alert Machines"
-						hasData={
-							topOffenders?.topMachines && topOffenders.topMachines.length > 0
-						}
-						infoTooltip={
-							<div className="flex flex-col">
-								<p>Machines with highest alert counts</p>
-								<p className="text-xs text-gray-500">
-									Red: Most alerts, Orange: Second most, Yellow: Third most
-								</p>
-								<p className="text-xs text-blue-500 mt-1">
-									Data from top-offenders API
-								</p>
-							</div>
-						}
-					/>
+				<div className="col-span-1 h-full">
+					<RepeatedClicksPanel data={topOffenders} />
 				</div>
 				<div className="col-span-2 h-full">
 					<Top10 telemetryData={telemetryData} />
