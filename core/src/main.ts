@@ -7,33 +7,36 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: true,
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
+    allowedHeaders: "*",
   });
 
-  // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle("IoT Telemetry Dashboard API")
-    .setDescription(
-      "A comprehensive API for IoT telemetry data management with real-time WebSocket support",
-    )
+    .setTitle("Auth Service")
+    .setDescription("APIs for user authentication")
     .setVersion("1.0")
-    .addTag("telemetry", "IoT telemetry data operations")
-    .addTag("websocket", "Real-time WebSocket events")
-    .addServer("http://localhost:9000", "Development server")
-    .addServer("https://api.example.com", "Production server")
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document, {
+  SwaggerModule.setup("api", app, document, {
     swaggerOptions: {
       persistAuthorization: true,
-      displayRequestDuration: true,
+      docExpansion: "list",
       filter: true,
-      showRequestHeaders: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+      deepLinking: true,
+      displayRequestDuration: true,
+      syntaxHighlight: {
+        theme: "monokai",
+      },
     },
-    customSiteTitle: "IoT Telemetry API Documentation",
-    customCss: ".swagger-ui .topbar { display: none }",
+  });
+  app.getHttpAdapter().get("/api-docs", (req, res) => {
+    res.json(document);
   });
 
   const port = 9000;
