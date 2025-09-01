@@ -34,13 +34,13 @@ export const TelemetryDashboard: React.FC = () => {
 		high: number
 		medium: number
 		low: number
-		warning: number
+		catastrophic: number
 	}>({
 		critical: 0,
 		high: 0,
 		medium: 0,
 		low: 0,
-		warning: 0
+		catastrophic: 0
 	})
 
 	// Initialize real-time counts from API data
@@ -51,7 +51,7 @@ export const TelemetryDashboard: React.FC = () => {
 				high: 0,
 				medium: 0,
 				low: 0,
-				warning: 0
+				catastrophic: 0
 			}
 
 			alertCounts.data.forEach((alertCount) => {
@@ -97,12 +97,9 @@ export const TelemetryDashboard: React.FC = () => {
 						case 'low':
 							newCounts.low += 1
 							break
-						case 'warning':
-							newCounts.warning += 1
-							break
 						default:
 							// Default to warning for unknown severities
-							newCounts.warning += 1
+							newCounts.catastrophic += 1
 							break
 					}
 
@@ -413,9 +410,9 @@ export const TelemetryDashboard: React.FC = () => {
 				variant: '600'
 			},
 			{
-				id: 'Warning',
-				label: 'Warning',
-				value: counts.warning,
+				id: 'Catastrophic',
+				label: 'catastrophic',
+				value: counts.catastrophic,
 				color: 'green',
 				variant: '500'
 			}
