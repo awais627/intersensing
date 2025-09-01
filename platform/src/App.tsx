@@ -4,6 +4,9 @@ import { CgSpinner } from 'react-icons/cg'
 import { ThemeFix } from 'theme-fix'
 import { PageNotFound } from './pages/pagenotfound'
 import { MainLayout } from './layout'
+import { LoginPage } from './pages/login'
+import { ProtectedRoute } from './components/ProtectedRoute'
+import { DemoPage } from './pages/demo'
 import { TelemetryPage } from './pages/workspace/asset/threat/telemetry-page'
 import { AlertsPage } from './pages/workspace/asset/threat/alerts-page'
 import { RulesPage } from './pages/workspace/asset/rules/rules-page'
@@ -18,18 +21,79 @@ export const App = () => {
 			}
 		>
 			<div className="min-h-full">
-				<div>
-					<MainLayout>
-						<Routes>
-							<Route path="telemetry" element={<TelemetryPage />} />
-							<Route path="alerts" element={<AlertsPage />} />
-							<Route path="rules" element={<RulesPage />} />
-							<Route path="settings" element={<SettingsPage />} />
-							<Route path="team" element={<TeamPage />} />
-							<Route path="*" element={<PageNotFound />} />
-						</Routes>
-					</MainLayout>
-				</div>
+				<Routes>
+					<Route path="/login" element={<LoginPage />} />
+					<Route
+						path="/"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<DemoPage />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/telemetry"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<TelemetryPage />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/alerts"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<AlertsPage />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/rules"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<RulesPage />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/settings"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<SettingsPage />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/team"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<TeamPage />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="*"
+						element={
+							<ProtectedRoute>
+								<MainLayout>
+									<PageNotFound />
+								</MainLayout>
+							</ProtectedRoute>
+						}
+					/>
+				</Routes>
 				<ThemeFix />
 			</div>
 		</Suspense>

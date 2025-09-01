@@ -1,11 +1,12 @@
 /* eslint-disable no-prototype-builtins */
 import { useEffect, useState } from 'react'
 import { RiMoonLine, RiSunLine } from 'react-icons/ri'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useUiStore } from 'store'
 import { useShallow } from 'zustand/react/shallow'
 import { useThemeStore } from './store'
+import { useAuth } from '../../hooks/useAuth'
 
 export const Navbar = () => {
 	const { setMobileSidebarOpen, mobileSidebarOpen, desktopSidebarCollapsed } =
@@ -19,6 +20,8 @@ export const Navbar = () => {
 
 	const { theme, switchTheme } = useThemeStore()
 	const location = useLocation()
+	const { logout } = useAuth()
+	const navigate = useNavigate()
 
 	const [hasAccess, setHasAccess] = useState(false)
 	const [activeTheme, setActiveTheme] = useState(theme || 'light')
@@ -125,6 +128,17 @@ export const Navbar = () => {
 							}`}
 						/>
 					</div>
+				</div>
+				<div className="flex items-center mr-4">
+					<button
+						onClick={() => {
+							logout()
+							navigate('/login')
+						}}
+						className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+					>
+						Logout
+					</button>
 				</div>
 			</div>
 		</div>
