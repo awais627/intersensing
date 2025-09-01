@@ -13,6 +13,7 @@ import {
 	AlertSeverityCountsResponse
 } from 'services/telemetry'
 import { socketService } from 'services/socket'
+import { AlertsTimeline } from '../../pages/workspace/asset/threat/components/alerts-timeline'
 
 export const AlertsDashboard: React.FC = () => {
 	const {
@@ -422,6 +423,10 @@ export const AlertsDashboard: React.FC = () => {
 									</div>
 								)
 						  })}
+				</div>
+
+				<div className="w-full h-[400px]">
+					<AlertsTimeline alerts={timelineAlerts} />
 				</div>
 
 				<div className="w-full bg-white p-6 rounded-lg border">
