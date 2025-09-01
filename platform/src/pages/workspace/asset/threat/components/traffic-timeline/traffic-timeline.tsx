@@ -6,6 +6,7 @@ import { RiErrorWarningLine, RiQuestionLine } from 'react-icons/ri'
 import { cardFilterOptions } from '../../constants'
 import { AvailableMetrics } from '../repeated-clicks-panel/available-metrics'
 import { TelemetryData } from '../../../../../../services/telemetry'
+import moment from 'moment'
 
 export const ThreadTrafficTimeline = ({
 	telemetryData
@@ -17,8 +18,6 @@ export const ThreadTrafficTimeline = ({
 		name: string
 		type: string
 	}>(cardFilterOptions[0])
-
-	// demo timeline data
 
 	// example mapping
 	const mappedData = [
@@ -152,6 +151,58 @@ export const ThreadTrafficTimeline = ({
 						data={organizedTimelineData}
 						colors={timelineColors}
 						formatter={timelineDataValueFormatter}
+						tooltipFormator={(point: any) => {
+							const data = telemetryData[point?.index]
+							const timestamp = moment(Number(point.data.x)).format(
+								'MMM Do, HH:mm'
+							)
+
+							return (
+								<div className="border rounded bg-white shadow-sm p-2 flex flex-col space-y-1 text-xs min-w-[200px]">
+									<div className="flex items-center space-x-2">
+										<div
+											className="w-3 h-3 rounded-full"
+											style={{ backgroundColor: point?.color }}
+										/>
+										<span className="font-semibold">{point?.id}</span>
+									</div>
+									<div className="border-t pt-1">
+										<div className="flex justify-between">
+											<span className="text-gray-600">Metric:</span>
+											<span className="font-medium capitalize">
+												{selectedMetric?.name}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Value:</span>
+											<span className="font-semibold">
+												{timelineDataValueFormatter(Number(point?.data.y))}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Machine:</span>
+											<span className="font-semibold">{data?.machineId}</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Unit:</span>
+											<span className="font-medium">
+												{point.serieId === 'Temperature'
+													? '°C'
+													: point.serieId === 'Humidity'
+													? '%'
+													: point.serieId === 'Pressure'
+													? 'hPa'
+													: ''}
+											</span>
+										</div>
+										<div className="flex justify-between">
+											<span className="text-gray-600">Time:</span>
+											<span className="font-medium">{timestamp}</span>
+										</div>
+									</div>
+								</div>
+							)
+						}}
 					/>
 				) : (
 					emptyState
