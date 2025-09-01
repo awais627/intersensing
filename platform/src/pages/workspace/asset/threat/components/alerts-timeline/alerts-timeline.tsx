@@ -256,7 +256,7 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 										<div className="flex justify-between">
 											<span className="text-gray-600">Machine:</span>
 											<span className="font-medium ">
-												{alertData?.machineId || 'Unknown'}
+												{alertData?.telemetry_data?.machineId || 'Unknown'}
 											</span>
 										</div>
 										<div className="flex justify-between">
