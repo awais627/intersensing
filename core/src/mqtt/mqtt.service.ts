@@ -49,68 +49,21 @@ export class MqttService {
       const result = await this.telemetryService.create(data);
       this.logger.log(`💾 Saved telemetry data for machine ${data.machineId}`);
 
-      // Check for alerts
-      await this.checkAndCreateAlerts(data);
+      // Check for alerts using the alerts service
+      try {
+        const triggeredAlerts = await this.alertsService.checkTelemetryForAlerts(data);
+        if (triggeredAlerts.length > 0) {
+          this.logger.log(`🚨 Created ${triggeredAlerts.length} alert(s) for machine ${data.machineId}`);
+        }
+      } catch (alertError) {
+        this.logger.error(`❌ Failed to check/create alerts for machine ${data.machineId}:`, alertError);
+        // Don't throw here - we still want telemetry processing to succeed even if alert checking fails
+      }
 
       this.logger.log(`✅ Telemetry data processed successfully for machine ${data.machineId}`);
     } catch (error) {
       this.logger.error("❌ Failed to process telemetry data:", error);
       throw error;
-    }
-  }
-
-  /**
-   * Check telemetry data for alert conditions and create alerts if needed
-   */
-  private async checkAndCreateAlerts(telemetry: ITelemetry): Promise<void> {
-    try {
-      const alerts = [];
-
-      // Temperature alerts
-      if (telemetry.Temperature > 30) {
-        alerts.push({
-          type: "TEMPERATURE_HIGH",
-          severity: "HIGH",
-          message: `High temperature detected: ${telemetry.Temperature}°C`,
-          machineId: telemetry.machineId,
-          timestamp: telemetry.timestamp,
-          data: { temperature: telemetry.Temperature },
-        });
-      }
-
-      // Humidity alerts
-      if (telemetry.Humidity > 80) {
-        alerts.push({
-          type: "HUMIDITY_HIGH",
-          severity: "MEDIUM",
-          message: `High humidity detected: ${telemetry.Humidity}%`,
-          machineId: telemetry.machineId,
-          timestamp: telemetry.timestamp,
-          data: { humidity: telemetry.Humidity },
-        });
-      }
-
-      // Pressure alerts
-      if (telemetry.Pressure < 900 || telemetry.Pressure > 1100) {
-        alerts.push({
-          type: "PRESSURE_ANOMALY",
-          severity: "MEDIUM",
-          message: `Pressure anomaly detected: ${telemetry.Pressure} hPa`,
-          machineId: telemetry.machineId,
-          timestamp: telemetry.timestamp,
-          data: { pressure: telemetry.Pressure },
-        });
-      }
-
-      // Create alerts if any conditions are met
-      for (const alert of alerts) {
-        await this.alertsService.createAlert(alert);
-        this.logger.log(
-          `🚨 Created alert: ${alert.type} for machine ${alert.machineId}`,
-        );
-      }
-    } catch (error) {
-      this.logger.error("❌ Failed to check/create alerts:", error);
     }
   }
 
