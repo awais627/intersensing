@@ -27,7 +27,7 @@ export const TelemetryDashboard: React.FC = () => {
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
 	const [alertsLoading, setAlertsLoading] = useState(false)
-	
+
 	// Real-time alert counts by severity
 	const [realtimeAlertCounts, setRealtimeAlertCounts] = useState<{
 		critical: number
@@ -53,14 +53,15 @@ export const TelemetryDashboard: React.FC = () => {
 				low: 0,
 				warning: 0
 			}
-			
+
 			alertCounts.data.forEach((alertCount) => {
 				const severity = alertCount.type.toLowerCase()
 				if (severity in initialCounts) {
-					initialCounts[severity as keyof typeof initialCounts] = alertCount.count
+					initialCounts[severity as keyof typeof initialCounts] =
+						alertCount.count
 				}
 			})
-			
+
 			setRealtimeAlertCounts(initialCounts)
 		}
 	}, [alertCounts])
@@ -69,15 +70,18 @@ export const TelemetryDashboard: React.FC = () => {
 	useEffect(() => {
 		if (alerts.length > 0) {
 			const latestAlert = alerts[0]
-			
+
 			// Check if this is a new alert (not already processed)
 			if (!activeNotifications.find((n) => n._id === latestAlert._id)) {
-				console.log('🚨 Processing new alert for real-time counts:', latestAlert)
-				
+				console.log(
+					'🚨 Processing new alert for real-time counts:',
+					latestAlert
+				)
+
 				setRealtimeAlertCounts((prevCounts) => {
 					const severity = latestAlert.severity.toLowerCase()
 					const newCounts = { ...prevCounts }
-					
+
 					// Map severity levels to our count structure
 					switch (severity) {
 						case 'critical':
@@ -101,7 +105,7 @@ export const TelemetryDashboard: React.FC = () => {
 							newCounts.warning += 1
 							break
 					}
-					
+
 					return newCounts
 				})
 			}
@@ -345,10 +349,10 @@ export const TelemetryDashboard: React.FC = () => {
 	const getRealtimeAlertCountsData = () => {
 		// Use real-time counts if available, otherwise fall back to API data
 		const counts = realtimeAlertCounts
-		
+
 		// Check if we have any real-time data
-		const hasRealtimeData = Object.values(counts).some(count => count > 0)
-		
+		const hasRealtimeData = Object.values(counts).some((count) => count > 0)
+
 		if (!hasRealtimeData) {
 			// Fall back to API data
 			if (
@@ -415,7 +419,7 @@ export const TelemetryDashboard: React.FC = () => {
 				color: 'green',
 				variant: '500'
 			}
-		].filter(item => item.value > 0) // Only show categories with alerts
+		]
 	}
 
 	if (error) {
@@ -490,10 +494,10 @@ export const TelemetryDashboard: React.FC = () => {
 						data={getRealtimeAlertCountsData()}
 						label="Active Alerts by Severity"
 						hasData={
-							Object.values(realtimeAlertCounts).some(count => count > 0) ||
+							Object.values(realtimeAlertCounts).some((count) => count > 0) ||
 							(alertCounts?.data &&
-							Array.isArray(alertCounts.data) &&
-							alertCounts.data.length > 0)
+								Array.isArray(alertCounts.data) &&
+								alertCounts.data.length > 0)
 						}
 						infoTooltip={
 							<div className="flex flex-col">
@@ -509,7 +513,10 @@ export const TelemetryDashboard: React.FC = () => {
 									Click refresh button to manually update counts
 								</p>
 								<p className="text-xs text-green-500 mt-1">
-									🔄 Real-time data: {Object.values(realtimeAlertCounts).some(count => count > 0) ? 'Active' : 'Using API data'}
+									🔄 Real-time data:{' '}
+									{Object.values(realtimeAlertCounts).some((count) => count > 0)
+										? 'Active'
+										: 'Using API data'}
 								</p>
 							</div>
 						}
