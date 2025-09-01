@@ -5,15 +5,44 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+  console.log({
+    url:
+      process.env.NODE_ENV === "production"
+        ? "mqtts://9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud:8883"
+        : "mqtts://61c08bcf1acf4e23873a4057d7f361c5.s1.eu.hivemq.cloud:8883",
+    username:
+      process.env.NODE_ENV === "production"
+        ? "hivemq.webclient.1756719842910"
+        : "hivemq.webclient.1756727689694",
+    password:
+      process.env.NODE_ENV === "production"
+        ? "IH#.rGN7,f04wLpJcx9?"
+        : ".WK5aTm>#6gDBpqsE1!0",
+    clientId:
+      process.env.NODE_ENV === "production"
+        ? "nestjs-mqtt-backend-prod"
+        : "nestjs-mqtt-backend-dev",
+  });
   // Connect MQTT microservice
   const mqttMicroservice = app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.MQTT,
     options: {
-      url: "mqtts://9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud:8883",
-      username: "hivemq.webclient.1756719842910", // put HiveMQ username in .env
-      password: "IH#.rGN7,f04wLpJcx9?", // put HiveMQ password in .env
-      clientId: "nestjs-mqtt-backend",
+      url:
+        process.env.NODE_ENV === "production"
+          ? "mqtts://9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud:8883"
+          : "mqtts://61c08bcf1acf4e23873a4057d7f361c5.s1.eu.hivemq.cloud:8883",
+      username:
+        process.env.NODE_ENV === "production"
+          ? "hivemq.webclient.1756719842910"
+          : "hivemq.webclient.1756727689694",
+      password:
+        process.env.NODE_ENV === "production"
+          ? "IH#.rGN7,f04wLpJcx9?"
+          : ".WK5aTm>#6gDBpqsE1!0",
+      clientId:
+        process.env.NODE_ENV === "production"
+          ? "nestjs-mqtt-backend-prod"
+          : "nestjs-mqtt-backend-dev",
     },
   });
 

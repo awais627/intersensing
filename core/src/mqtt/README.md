@@ -127,7 +127,7 @@ mosquitto_pub -h 9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud \
   --insecure
 ```
 
-#### 2. Test Telemetry Data
+#### 2. prod Test Telemetry Data
 ```bash
 mosquitto_pub -h 9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud \
   -p 8883 \
@@ -151,6 +151,33 @@ mosquitto_pub -h 9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud \
     "machineId": 1
   }' \
   --insecure
+```
+
+#### 2. Stage Test Telemetry Data
+```bash
+mosquitto_pub -h 61c08bcf1acf4e23873a4057d7f361c5.s1.eu.hivemq.cloud \
+  -p 8883 \
+  -u 'hivemq.webclient.1756727689694' \
+  -P '.WK5aTm>#6gDBpqsE1!0' \
+  -t "telemetry/3/alert" \
+  -m '{
+    "timestamp": "1654733331",
+    "Temperature": 38.5,
+    "Humidity": 90.2,
+    "TVOC": 0,
+    "eCO2": 400,
+    "Raw H2": 12448,
+    "Raw Ethanol": 19155,
+    "Pressure": 850.5,
+    "PM1.0": 0.0,
+    "PM2.5": 0.0,
+    "NC0.5": 0.0,
+    "NC1.0": 0.0,
+    "NC2.5": 0.0,
+    "machineId": 3
+  }' \
+  --insecure
+
 ```
 
 #### 3. Test Alert Generation (High Temperature)
