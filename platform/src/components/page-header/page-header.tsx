@@ -116,6 +116,7 @@ export const PageHeader = (props: PageHeaderProps) => {
 				<div className="flex gap-2 px-8 items-center justify-between">
 					<div className="w-full">
 						{info && <div className="flex-1 flex-wrap">{info}</div>}
+						{tabs && currentTab && <div className="flex-1 flex-wrap"> </div>}
 					</div>
 					{tabsActions && (
 						<div className="w-full flex justify-end">{tabsActions}</div>

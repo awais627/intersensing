@@ -13,7 +13,6 @@ import {
 	AlertSeverityCountsResponse
 } from 'services/telemetry'
 import { socketService } from 'services/socket'
-import { AlertsTimeline } from '../../pages/workspace/asset/threat/components/alerts-timeline'
 
 export const AlertsDashboard: React.FC = () => {
 	const {
@@ -53,10 +52,11 @@ export const AlertsDashboard: React.FC = () => {
 			const offset = (page - 1) * alertsPerPage
 			const response = await AlertService.getRecentAlerts(alertsPerPage, offset)
 
-		    // Map historical alerts to include machineId
-			const alertsWithMachineId = response.alerts.map(alert => ({
-			...alert,
-			machineId: alert.telemetry_data?.machineId || alert.machineId || 'Unknown'
+			// Map historical alerts to include machineId
+			const alertsWithMachineId = response.alerts.map((alert) => ({
+				...alert,
+				machineId:
+					alert.telemetry_data?.machineId || alert.machineId || 'Unknown'
 			}))
 			setAllAlerts(alertsWithMachineId.slice(0, alertsPerPage))
 			// setAllAlerts(response.alerts.slice(0, alertsPerPage))
@@ -266,20 +266,20 @@ export const AlertsDashboard: React.FC = () => {
 	}
 
 	const handleAckAlert = async (alertId: string) => {
-	try {
-		await AlertService.ackAlert(alertId);
+		try {
+			await AlertService.ackAlert(alertId)
 
-		setAllAlerts(prev =>
-		prev.map(alert =>
-			alert._id === alertId
-			? { ...alert, acknowledged: true, acknowledged_at: new Date() }
-			: alert
-		)
-		);
-	} catch (err) {
-		console.error('Error acknowledging alert:', err);
+			setAllAlerts((prev) =>
+				prev.map((alert) =>
+					alert._id === alertId
+						? { ...alert, acknowledged: true, acknowledged_at: new Date() }
+						: alert
+				)
+			)
+		} catch (err) {
+			console.error('Error acknowledging alert:', err)
+		}
 	}
-	};
 	// Get alert metrics from API data
 	const getAlertMetrics = () => {
 		if (!severityCounts) return []
@@ -368,209 +368,187 @@ export const AlertsDashboard: React.FC = () => {
 	const metrics = getAlertMetrics()
 
 	return (
-		<div className="flex items-center justify-center flex-col gap-6 w-full">
-			<div className="flex items-center gap-2 text-sm">
-				<div
-					className={`w-5 h-5 rounded-full ${
-						isConnected ? 'bg-green-500' : 'bg-red-500'
-					}`}
-				/>
-				<span
-					className={
-						isConnected
-							? 'text-green-600 font-bold text-base'
-							: 'text-red-600 font-bold text-base'
-					}
-				>
-					{isConnected
-						? 'Connected to IoT Device'
-						: 'Disconnected from IoT Device'}
-				</span>
-			</div>
+		<>
+			<div className="flex items-center justify-center flex-col gap-6 w-full">
+				<div className="flex items-center gap-2 text-sm">
+					<div
+						className={`w-5 h-5 rounded-full ${
+							isConnected ? 'bg-green-500' : 'bg-red-500'
+						}`}
+					/>
+					<span
+						className={
+							isConnected
+								? 'text-green-600 font-bold text-base'
+								: 'text-red-600 font-bold text-base'
+						}
+					>
+						{isConnected
+							? 'Connected to IoT Device'
+							: 'Disconnected from IoT Device'}
+					</span>
+				</div>
 
-			{/* Alert Metrics */}
-			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
-				{severityCountsLoading
-					? // Loading skeleton for metrics
-					  Array.from({ length: 6 }).map((_, index) => (
-							<div
-								key={index}
-								className="bg-white p-4 rounded-lg border border-card-border animate-pulse"
-							>
-								<div className="flex items-center justify-between mb-2">
-									<div className="w-5 h-5 bg-gray-300 rounded"></div>
-									<div className="w-20 h-3 bg-gray-300 rounded"></div>
-								</div>
-								<div className="w-16 h-8 bg-gray-300 rounded"></div>
-							</div>
-					  ))
-					: metrics.map((metric, index) => {
-							const IconComponent = metric.icon
-							return (
+				{/* Alert Metrics */}
+				<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+					{severityCountsLoading
+						? // Loading skeleton for metrics
+						  Array.from({ length: 6 }).map((_, index) => (
 								<div
 									key={index}
-									className="bg-white p-4 rounded-lg border border-card-border"
+									className="bg-white p-4 rounded-lg border border-card-border animate-pulse"
 								>
 									<div className="flex items-center justify-between mb-2">
-										<IconComponent className={`w-5 h-5 ${metric.color}`} />
-										<span className="text-xs text-gray-500">
-											{metric.label}
-										</span>
+										<div className="w-5 h-5 bg-gray-300 rounded"></div>
+										<div className="w-20 h-3 bg-gray-300 rounded"></div>
 									</div>
-									<div className="text-2xl font-bold ">{metric.value}</div>
+									<div className="w-16 h-8 bg-gray-300 rounded"></div>
 								</div>
-							)
-					  })}
-			</div>
+						  ))
+						: metrics.map((metric, index) => {
+								const IconComponent = metric.icon
+								return (
+									<div
+										key={index}
+										className="bg-white p-4 rounded-lg border border-card-border"
+									>
+										<div className="flex items-center justify-between mb-2">
+											<IconComponent className={`w-5 h-5 ${metric.color}`} />
+											<span className="text-xs text-gray-500">
+												{metric.label}
+											</span>
+										</div>
+										<div className="text-2xl font-bold ">{metric.value}</div>
+									</div>
+								)
+						  })}
+				</div>
 
-			<div className="grid grid-cols-3 items-center gap-6 w-full h-[400px]">
-				<div className="col-span-3 h-full">
+				<div className="w-full bg-white p-6 rounded-lg border">
 					<div className="flex justify-between items-center mb-4">
+						<h3 className="text-xl font-semibold">Alerts Records</h3>
 						<button
-							onClick={fetchTimelineAlerts}
-							disabled={timelineLoading}
-							className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+							onClick={handleRefreshAlerts}
+							disabled={alertsLoading}
+							className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
 						>
-							{timelineLoading ? 'Refreshing...' : 'Refresh Timeline'}
+							{alertsLoading ? 'Refreshing...' : 'Refresh'}
 						</button>
 					</div>
-					{timelineLoading ? (
-						<div className="flex items-center justify-center h-full">
-							<div className="text-center">
-								<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-								<p className="text-gray-500">Loading timeline...</p>
+
+					<div className="overflow-x-auto">
+						<table className="min-w-full divide-y divide-gray-200">
+							<thead className="bg-gray-50">
+								<tr>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Machine ID
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Severity
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Sensor Type
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Rule ID
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Triggered At
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Status
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+										Actions
+									</th>
+								</tr>
+							</thead>
+							<tbody className="bg-white divide-y divide-gray-200">
+								{allAlerts.map((alert) => (
+									<tr key={alert._id} className="hover:bg-gray-50">
+										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+											{alert.machineId || 'Unknown'}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap">
+											<span
+												className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+													alert.severity === 'critical'
+														? 'bg-red-100 text-red-800'
+														: alert.severity === 'high'
+														? 'bg-orange-100 text-orange-800'
+														: alert.severity === 'medium'
+														? 'bg-yellow-100 text-yellow-800'
+														: alert.severity === 'catastrophic'
+														? 'bg-amber-100 text-amber-800'
+														: 'bg-blue-100 text-blue-800'
+												}`}
+											>
+												{alert.severity}
+											</span>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm ">
+											{alert.sensor_type}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm ">
+											{alert.rule_id}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm">
+											{new Date(alert.triggered_at).toLocaleString()}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap">
+											<span
+												className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+													alert.acknowledged
+														? 'bg-green-100 text-green-800'
+														: 'bg-red-100 text-red-800'
+												}`}
+											>
+												{alert.acknowledged ? 'Acknowledged' : 'Active'}
+											</span>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+											{!alert.acknowledged && (
+												<button
+													onClick={() => handleAckAlert(alert._id!)}
+													className="text-indigo-600 hover:text-indigo-900"
+												>
+													Acknowledge
+												</button>
+											)}
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+
+					{totalPages > 1 && (
+						<div className="flex items-center justify-between mt-4">
+							<div className="text-sm text-gray-700">
+								Showing {(currentPage - 1) * alertsPerPage + 1} to{' '}
+								{Math.min(currentPage * alertsPerPage, totalAlertsCount)} of{' '}
+								{totalAlertsCount} results
+							</div>
+							<div className="flex space-x-2">
+								<button
+									onClick={() => handlePageChange(currentPage - 1)}
+									disabled={currentPage === 1}
+									className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									Previous
+								</button>
+								<button
+									onClick={() => handlePageChange(currentPage + 1)}
+									disabled={currentPage === totalPages}
+									className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									Next
+								</button>
 							</div>
 						</div>
-					) : (
-						<AlertsTimeline alerts={timelineAlerts} />
 					)}
 				</div>
 			</div>
-
-			<div className="w-full bg-white p-6 rounded-lg border">
-				<div className="flex justify-between items-center mb-4">
-					<h3 className="text-xl font-semibold">Alerts Records</h3>
-					<button
-						onClick={handleRefreshAlerts}
-						disabled={alertsLoading}
-						className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-					>
-						{alertsLoading ? 'Refreshing...' : 'Refresh'}
-					</button>
-				</div>
-
-				<div className="overflow-x-auto">
-					<table className="min-w-full divide-y divide-gray-200">
-						<thead className="bg-gray-50">
-							<tr>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Machine ID
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Severity
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Sensor Type
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Rule ID
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Triggered At
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Status
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-									Actions
-								</th>
-							</tr>
-						</thead>
-						<tbody className="bg-white divide-y divide-gray-200">
-							{allAlerts.map((alert) => (
-								<tr key={alert._id} className="hover:bg-gray-50">
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										{alert.machineId || 'Unknown'}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<span
-											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-												alert.severity === 'critical'
-													? 'bg-red-100 text-red-800'
-													: alert.severity === 'high'
-													? 'bg-orange-100 text-orange-800'
-													: alert.severity === 'medium'
-													? 'bg-yellow-100 text-yellow-800'
-													: alert.severity === 'catastrophic'
-													? 'bg-amber-100 text-amber-800'
-													: 'bg-blue-100 text-blue-800'
-											}`}
-										>
-											{alert.severity}
-										</span>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm ">
-										{alert.sensor_type}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm ">
-										{alert.rule_id}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm">
-										{new Date(alert.triggered_at).toLocaleString()}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<span
-											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-												alert.acknowledged
-													? 'bg-green-100 text-green-800'
-													: 'bg-red-100 text-red-800'
-											}`}
-										>
-											{alert.acknowledged ? 'Acknowledged' : 'Active'}
-										</span>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										{!alert.acknowledged && (
-											<button
-												onClick={() => handleAckAlert(alert._id!)}
-												className="text-indigo-600 hover:text-indigo-900"
-											>
-												Acknowledge
-											</button>
-										)}
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-
-				{totalPages > 1 && (
-					<div className="flex items-center justify-between mt-4">
-						<div className="text-sm text-gray-700">
-							Showing {(currentPage - 1) * alertsPerPage + 1} to{' '}
-							{Math.min(currentPage * alertsPerPage, totalAlertsCount)} of{' '}
-							{totalAlertsCount} results
-						</div>
-						<div className="flex space-x-2">
-							<button
-								onClick={() => handlePageChange(currentPage - 1)}
-								disabled={currentPage === 1}
-								className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								Previous
-							</button>
-							<button
-								onClick={() => handlePageChange(currentPage + 1)}
-								disabled={currentPage === totalPages}
-								className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								Next
-							</button>
-						</div>
-					</div>
-				)}
-			</div>
-		</div>
+		</>
 	)
 }

@@ -27,6 +27,86 @@ export const TelemetryDashboard: React.FC = () => {
 
 	const [activeNotifications, setActiveNotifications] = useState<Alert[]>([])
 	const [alertsLoading, setAlertsLoading] = useState(false)
+	
+	// Real-time alert counts by severity
+	const [realtimeAlertCounts, setRealtimeAlertCounts] = useState<{
+		critical: number
+		high: number
+		medium: number
+		low: number
+		warning: number
+	}>({
+		critical: 0,
+		high: 0,
+		medium: 0,
+		low: 0,
+		warning: 0
+	})
+
+	// Initialize real-time counts from API data
+	useEffect(() => {
+		if (alertCounts?.data && Array.isArray(alertCounts.data)) {
+			const initialCounts = {
+				critical: 0,
+				high: 0,
+				medium: 0,
+				low: 0,
+				warning: 0
+			}
+			
+			alertCounts.data.forEach((alertCount) => {
+				const severity = alertCount.type.toLowerCase()
+				if (severity in initialCounts) {
+					initialCounts[severity as keyof typeof initialCounts] = alertCount.count
+				}
+			})
+			
+			setRealtimeAlertCounts(initialCounts)
+		}
+	}, [alertCounts])
+
+	// Update real-time counts when new alerts arrive via socket
+	useEffect(() => {
+		if (alerts.length > 0) {
+			const latestAlert = alerts[0]
+			
+			// Check if this is a new alert (not already processed)
+			if (!activeNotifications.find((n) => n._id === latestAlert._id)) {
+				console.log('🚨 Processing new alert for real-time counts:', latestAlert)
+				
+				setRealtimeAlertCounts((prevCounts) => {
+					const severity = latestAlert.severity.toLowerCase()
+					const newCounts = { ...prevCounts }
+					
+					// Map severity levels to our count structure
+					switch (severity) {
+						case 'critical':
+						case 'catastrophic':
+							newCounts.critical += 1
+							break
+						case 'high':
+							newCounts.high += 1
+							break
+						case 'medium':
+							newCounts.medium += 1
+							break
+						case 'low':
+							newCounts.low += 1
+							break
+						case 'warning':
+							newCounts.warning += 1
+							break
+						default:
+							// Default to warning for unknown severities
+							newCounts.warning += 1
+							break
+					}
+					
+					return newCounts
+				})
+			}
+		}
+	}, [alerts, activeNotifications])
 
 	// Handle new alerts and show notifications
 	useEffect(() => {
@@ -262,32 +342,80 @@ export const TelemetryDashboard: React.FC = () => {
 		}))
 	}
 
-	const getAlertCountsData = () => {
-		if (
-			!alertCounts?.data ||
-			!Array.isArray(alertCounts.data) ||
-			alertCounts.data.length === 0
-		) {
-			return [
-				{
-					id: 'No Alerts',
-					value: 0,
-					color: 'gray',
-					variant: '900'
-				}
-			]
+	const getRealtimeAlertCountsData = () => {
+		// Use real-time counts if available, otherwise fall back to API data
+		const counts = realtimeAlertCounts
+		
+		// Check if we have any real-time data
+		const hasRealtimeData = Object.values(counts).some(count => count > 0)
+		
+		if (!hasRealtimeData) {
+			// Fall back to API data
+			if (
+				!alertCounts?.data ||
+				!Array.isArray(alertCounts.data) ||
+				alertCounts.data.length === 0
+			) {
+				return [
+					{
+						id: 'No Alerts',
+						value: 0,
+						color: 'gray',
+						variant: '900'
+					}
+				]
+			}
+
+			// Convert alert counts to the format expected by PieCard
+			return alertCounts.data.map((alertCount, index) => ({
+				id: alertCount.type.charAt(0).toUpperCase() + alertCount.type.slice(1),
+				value: alertCount.count,
+				color: 'red',
+				variant: (700 - index * 100 > 0
+					? 700 - index * 100
+					: 100
+				).toLocaleString()
+			}))
 		}
 
-		// Convert alert counts to the format expected by PieCard
-		return alertCounts.data.map((alertCount, index) => ({
-			id: alertCount.type.charAt(0).toUpperCase() + alertCount.type.slice(1),
-			value: alertCount.count,
-			color: 'red',
-			variant: (700 - index * 100 > 0
-				? 700 - index * 100
-				: 100
-			).toLocaleString()
-		}))
+		// Use real-time data
+		return [
+			{
+				id: 'Critical',
+				label: 'Critical',
+				value: counts.critical,
+				color: 'red',
+				variant: '900'
+			},
+			{
+				id: 'High',
+				label: 'High',
+				value: counts.high,
+				color: 'orange',
+				variant: '800'
+			},
+			{
+				id: 'Medium',
+				label: 'Medium',
+				value: counts.medium,
+				color: 'yellow',
+				variant: '700'
+			},
+			{
+				id: 'Low',
+				label: 'Low',
+				value: counts.low,
+				color: 'blue',
+				variant: '600'
+			},
+			{
+				id: 'Warning',
+				label: 'Warning',
+				value: counts.warning,
+				color: 'green',
+				variant: '500'
+			}
+		].filter(item => item.value > 0) // Only show categories with alerts
 	}
 
 	if (error) {
@@ -359,12 +487,13 @@ export const TelemetryDashboard: React.FC = () => {
 				<div className="h-full">
 					<PieCard
 						containerClassName="h-full"
-						data={getAlertCountsData()}
+						data={getRealtimeAlertCountsData()}
 						label="Active Alerts by Severity"
 						hasData={
-							alertCounts?.data &&
+							Object.values(realtimeAlertCounts).some(count => count > 0) ||
+							(alertCounts?.data &&
 							Array.isArray(alertCounts.data) &&
-							alertCounts.data.length > 0
+							alertCounts.data.length > 0)
 						}
 						infoTooltip={
 							<div className="flex flex-col">
@@ -378,6 +507,9 @@ export const TelemetryDashboard: React.FC = () => {
 								</p>
 								<p className="text-xs text-blue-500 mt-1">
 									Click refresh button to manually update counts
+								</p>
+								<p className="text-xs text-green-500 mt-1">
+									🔄 Real-time data: {Object.values(realtimeAlertCounts).some(count => count > 0) ? 'Active' : 'Using API data'}
 								</p>
 							</div>
 						}
