@@ -3,8 +3,19 @@ import { PageTitle } from 'utils/page-title'
 import { TelemetryDashboard } from '../../../../components'
 import { GDateRange } from '../../../../components/g-date-range'
 import React from 'react'
+import { DemoBreadcrumbs } from '../../../../components/demo-breadcrumbs'
 
 export const TelemetryPage = () => {
+	const pageActions = (
+		<div className="w-full pr-4 flex items-center justify-between pb-4">
+			<DemoBreadcrumbs />
+			<GDateRange
+				onApply={(e) => handleDateRangeChange({ from: e.from, to: e.to })}
+				align="right"
+				demoMode={false}
+			/>
+		</div>
+	)
 	const handleDateRangeChange = (e: { from: Date; to: Date }) => {}
 	return (
 		<>
@@ -17,15 +28,7 @@ export const TelemetryPage = () => {
 						label: 'Alerts'
 					}
 				]}
-				action={
-					<div className="w-full pr-4 flex items-center justify-end pb-4">
-						<GDateRange
-							onApply={(e) => handleDateRangeChange({ from: e.from, to: e.to })}
-							align="right"
-							demoMode={false}
-						/>
-					</div>
-				}
+				action={pageActions}
 			/>
 
 			<div className="max-w-full mx-auto px-6 sm:px-8">
