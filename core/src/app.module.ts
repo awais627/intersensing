@@ -6,6 +6,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import { TelemetryModule } from "./telemetry/telemetry.module";
 import { EventsModule } from "./events/events.module";
 import { AlertsModule } from "./alerts/alerts.module";
+import { MqttModule } from "./mqtt";
 import { AppController } from "./telemetry/app.controller";
 
 @Module({
@@ -38,6 +39,7 @@ import { AppController } from "./telemetry/app.controller";
     TelemetryModule,
     EventsModule,
     AlertsModule,
+    MqttModule,
   ],
   controllers: [AppController],
 })
