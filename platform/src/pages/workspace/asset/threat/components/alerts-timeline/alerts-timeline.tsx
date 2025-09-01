@@ -54,6 +54,18 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 		}))
 
 		return [
+				{
+				id: 'Catastrophic',
+				data: alertsWithIndex
+					.filter((alert) => alert.severity === 'catastrophic')
+					.map((alert) => ({
+						x: alert.index,
+						y:
+							alert.telemetry_data[
+								alert.sensor_type as keyof typeof alert.telemetry_data
+							] || 0
+					}))
+			},
 			{
 				id: 'Critical',
 				data: alertsWithIndex
@@ -102,27 +114,16 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 							] || 0
 					}))
 			},
-			{
-				id: 'Catastrophic',
-				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'catastrophic')
-					.map((alert) => ({
-						x: alert.index,
-						y:
-							alert.telemetry_data[
-								alert.sensor_type as keyof typeof alert.telemetry_data
-							] || 0
-					}))
-			}
+
 		]
 	}, [filteredAlerts])
 
 	const timelineColors = [
-		{ color: 'red', shade: 500 }, // Critical
-		{ color: 'orange', shade: 500 }, // High
-		{ color: 'yellow', shade: 500 }, // Medium
-		{ color: 'blue', shade: 500 }, // Low
-		{ color: 'amber', shade: 500 } // Warning
+		{ color: 'red', shade: 500 }, // Catastrophic
+		{ color: 'orange', shade: 500 }, // Critical
+		{ color: 'yellow', shade: 500 }, // High
+		{ color: 'blue', shade: 500 }, // Medium
+		{ color: 'amber', shade: 500 } // Low
 	]
 
 	const timelineDataValueFormatter = (value: number) => value.toLocaleString()
@@ -247,12 +248,12 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 												{timelineDataValueFormatter(Number(point.data.y))}
 											</span>
 										</div>
-										<div className="flex justify-between">
+										{/* <div className="flex justify-between">
 											<span className="text-gray-600">Threshold:</span>
 											<span className="font-medium ">
 												{alertData?.operator} {alertData?.threshold}
 											</span>
-										</div>
+										</div> */}
 										<div className="flex justify-between">
 											<span className="text-gray-600">Machine:</span>
 											<span className="font-medium ">
@@ -263,7 +264,7 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 											<span className="text-gray-600">Time:</span>
 											<span className="font-medium ">
 												{moment(alertData?.triggered_at).format(
-													'MMM Do, HH:mm'
+													'MMM Do, h:mm:ss A'
 												)}
 											</span>
 										</div>
