@@ -117,7 +117,7 @@ export const LineChart = ({
 								className="w-5 h-5"
 								style={{ color: point.color }}
 							/>
-							<span>{moment(Number(point.data.x)).format('MMM Do')}</span>:
+							<span>{moment(Number(point.data.x)).format('MMM Do, h:mm:ss A')}</span>
 							<span className="font-semibold">
 								{formatter(Number(point.data.y))} {point.id.split('.')[0]}{' '}
 							</span>
