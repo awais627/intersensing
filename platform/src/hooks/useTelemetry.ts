@@ -142,7 +142,7 @@ export const useTelemetry = () => {
 				updatedAt: formatDate(newData.updatedAt)
 			}
 
-			setTelemetryData((prev) => [formattedData, ...prev.slice(0, 19)]) // Keep only latest 20
+			setTelemetryData((prev) => [...prev.slice(-19), formattedData]) // Keep only latest 20
 			setLatestData(formattedData)
 		} catch (err) {
 			const errorMessage =
@@ -180,7 +180,8 @@ export const useTelemetry = () => {
 				updatedAt: formatDate(newData.updatedAt)
 			}
 
-			setTelemetryData((prev) => [formattedData, ...prev.slice(0, 19)]) // Keep only latest 20
+			// setTelemetryData((prev) => [formattedData, ...prev.slice(0, 19)]) // Keep only latest 20
+			setTelemetryData((prev) => [...prev.slice(-19), formattedData])
 			setLatestData(formattedData)
 
 			// Update machine counts when new telemetry data arrives
