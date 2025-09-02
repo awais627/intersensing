@@ -382,40 +382,40 @@ export const TelemetryDashboard: React.FC = () => {
 		// Use real-time data
 		return [
 			{
+				id: 'Catastrophic',
+				label: 'catastrophic',
+				value: counts.catastrophic,
+				color: 'red',
+				variant: '900'
+			},
+			{
 				id: 'Critical',
 				label: 'Critical',
 				value: counts.critical,
-				color: 'red',
-				variant: '900'
+				color: 'orange',
+				variant: '800',
 			},
 			{
 				id: 'High',
 				label: 'High',
 				value: counts.high,
-				color: 'orange',
-				variant: '800'
+				color: 'yellow',
+				variant: '700'
 			},
 			{
 				id: 'Medium',
 				label: 'Medium',
 				value: counts.medium,
-				color: 'yellow',
-				variant: '700'
+				color: 'blue', 
+				variant: '600'
 			},
 			{
 				id: 'Low',
 				label: 'Low',
 				value: counts.low,
-				color: 'blue',
-				variant: '600'
+				color: 'green', 
+				variant: '500' 
 			},
-			{
-				id: 'Catastrophic',
-				label: 'catastrophic',
-				value: counts.catastrophic,
-				color: 'green',
-				variant: '500'
-			}
 		]
 	}
 
@@ -501,7 +501,7 @@ export const TelemetryDashboard: React.FC = () => {
 								<p>Real-time alert counts by severity level</p>
 								<p className="text-xs text-gray-500">
 									Red: Critical, Orange: High, Yellow: Medium, Blue: Low, Green:
-									Warning
+									Catastrophic
 								</p>
 								<p className="text-xs text-gray-400 mt-2">
 									Updates automatically via WebSocket when new alerts arrive
