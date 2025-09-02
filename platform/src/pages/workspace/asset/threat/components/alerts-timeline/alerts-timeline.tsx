@@ -42,7 +42,7 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 			)
 		}
 
-		return filtered
+		return filtered.reverse()
 	}, [alerts, selectedSeverity, selectedAlertType])
 
 	// Create timeline data with actual telemetry values (supports up to 200 alerts)
