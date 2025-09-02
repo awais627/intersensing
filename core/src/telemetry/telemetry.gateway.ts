@@ -31,7 +31,7 @@ export class WebSocketTelemetryEvent {
       "NC0.5": 0.0,
       "NC1.0": 0.0,
       "NC2.5": 0.0,
-      machineId: 3,
+      machineId: "sn-sd005",
     },
   })
   data: CreateTelemetryDto;
@@ -119,6 +119,14 @@ export class TelemetryGateway {
 
   constructor(private readonly telemetryService: TelemetryService) {}
 
+  handleConnection(client: Socket) {
+    // console.log(`🔌 Client connected: ${client.id}`);
+  }
+
+  handleDisconnect(client: Socket) {
+    // console.log(`🔌 Client disconnected: ${client.id}`);
+  }
+
   @SubscribeMessage("telemetry:new")
   @ApiOperation({
     summary: "Send new telemetry data via WebSocket",
@@ -136,10 +144,8 @@ export class TelemetryGateway {
     try {
       const telemetry = await this.telemetryService.create(createTelemetryDto);
 
-      // Broadcast to all connected clients
       this.server.emit("telemetry:new", telemetry);
 
-      // Send confirmation to the sender
       client.emit("telemetry:created", {
         success: true,
         data: telemetry,
@@ -190,13 +196,18 @@ export class TelemetryGateway {
     });
   }
 
-  // Method to broadcast telemetry updates to all connected clients
   broadcastTelemetryUpdate(telemetry: any): void {
     this.server.emit("telemetry:new", { data: telemetry });
   }
 
-  // Method to broadcast alerts to all connected clients
   broadcastAlert(alert: IAlert): void {
+    // console.log('🚨 Broadcasting alert via WebSocket:', {
+    //   alertId: alert._id,
+    //   severity: alert.severity,
+    //   sensorType: alert.sensor_type,
+    //   connectedClients: this.getConnectedClientsCount()
+    // });
+    
     this.server.emit("alert:new", {
       success: true,
       data: alert,
@@ -204,14 +215,18 @@ export class TelemetryGateway {
       severity: alert.severity,
       timestamp: alert.triggered_at,
     });
+    
+    // console.log('✅ Alert broadcast completed');
   }
 
-  // Method to get connected clients count
   getConnectedClientsCount(): number {
-    return this.server.engine.clientsCount;
+    try {
+      return this.server.engine.clientsCount || 0;
+    } catch (error) {
+      return 0;
+    }
   }
 
-  // Method to get clients in telemetry room
   getTelemetrySubscribersCount(): number {
     const room = this.server.sockets.adapter.rooms.get("telemetry");
     return room ? room.size : 0;

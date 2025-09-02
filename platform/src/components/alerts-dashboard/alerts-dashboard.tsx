@@ -103,111 +103,46 @@ export const AlertsDashboard: React.FC = () => {
 		fetchTimelineAlerts() // Fetch timeline alerts
 	}, [])
 
-	// Subscribe to real-time alerts updates
+	// Subscribe to alerts from useTelemetry hook - avoiding duplicate socket subscriptions
 	useEffect(() => {
-		if (isConnected) {
-			socketService.subscribeToAlerts((newAlert) => {
-				console.log('🚨 New real-time alert received:', newAlert)
-				// Ensure resolved property exists
-				const alertWithDefaults = {
-					...newAlert,
-					resolved: newAlert.resolved || false,
-					machineId: newAlert.telemetry_data?.machineId || 'Unknown'
-				}
-
-				// Update timeline alerts with new alert
-				setTimelineAlerts((prev) => {
-					const updated = [alertWithDefaults, ...prev]
-					// Keep only last 200 alerts for timeline
-					return updated.slice(0, 200)
-				})
-
-				// Add new alert to top of current page data (maintain 10-record limit)
-				setAllAlerts((prev) => {
-					const updated = [alertWithDefaults, ...prev]
-					// Keep only the first 10 records to maintain pagination
-					return updated.slice(0, alertsPerPage)
-				})
-
-				// Update severity counts in real-time
-				setSeverityCounts((prev) => {
-					if (!prev) return prev
-
-					// Create updated counts object
-					const updatedCounts = { ...prev }
-
-					// Update the specific severity count
-					switch (newAlert.severity) {
-						case 'critical':
-							updatedCounts.critical += 1
-							break
-						case 'high':
-							updatedCounts.high += 1
-							break
-						case 'catastrophic':
-							updatedCounts.catastrophic += 1
-							break
-						case 'low':
-							updatedCounts.low += 1
-							break
-						default:
-							// Handle any other severity types
-							break
-					}
-
-					// Update total count
-					updatedCounts.total += 1
-
-					// Update resolved count if the alert is resolved
-					if (newAlert.acknowledged) {
-						updatedCounts.acknowledged += 1
-					}
-
-					return updatedCounts
-				})
-
-				// Update active notifications
-				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
-
-				// Auto-remove notification after 10 seconds
-				setTimeout(() => {
-					setActiveNotifications((prev) =>
-						prev.filter((n) => n._id !== newAlert._id)
-					)
-				}, 10000)
-			})
-		}
-
-		return () => {
-			socketService.unsubscribeFromAlerts()
-		}
-	}, [isConnected, alertsPerPage])
-
-	// Handle new alerts and show notifications
-	useEffect(() => {
+		// Listen for new alerts from the hook's alerts state
 		if (alerts.length > 0) {
 			const latestAlert = alerts[0]
-			if (!activeNotifications.find((n) => n._id === latestAlert._id)) {
-				console.log('🚨 Adding new alert notification:', latestAlert)
+			const existingNotification = activeNotifications.find(n => n._id === latestAlert._id)
+			
+			// Only add notification if it's a new alert (not already in notifications)
+			if (!existingNotification) {
+				console.log('🚨 New alert detected from hook:', latestAlert)
+				
 				// Ensure resolved property exists
 				const alertWithDefaults = {
 					...latestAlert,
 					resolved: latestAlert.resolved || false,
-					machineId: latestAlert.telemetry_data?.machineId || 'Unknown'
+					acknowledged: latestAlert.acknowledged || false,
+					machineId: latestAlert.telemetry_data?.machineId || latestAlert.machineId || 'Unknown'
 				}
 
-				// Update timeline alerts with new alert
+				// Update timeline alerts with new alert (immediately visible)
 				setTimelineAlerts((prev) => {
-					const updated = [alertWithDefaults, ...prev]
-					// Keep only last 200 alerts for timeline
-					return updated.slice(0, 200)
+					const existingIndex = prev.findIndex(a => a._id === alertWithDefaults._id)
+					if (existingIndex === -1) {
+						const updated = [alertWithDefaults, ...prev]
+						// Keep only last 200 alerts for timeline
+						return updated.slice(0, 200)
+					}
+					return prev
 				})
 
 				// Add new alert to top of current page data (maintain 10-record limit)
+				// This should make it immediately visible in the table
 				setAllAlerts((prev) => {
-					const updated = [alertWithDefaults, ...prev]
-					// Keep only the first 10 records to maintain pagination
-					return updated.slice(0, alertsPerPage)
+					const existingIndex = prev.findIndex(a => a._id === alertWithDefaults._id)
+					if (existingIndex === -1) {
+						const updated = [alertWithDefaults, ...prev]
+						// Keep only the first 10 records to maintain pagination
+						return updated.slice(0, alertsPerPage)
+					}
+					return prev
 				})
 
 				// Update severity counts in real-time
@@ -218,7 +153,7 @@ export const AlertsDashboard: React.FC = () => {
 					const updatedCounts = { ...prev }
 
 					// Update the specific severity count
-					switch (latestAlert.severity) {
+					switch (alertWithDefaults.severity) {
 						case 'critical':
 							updatedCounts.critical += 1
 							break
@@ -232,33 +167,37 @@ export const AlertsDashboard: React.FC = () => {
 							updatedCounts.low += 1
 							break
 						default:
-							// Handle any other severity types
+							// Handle any other severity types - for now, treat as low
+							updatedCounts.low += 1
 							break
 					}
 
 					// Update total count
 					updatedCounts.total += 1
 
-					// Update resolved count if the alert is resolved
-					if (latestAlert.acknowledged) {
+					// Update acknowledged count if the alert is acknowledged
+					if (alertWithDefaults.acknowledged) {
 						updatedCounts.acknowledged += 1
 					}
 
 					return updatedCounts
 				})
 
-				// Update active notifications
+				// Update total alerts count for pagination
+				setTotalAlertsCount((prev) => prev + 1)
+
+				// Update active notifications (show toast notification)
 				setActiveNotifications((prev) => [alertWithDefaults, ...prev])
 
 				// Auto-remove notification after 10 seconds
 				setTimeout(() => {
 					setActiveNotifications((prev) =>
-						prev.filter((n) => n._id !== latestAlert._id)
+						prev.filter((n) => n._id === alertWithDefaults._id)
 					)
 				}, 10000)
 			}
 		}
-	}, [alerts, activeNotifications, alertsPerPage])
+	}, [alerts, alertsPerPage])
 
 	const handleRefreshAlerts = async () => {
 		await fetchAlertsForPage(currentPage)
@@ -554,6 +493,52 @@ export const AlertsDashboard: React.FC = () => {
 					)}
 				</div>
 			</div>
+
+			{/* Real-time Alert Notifications */}
+			{activeNotifications.length > 0 && (
+				<div className="fixed top-4 right-4 z-50 space-y-2">
+					{activeNotifications.map((notification) => (
+						<div
+							key={notification._id}
+							className={`max-w-sm p-4 rounded-lg shadow-lg border-l-4 bg-white ${
+								notification.severity === 'critical' 
+									? 'border-red-500' 
+									: notification.severity === 'high'
+									? 'border-orange-500'
+									: notification.severity === 'catastrophic'
+									? 'border-amber-500'
+									: 'border-blue-500'
+							} animate-slide-in`}
+						>
+							<div className="flex items-start justify-between">
+								<div className="flex-1">
+									<h4 className="text-sm font-semibold text-gray-900">
+										New Alert: {notification.severity.toUpperCase()}
+									</h4>
+									<p className="text-xs text-gray-600 mt-1">
+										{notification.sensor_type} sensor on Machine {notification.machineId}
+									</p>
+									<p className="text-xs text-gray-500 mt-1">
+										{new Date(notification.triggered_at).toLocaleTimeString()}
+									</p>
+								</div>
+								<button
+									onClick={() => {
+										setActiveNotifications(prev => 
+											prev.filter(n => n._id !== notification._id)
+										)
+									}}
+									className="ml-2 text-gray-400 hover:text-gray-600"
+								>
+									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					))}
+				</div>
+			)}
 		</>
 	)
 }

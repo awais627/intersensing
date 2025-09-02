@@ -1,7 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Inject, forwardRef } from "@nestjs/common";
 import { ITelemetry } from "../common/interfaces/telemetry";
 import { TelemetryService } from "../common/common/src/services/telemetry.service";
 import { AlertsService } from "../alerts/alerts.service";
+import { TelemetryGateway } from "../telemetry/telemetry.gateway";
 
 @Injectable()
 export class MqttService {
@@ -10,6 +11,7 @@ export class MqttService {
   constructor(
     private readonly telemetryService: TelemetryService,
     private readonly alertsService: AlertsService,
+    @Inject(forwardRef(() => TelemetryGateway)) private readonly telemetryGateway: TelemetryGateway,
   ) {}
 
   /**
@@ -48,6 +50,14 @@ export class MqttService {
       // Save telemetry data
       const result = await this.telemetryService.create(data);
       this.logger.log(`💾 Saved telemetry data for machine ${data.machineId}`);
+
+      // Broadcast telemetry data via WebSocket to all connected clients
+      try {
+        this.telemetryGateway.broadcastTelemetryUpdate(data);
+        this.logger.log(`📡 Broadcasted telemetry data via WebSocket for machine ${data.machineId}`);
+      } catch (broadcastError) {
+        this.logger.error(`❌ Failed to broadcast telemetry data:`, broadcastError);
+      }
 
       // Check for alerts using the alerts service
       try {

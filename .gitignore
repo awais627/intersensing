@@ -176,3 +176,6 @@ vite.config.ts.timestamp-*
 ./api-models/.idea
 ./core/.idea
 ./platform/.idea
+
+send_mqtt.py
+./mqtt-test/
