@@ -148,7 +148,7 @@ mosquitto_pub -h 9bc811871bbb400281764a67bbfc77b9.s1.eu.hivemq.cloud \
     "NC0.5": 0.0,
     "NC1.0": 0.0,
     "NC2.5": 0.0,
-    "machineId": 1
+    "machineId": sn-sd004	
   }' \
   --insecure
 ```
@@ -174,7 +174,7 @@ mosquitto_pub -h 61c08bcf1acf4e23873a4057d7f361c5.s1.eu.hivemq.cloud \
     "NC0.5": 0.0,
     "NC1.0": 0.0,
     "NC2.5": 0.0,
-    "machineId": 3
+    "machineId": sn-sd004	
   }' \
   --insecure
 
