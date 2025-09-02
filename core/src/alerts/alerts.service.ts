@@ -1,9 +1,10 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, Inject, forwardRef } from "@nestjs/common";
 import { Collection, ObjectId } from "mongodb";
 import { MongoService } from "../common/common/src/mongo.service";
 import { IAlert, ISensorOptimalRange, IDeviationThreshold } from "../common/interfaces/alert";
 import { ITelemetry } from "../common/interfaces/telemetry";
 import { TelemetryService } from "../common/common/src/services/telemetry.service";
+import { TelemetryGateway } from "../telemetry/telemetry.gateway";
 
 @Injectable()
 export class AlertsService {
@@ -31,6 +32,7 @@ export class AlertsService {
   constructor(
     private readonly mongoService: MongoService, 
     private readonly telemetryService: TelemetryService,
+    @Inject(forwardRef(() => TelemetryGateway)) private readonly telemetryGateway: TelemetryGateway,
   ) {}
 
   async checkTelemetryForAlerts(telemetry: ITelemetry): Promise<IAlert[]> {
@@ -112,7 +114,16 @@ export class AlertsService {
   async createAlert(alert: IAlert): Promise<IAlert> {
     const collection = await this.getAlertsCollection();
     const result = await collection.insertOne(alert);
-    return { ...alert, _id: result.insertedId.toString() };
+    const savedAlert = { ...alert, _id: result.insertedId.toString() };
+    
+    // Broadcast alert via WebSocket
+    try {
+      this.telemetryGateway.broadcastAlert(savedAlert);
+    } catch (error) {
+      this.logger.error('Failed to broadcast alert via WebSocket:', error);
+    }
+    
+    return savedAlert;
   }
 
   async getAlertsForDay(date: Date): Promise<IAlert[]> {
