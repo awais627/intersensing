@@ -41,6 +41,21 @@ export const ThreadTrafficTimeline = ({
 				x: d.timestamp,
 				y: d.Pressure
 			}))
+		},
+		{
+			id: 'eCO2',
+			data: telemetryData.map((d, index) => {
+				// Generate static demo data for eCO2 with values in between other metrics
+				// Simulate realistic eCO2 values (400-1000 ppm range)
+				const baseValue = 600
+				const variation = Math.sin(index * 0.1) * 100 + Math.cos(index * 0.05) * 50
+				const demoValue = Math.round(baseValue + variation)
+				
+				return {
+					x: d.timestamp,
+					y: d['eCO2'] || demoValue // Use actual eCO2 data if available, otherwise demo data
+				}
+			})
 		}
 	]
 
@@ -48,7 +63,22 @@ export const ThreadTrafficTimeline = ({
 		const temperature = mappedData.filter((d) => d.id === 'Temperature')
 		const humidity = mappedData.filter((d) => d.id === 'Humidity')
 		const pressure = mappedData.filter((d) => d.id === 'Pressure')
+		const eco2 = mappedData.filter((d) => d.id === 'eCO2')
 
+		// If ALL is selected, return all four metrics with different colors
+		if (selectedMetric.type === 'all') {
+			return {
+				organizedTimelineData: [...temperature, ...humidity, ...pressure, ...eco2],
+				timelineColors: [
+					{ color: 'red', shade: 500 },    // Temperature
+					{ color: 'blue', shade: 500 },   // Humidity
+					{ color: 'amber', shade: 500 },  // Pressure
+					{ color: 'green', shade: 500 }   // eCO2
+				]
+			}
+		}
+
+		// For individual metrics, return only the selected one
 		return {
 			organizedTimelineData:
 				selectedMetric.type === 'humidity'

@@ -1,4 +1,5 @@
 export const cardFilterOptions = [
+	{ name: 'ALL', type: 'all' },
 	{ name: 'Temperature', type: 'temperature' },
 	{ name: 'Pressure', type: 'pressure' },
 	{ name: 'Humidity', type: 'humidity' }
