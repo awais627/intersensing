@@ -21,7 +21,8 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 					prev.some(s => s.id === suggestion.id)) {
 					return prev
 				}
-				return [...prev, suggestion]
+				// Only show one suggestion at a time - replace any existing suggestions
+				return [suggestion]
 			})
 		})
 
@@ -71,7 +72,8 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 					prev.some(s => s.id === randomSuggestion.id)) {
 					return prev
 				}
-				return [...prev, randomSuggestion]
+				// Only show one suggestion at a time
+				return [randomSuggestion]
 			})
 		}, 10000) // Initial trigger after 10 seconds
 
@@ -81,8 +83,8 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 	// Generate demo suggestions periodically for demo purposes
 	useEffect(() => {
 		const demoInterval = setInterval(() => {
-			// Only generate demo suggestions if no real suggestions are active
-			if (activeSuggestions.length === 0 && Math.random() < 0.3) {
+			// Generate demo suggestions with 30% probability
+			if (Math.random() < 0.3) {
 				const demoSuggestions = aiSuggestionService.generateDemoSuggestions()
 				const randomSuggestion = demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
 				
@@ -91,24 +93,25 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 						prev.some(s => s.id === randomSuggestion.id)) {
 						return prev
 					}
-					return [...prev, randomSuggestion]
+					// Only show one suggestion at a time - replace any existing suggestions
+					return [randomSuggestion]
 				})
 			}
 		}, 10000) // Every 10 seconds
 
 		return () => clearInterval(demoInterval)
-	}, [activeSuggestions.length, dismissedSuggestions])
+	}, [dismissedSuggestions])
 
 	return (
-		<div className="fixed top-4 right-4 z-50 space-y-2">
-			{activeSuggestions.map((suggestion) => (
+		<div className="fixed top-4 right-4 z-50">
+			{activeSuggestions.length > 0 && (
 				<AISuggestionPopup
-					key={suggestion.id}
-					suggestion={suggestion}
-					onClose={() => handleClose(suggestion.id)}
-					onDismiss={() => handleDismiss(suggestion.id)}
+					key={activeSuggestions[0].id}
+					suggestion={activeSuggestions[0]}
+					onClose={() => handleClose(activeSuggestions[0].id)}
+					onDismiss={() => handleDismiss(activeSuggestions[0].id)}
 				/>
-			))}
+			)}
 		</div>
 	)
 }
