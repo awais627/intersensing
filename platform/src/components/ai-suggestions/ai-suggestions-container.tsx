@@ -60,6 +60,24 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 		)
 	}
 
+	// Initial demo suggestion after 10 seconds
+	useEffect(() => {
+		const initialTimer = setTimeout(() => {
+			const demoSuggestions = aiSuggestionService.generateDemoSuggestions()
+			const randomSuggestion = demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
+			
+			setActiveSuggestions(prev => {
+				if (dismissedSuggestions.has(randomSuggestion.id) || 
+					prev.some(s => s.id === randomSuggestion.id)) {
+					return prev
+				}
+				return [...prev, randomSuggestion]
+			})
+		}, 10000) // Initial trigger after 10 seconds
+
+		return () => clearTimeout(initialTimer)
+	}, [dismissedSuggestions])
+
 	// Generate demo suggestions periodically for demo purposes
 	useEffect(() => {
 		const demoInterval = setInterval(() => {
@@ -76,7 +94,7 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 					return [...prev, randomSuggestion]
 				})
 			}
-		}, 30000) // Every 30 seconds
+		}, 10000) // Every 10 seconds
 
 		return () => clearInterval(demoInterval)
 	}, [activeSuggestions.length, dismissedSuggestions])

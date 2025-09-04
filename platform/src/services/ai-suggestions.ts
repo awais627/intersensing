@@ -44,10 +44,10 @@ export class AISuggestionService {
 		if (telemetryData.Temperature > 30) {
 			suggestions.push({
 				id: `temp-high-${Date.now()}`,
-				title: 'High Temperature Detected',
-				message: `Temperature has reached ${telemetryData.Temperature.toFixed(1)}°C, which is above the recommended threshold.`,
+				title: 'Thermal Anomaly Detected',
+				message: `I've detected a significant temperature elevation to ${telemetryData.Temperature.toFixed(1)}°C. This exceeds optimal operating parameters and may indicate potential equipment stress or environmental factors requiring immediate attention.`,
 				severity: telemetryData.Temperature > 35 ? 'critical' : 'high',
-				action: 'Consider increasing ventilation or reducing heat sources in the area.',
+				action: 'I recommend implementing immediate cooling measures: activate ventilation systems, reduce heat-generating activities, and monitor equipment performance closely. Consider scheduling maintenance if temperatures persist above 35°C.',
 				icon: '🌡️',
 				timestamp: now,
 				parameter: 'Temperature',
@@ -57,10 +57,10 @@ export class AISuggestionService {
 		} else if (telemetryData.Temperature < 15) {
 			suggestions.push({
 				id: `temp-low-${Date.now()}`,
-				title: 'Low Temperature Alert',
-				message: `Temperature has dropped to ${telemetryData.Temperature.toFixed(1)}°C, which may affect equipment performance.`,
+				title: 'Thermal Efficiency Warning',
+				message: `Current temperature reading of ${telemetryData.Temperature.toFixed(1)}°C is below optimal range. This may impact equipment efficiency and could lead to condensation issues or reduced performance.`,
 				severity: 'medium',
-				action: 'Check heating systems and ensure proper insulation.',
+				action: 'I suggest checking heating systems, verifying insulation integrity, and monitoring for any condensation buildup. Consider adjusting environmental controls to maintain optimal operating temperature.',
 				icon: '❄️',
 				timestamp: now,
 				parameter: 'Temperature',
@@ -73,10 +73,10 @@ export class AISuggestionService {
 		if (telemetryData.Humidity > 70) {
 			suggestions.push({
 				id: `humidity-high-${Date.now()}`,
-				title: 'High Humidity Warning',
-				message: `Humidity levels are at ${telemetryData.Humidity.toFixed(1)}%, which can cause condensation and equipment damage.`,
+				title: 'Moisture Accumulation Alert',
+				message: `I'm observing elevated humidity levels at ${telemetryData.Humidity.toFixed(1)}%. This creates an environment conducive to condensation, which poses risks to electronic equipment and may accelerate corrosion processes.`,
 				severity: telemetryData.Humidity > 80 ? 'high' : 'medium',
-				action: 'Increase ventilation or use dehumidifiers to reduce moisture levels.',
+				action: 'My analysis suggests implementing immediate moisture control: activate dehumidification systems, increase air circulation, and monitor for condensation formation. Consider installing additional humidity sensors for better coverage.',
 				icon: '💧',
 				timestamp: now,
 				parameter: 'Humidity',
@@ -86,10 +86,10 @@ export class AISuggestionService {
 		} else if (telemetryData.Humidity < 30) {
 			suggestions.push({
 				id: `humidity-low-${Date.now()}`,
-				title: 'Low Humidity Alert',
-				message: `Humidity is at ${telemetryData.Humidity.toFixed(1)}%, which may cause static electricity and equipment issues.`,
+				title: 'Dry Air Condition Detected',
+				message: `Current humidity reading of ${telemetryData.Humidity.toFixed(1)}% indicates extremely dry conditions. This environment increases static electricity risk and may cause discomfort or equipment sensitivity issues.`,
 				severity: 'low',
-				action: 'Consider using humidifiers to maintain optimal humidity levels.',
+				action: 'I recommend introducing controlled moisture to the environment through humidification systems. Monitor static discharge and consider implementing anti-static measures for sensitive equipment.',
 				icon: '🏜️',
 				timestamp: now,
 				parameter: 'Humidity',
@@ -102,10 +102,10 @@ export class AISuggestionService {
 		if (telemetryData.Pressure > 1020) {
 			suggestions.push({
 				id: `pressure-high-${Date.now()}`,
-				title: 'High Pressure System',
-				message: `Atmospheric pressure is ${telemetryData.Pressure.toFixed(1)} hPa, indicating a high-pressure system.`,
+				title: 'Atmospheric Pressure Analysis',
+				message: `I'm detecting elevated barometric pressure at ${telemetryData.Pressure.toFixed(1)} hPa. This indicates a high-pressure weather system, which typically brings stable conditions but may affect air circulation patterns.`,
 				severity: 'low',
-				action: 'Monitor for potential weather changes and ensure proper ventilation.',
+				action: 'Based on meteorological patterns, I recommend monitoring ventilation efficiency and ensuring adequate air exchange. High pressure systems can sometimes trap pollutants, so verify air quality systems are functioning optimally.',
 				icon: '🔺',
 				timestamp: now,
 				parameter: 'Pressure',
@@ -115,10 +115,10 @@ export class AISuggestionService {
 		} else if (telemetryData.Pressure < 980) {
 			suggestions.push({
 				id: `pressure-low-${Date.now()}`,
-				title: 'Low Pressure Alert',
-				message: `Pressure has dropped to ${telemetryData.Pressure.toFixed(1)} hPa, which may indicate stormy weather.`,
+				title: 'Barometric Pressure Drop Detected',
+				message: `I've identified a significant pressure decrease to ${telemetryData.Pressure.toFixed(1)} hPa. This suggests an approaching low-pressure system that may bring weather changes and could impact environmental conditions.`,
 				severity: 'medium',
-				action: 'Prepare for potential weather changes and check equipment stability.',
+				action: 'My weather analysis indicates potential atmospheric instability. I recommend securing outdoor equipment, checking building integrity, and preparing for possible changes in air circulation patterns.',
 				icon: '🔻',
 				timestamp: now,
 				parameter: 'Pressure',
@@ -131,10 +131,10 @@ export class AISuggestionService {
 		if (telemetryData.eCO2 > 800) {
 			suggestions.push({
 				id: `eco2-high-${Date.now()}`,
-				title: 'Poor Air Quality Detected',
-				message: `eCO2 levels are elevated at ${telemetryData.eCO2} ppm, indicating poor air circulation.`,
+				title: 'Air Quality Degradation Alert',
+				message: `My sensors are detecting elevated CO2 concentrations at ${telemetryData.eCO2} ppm. This indicates inadequate ventilation and potential air quality issues that could impact occupant health and comfort.`,
 				severity: telemetryData.eCO2 > 1200 ? 'high' : 'medium',
-				action: 'Improve ventilation immediately to reduce CO2 concentration.',
+				action: 'I recommend immediate ventilation enhancement: increase fresh air intake, activate air circulation systems, and consider temporary occupancy reduction. Monitor CO2 levels continuously until they return to acceptable ranges below 600 ppm.',
 				icon: '🌫️',
 				timestamp: now,
 				parameter: 'eCO2',
@@ -146,10 +146,10 @@ export class AISuggestionService {
 		if (telemetryData.TVOC > 500) {
 			suggestions.push({
 				id: `tvoc-high-${Date.now()}`,
-				title: 'High VOC Levels',
-				message: `TVOC concentration is ${telemetryData.TVOC} ppb, which may indicate chemical contamination.`,
+				title: 'Chemical Contamination Detected',
+				message: `I've identified elevated volatile organic compound levels at ${telemetryData.TVOC} ppb. This suggests potential chemical contamination that may pose health risks and requires immediate investigation.`,
 				severity: telemetryData.TVOC > 1000 ? 'critical' : 'high',
-				action: 'Investigate potential sources of volatile organic compounds and improve air filtration.',
+				action: 'My analysis indicates a potential chemical source in the environment. I recommend: 1) Identifying and eliminating VOC sources, 2) Enhancing air filtration systems, 3) Increasing ventilation rates, and 4) Considering temporary evacuation if levels exceed 1000 ppb.',
 				icon: '⚠️',
 				timestamp: now,
 				parameter: 'TVOC',
@@ -162,10 +162,10 @@ export class AISuggestionService {
 		if (telemetryData['PM2.5'] > 25) {
 			suggestions.push({
 				id: `pm25-high-${Date.now()}`,
-				title: 'High PM2.5 Levels',
-				message: `PM2.5 particles are at ${telemetryData['PM2.5']} μg/m³, exceeding safe air quality standards.`,
+				title: 'Particulate Matter Contamination',
+				message: `I'm detecting elevated PM2.5 concentrations at ${telemetryData['PM2.5']} μg/m³, which exceeds WHO air quality guidelines. These fine particles can penetrate deep into respiratory systems and pose significant health risks.`,
 				severity: telemetryData['PM2.5'] > 50 ? 'critical' : 'high',
-				action: 'Activate air purifiers and check for sources of fine particulate matter.',
+				action: 'My environmental analysis recommends: 1) Activating high-efficiency air purifiers immediately, 2) Identifying and eliminating particulate sources, 3) Implementing enhanced filtration systems, and 4) Considering protective measures for sensitive individuals if levels exceed 50 μg/m³.',
 				icon: '🌪️',
 				timestamp: now,
 				parameter: 'PM2.5',
@@ -207,10 +207,10 @@ export class AISuggestionService {
 		const demoSuggestions: AISuggestion[] = [
 			{
 				id: `demo-temp-${Date.now()}`,
-				title: 'Temperature Optimization',
-				message: 'AI analysis suggests the current temperature of 28.5°C is optimal for equipment performance.',
+				title: 'Thermal Optimization Complete',
+				message: 'My continuous monitoring indicates optimal thermal conditions at 28.5°C. All systems are operating within ideal parameters, ensuring maximum efficiency and equipment longevity.',
 				severity: 'low',
-				action: 'Maintain current temperature settings for optimal efficiency.',
+				action: 'I recommend maintaining current environmental settings. The thermal profile is perfectly balanced for your equipment specifications. No immediate adjustments required.',
 				icon: '✅',
 				timestamp: now,
 				parameter: 'Temperature',
@@ -219,10 +219,10 @@ export class AISuggestionService {
 			},
 			{
 				id: `demo-humidity-${Date.now()}`,
-				title: 'Humidity Management',
-				message: 'Humidity levels are within acceptable range. Consider slight adjustment for better comfort.',
+				title: 'Environmental Balance Achieved',
+				message: 'My analysis confirms humidity levels at 45.2% are within the optimal range for both equipment performance and human comfort. The environmental conditions are well-regulated.',
 				severity: 'low',
-				action: 'Monitor humidity trends and adjust ventilation if needed.',
+				action: 'Current humidity management is excellent. I suggest maintaining present settings while continuing to monitor for any seasonal variations that might require adjustment.',
 				icon: '💡',
 				timestamp: now,
 				parameter: 'Humidity',
@@ -231,10 +231,10 @@ export class AISuggestionService {
 			},
 			{
 				id: `demo-pressure-${Date.now()}`,
-				title: 'Pressure System Analysis',
-				message: 'Atmospheric pressure indicates stable weather conditions ahead.',
+				title: 'Atmospheric Stability Confirmed',
+				message: 'My meteorological analysis shows stable atmospheric pressure at 1013.2 hPa, indicating favorable weather conditions and optimal air circulation patterns for the next 24-48 hours.',
 				severity: 'low',
-				action: 'Continue monitoring for any significant pressure changes.',
+				action: 'Environmental conditions are stable. I recommend continuing current monitoring protocols. The pressure trend suggests no immediate weather-related concerns.',
 				icon: '🌤️',
 				timestamp: now,
 				parameter: 'Pressure',
