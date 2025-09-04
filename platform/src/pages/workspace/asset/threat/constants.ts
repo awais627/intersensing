@@ -6,6 +6,7 @@ export const cardFilterOptions = [
 ]
 
 export const alertFilterOptions = [
+	{ name: 'ALL', type: 'all' },
 	{ name: 'Catastrophic', type: 'catastrophic' },
 	{ name: 'Critical', type: 'critical' },
 	{ name: 'High', type: 'high' },

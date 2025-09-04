@@ -23,8 +23,6 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 	// Filter alerts based on selected severity and type
 	const filteredAlerts = useMemo(() => {
 		let filtered = alerts
-
-		// Filter by severity
 		if (selectedSeverity.type !== 'all') {
 			if (selectedSeverity.type === 'resolved') {
 				filtered = filtered.filter((alert) => alert.resolved)
@@ -53,78 +51,114 @@ export const AlertsTimeline = ({ alerts }: { alerts: Alert[] }) => {
 			index: index + 1
 		}))
 
-		return [
+		if (selectedSeverity.type === 'all') {
+			return [
 				{
-				id: 'Catastrophic',
-				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'catastrophic')
-					.map((alert) => ({
-						x: alert.index,
-						y:
-							alert.telemetry_data[
-								alert.sensor_type as keyof typeof alert.telemetry_data
-							] || 0
-					}))
-			},
-			{
-				id: 'Critical',
-				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'critical')
-					.map((alert) => ({
-						x: alert.index,
-						y:
-							alert.telemetry_data[
-								alert.sensor_type as keyof typeof alert.telemetry_data
-							] || 0
-					}))
-			},
-			{
-				id: 'High',
-				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'high')
-					.map((alert) => ({
-						x: alert.index,
-						y:
-							alert.telemetry_data[
-								alert.sensor_type as keyof typeof alert.telemetry_data
-							] || 0
-					}))
-			},
-			{
-				id: 'Medium',
-				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'medium')
-					.map((alert) => ({
-						x: alert.index,
-						y:
-							alert.telemetry_data[
-								alert.sensor_type as keyof typeof alert.telemetry_data
-							] || 0
-					}))
-			},
-			{
-				id: 'Low',
-				data: alertsWithIndex
-					.filter((alert) => alert.severity === 'low')
-					.map((alert) => ({
-						x: alert.index,
-						y:
-							alert.telemetry_data[
-								alert.sensor_type as keyof typeof alert.telemetry_data
-							] || 0
-					}))
-			},
+					id: 'Catastrophic',
+					data: alertsWithIndex
+						.filter((alert) => alert.severity === 'catastrophic')
+						.map((alert) => ({
+							x: alert.index,
+							y:
+								alert.telemetry_data[
+									alert.sensor_type as keyof typeof alert.telemetry_data
+								] || 0
+						}))
+				},
+				{
+					id: 'Critical',
+					data: alertsWithIndex
+						.filter((alert) => alert.severity === 'critical')
+						.map((alert) => ({
+							x: alert.index,
+							y:
+								alert.telemetry_data[
+									alert.sensor_type as keyof typeof alert.telemetry_data
+								] || 0
+						}))
+				},
+				{
+					id: 'High',
+					data: alertsWithIndex
+						.filter((alert) => alert.severity === 'high')
+						.map((alert) => ({
+							x: alert.index,
+							y:
+								alert.telemetry_data[
+									alert.sensor_type as keyof typeof alert.telemetry_data
+								] || 0
+						}))
+				},
+				{
+					id: 'Medium',
+					data: alertsWithIndex
+						.filter((alert) => alert.severity === 'medium')
+						.map((alert) => ({
+							x: alert.index,
+							y:
+								alert.telemetry_data[
+									alert.sensor_type as keyof typeof alert.telemetry_data
+								] || 0
+						}))
+				},
+				{
+					id: 'Low',
+					data: alertsWithIndex
+						.filter((alert) => alert.severity === 'low')
+						.map((alert) => ({
+							x: alert.index,
+							y:
+								alert.telemetry_data[
+									alert.sensor_type as keyof typeof alert.telemetry_data
+								] || 0
+						}))
+				}
+			]
+		}
 
+		// For specific severity selection, show only that severity level
+		return [
+			{
+				id: selectedSeverity.name,
+				data: alertsWithIndex.map((alert) => ({
+					x: alert.index,
+					y:
+						alert.telemetry_data[
+							alert.sensor_type as keyof typeof alert.telemetry_data
+						] || 0
+				}))
+			}
 		]
-	}, [filteredAlerts])
+	}, [filteredAlerts, selectedSeverity])
 
-	const timelineColors = [
-		{ color: 'red', shade: 500 }, // Catastrophic
-		{ color: 'orange', shade: 500 }, // Critical
-		{ color: 'yellow', shade: 500 }, // High
-		{ color: 'blue', shade: 500 }, // Medium
-		{ color: 'amber', shade: 500 } // Low
-	]
+	const timelineColors = useMemo(() => {
+		// If ALL is selected, return colors for all severity levels
+		if (selectedSeverity.type === 'all') {
+			return [
+				{ color: 'red', shade: 500 }, // Catastrophic
+				{ color: 'orange', shade: 500 }, // Critical
+				{ color: 'yellow', shade: 500 }, // High
+				{ color: 'blue', shade: 500 }, // Medium
+				{ color: 'amber', shade: 500 } // Low
+			]
+		}
+
+		// For individual severity selection, return appropriate color
+		switch (selectedSeverity.type) {
+			case 'catastrophic':
+				return [{ color: 'red', shade: 500 }]
+			case 'critical':
+				return [{ color: 'orange', shade: 500 }]
+			case 'high':
+				return [{ color: 'yellow', shade: 500 }]
+			case 'medium':
+				return [{ color: 'blue', shade: 500 }]
+			case 'low':
+				return [{ color: 'amber', shade: 500 }]
+			default:
+				return [{ color: 'gray', shade: 500 }]
+		}
+	}, [selectedSeverity])
 
 	const timelineDataValueFormatter = (value: number) => value.toLocaleString()
 
