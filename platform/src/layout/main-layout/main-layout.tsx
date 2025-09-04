@@ -2,12 +2,15 @@ import { Navbar } from 'layout/navbar'
 import { Sidebar } from 'layout/sidebar'
 import { ReactNode } from 'react'
 import { useUiStore } from 'store'
+import { AISuggestionsContainer, AIDemoTrigger } from 'components/ai-suggestions'
+import { useAISuggestions } from 'contexts/ai-suggestions-context'
 
 export const MainLayout = (props: { children: ReactNode }) => {
 	const { children } = props
 	const desktopSidebarCollapsed = useUiStore(
 		(state) => state.desktopSidebarCollapsed
 	)
+	const { telemetryData } = useAISuggestions()
 
 	return (
 		<div>
@@ -24,6 +27,8 @@ export const MainLayout = (props: { children: ReactNode }) => {
 					</main>
 				</div>
 			</div>
+			<AISuggestionsContainer telemetryData={telemetryData} />
+			<AIDemoTrigger />
 		</div>
 	)
 }
