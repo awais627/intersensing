@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AISuggestion } from '../../services/ai-suggestions'
-import { RiCloseLine, RiInformationLine, RiErrorWarningLine, RiAlertLine, RiCheckboxCircleLine, RiRobotLine, RiBrainLine, RiPulseLine } from 'react-icons/ri'
+import {
+	RiAlertLine,
+	RiBrainLine,
+	RiCheckboxCircleLine,
+	RiCloseLine,
+	RiErrorWarningLine,
+	RiInformationLine,
+	RiPulseLine,
+	RiRobotLine
+} from 'react-icons/ri'
 
 interface AISuggestionPopupProps {
 	suggestion: AISuggestion
@@ -71,12 +80,12 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 		setIsTyping(true)
 		setDisplayedMessage('')
 		setDisplayedAction('')
-		
+
 		let messageIndex = 0
 		let actionIndex = 0
 		let messageInterval: NodeJS.Timeout
 		let actionInterval: NodeJS.Timeout
-		
+
 		messageInterval = setInterval(() => {
 			if (messageIndex < suggestion.message.length) {
 				setDisplayedMessage(suggestion.message.slice(0, messageIndex + 1))
@@ -112,7 +121,7 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 		}, 200)
 
 		// Auto-dismiss after 30 seconds for all severities
-		const autoDismissTime = 30000
+		const autoDismissTime = 50000
 		const timer = setTimeout(() => {
 			handleDismiss()
 		}, autoDismissTime)
@@ -147,7 +156,7 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 				<div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
 					{/* Animated background pattern */}
 					<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>
-					
+
 					{/* Header with AI branding */}
 					<div className="relative p-4 border-b border-slate-700">
 						<div className="flex items-center justify-between">
@@ -160,19 +169,25 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 									{/* Pulsing ring */}
 									<div className="absolute inset-0 rounded-full border-2 border-blue-400 animate-ping opacity-20"></div>
 								</div>
-								
+
 								<div>
 									<div className="flex items-center space-x-2">
-										<h3 className="text-white font-semibold text-sm">AI Assistant</h3>
+										<h3 className="text-white font-semibold text-sm">
+											AI Assistant
+										</h3>
 										<div className="flex items-center space-x-1">
 											<RiBrainLine className="w-3 h-3 text-blue-400" />
-											<span className="text-xs text-blue-400 font-medium">ANALYZING</span>
+											<span className="text-xs text-blue-400 font-medium">
+												ANALYZING
+											</span>
 										</div>
 									</div>
-									<p className="text-slate-400 text-xs">Real-time sensor analysis</p>
+									<p className="text-slate-400 text-xs">
+										Real-time sensor analysis
+									</p>
 								</div>
 							</div>
-							
+
 							{/* Close button */}
 							<button
 								onClick={handleClose}
@@ -188,7 +203,9 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 					<div className="p-4 space-y-4">
 						{/* Alert Header */}
 						<div className="flex items-center space-x-3">
-							<div className={`p-2 rounded-lg ${config.bgColor} ${config.borderColor} border`}>
+							<div
+								className={`p-2 rounded-lg ${config.bgColor} ${config.borderColor} border`}
+							>
 								<IconComponent className={`w-5 h-5 ${config.iconColor}`} />
 							</div>
 							<div>
@@ -198,7 +215,8 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 								<div className="flex items-center space-x-2 mt-1">
 									<span className="text-lg">{suggestion.icon}</span>
 									<span className="text-xs text-slate-500">
-										{suggestion.parameter}: {suggestion.value.toFixed(1)} {suggestion.unit}
+										{suggestion.parameter}: {suggestion.value.toFixed(1)}{' '}
+										{suggestion.unit}
 									</span>
 								</div>
 							</div>
@@ -228,7 +246,9 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 									<span className="text-white text-xs">💡</span>
 								</div>
 								<div className="flex-1">
-									<p className="text-blue-100 text-xs font-medium mb-1">AI Recommendation:</p>
+									<p className="text-blue-100 text-xs font-medium mb-1">
+										AI Recommendation:
+									</p>
 									<p className="text-slate-200 text-sm leading-relaxed">
 										{displayedAction}
 										{isTyping && displayedMessage === suggestion.message && (
@@ -244,7 +264,9 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 							<div className="flex items-center space-x-2">
 								<div className="flex items-center space-x-1">
 									<div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-									<span className="text-xs text-green-400 font-medium">AI ACTIVE</span>
+									<span className="text-xs text-green-400 font-medium">
+										AI ACTIVE
+									</span>
 								</div>
 								<span className="text-slate-500 text-xs">•</span>
 								<span className="text-xs text-slate-500">Confidence: 94%</span>

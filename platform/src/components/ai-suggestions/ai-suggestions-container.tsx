@@ -11,23 +11,32 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 }) => {
 	const [activeSuggestions, setActiveSuggestions] = useState<AISuggestion[]>([])
 	const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set())
+	const [suggestionQueue, setSuggestionQueue] = useState<AISuggestion[]>([])
+	const [isAlertActive, setIsAlertActive] = useState(false)
 
 	useEffect(() => {
+		// Register alert active callback with the service
+		aiSuggestionService.registerAlertActiveCallback(() => isAlertActive)
+
 		// Subscribe to new suggestions
 		const unsubscribe = aiSuggestionService.subscribe((suggestion) => {
-			setActiveSuggestions(prev => {
-				// Don't add if already dismissed or already active
-				if (dismissedSuggestions.has(suggestion.id) || 
-					prev.some(s => s.id === suggestion.id)) {
-					return prev
-				}
-				// Only show one suggestion at a time - replace any existing suggestions
-				return [suggestion]
-			})
+			// Don't add if already dismissed
+			if (dismissedSuggestions.has(suggestion.id)) {
+				return
+			}
+
+			// If no alert is currently active, show the suggestion immediately
+			if (!isAlertActive) {
+				setActiveSuggestions([suggestion])
+				setIsAlertActive(true)
+			} else {
+				// If alert is active, add to queue
+				setSuggestionQueue(prev => [...prev, suggestion])
+			}
 		})
 
 		return unsubscribe
-	}, [dismissedSuggestions])
+	}, [dismissedSuggestions, isAlertActive])
 
 	// Process telemetry data when it changes
 	useEffect(() => {
@@ -52,6 +61,18 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 		setActiveSuggestions(prev => 
 			prev.filter(s => s.id !== suggestionId)
 		)
+		setIsAlertActive(false)
+		
+		// Process next suggestion from queue if available
+		setSuggestionQueue(prev => {
+			if (prev.length > 0) {
+				const nextSuggestion = prev[0]
+				setActiveSuggestions([nextSuggestion])
+				setIsAlertActive(true)
+				return prev.slice(1)
+			}
+			return prev
+		})
 	}
 
 	const handleDismiss = (suggestionId: string) => {
@@ -59,6 +80,18 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 		setActiveSuggestions(prev => 
 			prev.filter(s => s.id !== suggestionId)
 		)
+		setIsAlertActive(false)
+		
+		// Process next suggestion from queue if available
+		setSuggestionQueue(prev => {
+			if (prev.length > 0) {
+				const nextSuggestion = prev[0]
+				setActiveSuggestions([nextSuggestion])
+				setIsAlertActive(true)
+				return prev.slice(1)
+			}
+			return prev
+		})
 	}
 
 	// Initial demo suggestion after 10 seconds
@@ -67,18 +100,23 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 			const demoSuggestions = aiSuggestionService.generateDemoSuggestions()
 			const randomSuggestion = demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
 			
-			setActiveSuggestions(prev => {
-				if (dismissedSuggestions.has(randomSuggestion.id) || 
-					prev.some(s => s.id === randomSuggestion.id)) {
-					return prev
-				}
-				// Only show one suggestion at a time
-				return [randomSuggestion]
-			})
+			// Don't add if already dismissed
+			if (dismissedSuggestions.has(randomSuggestion.id)) {
+				return
+			}
+
+			// If no alert is currently active, show the suggestion immediately
+			if (!isAlertActive) {
+				setActiveSuggestions([randomSuggestion])
+				setIsAlertActive(true)
+			} else {
+				// If alert is active, add to queue
+				setSuggestionQueue(prev => [...prev, randomSuggestion])
+			}
 		}, 10000) // Initial trigger after 10 seconds
 
 		return () => clearTimeout(initialTimer)
-	}, [dismissedSuggestions])
+	}, [dismissedSuggestions, isAlertActive])
 
 	// Generate demo suggestions periodically for demo purposes
 	useEffect(() => {
@@ -88,19 +126,24 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 				const demoSuggestions = aiSuggestionService.generateDemoSuggestions()
 				const randomSuggestion = demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
 				
-				setActiveSuggestions(prev => {
-					if (dismissedSuggestions.has(randomSuggestion.id) || 
-						prev.some(s => s.id === randomSuggestion.id)) {
-						return prev
-					}
-					// Only show one suggestion at a time - replace any existing suggestions
-					return [randomSuggestion]
-				})
+				// Don't add if already dismissed
+				if (dismissedSuggestions.has(randomSuggestion.id)) {
+					return
+				}
+
+				// If no alert is currently active, show the suggestion immediately
+				if (!isAlertActive) {
+					setActiveSuggestions([randomSuggestion])
+					setIsAlertActive(true)
+				} else {
+					// If alert is active, add to queue
+					setSuggestionQueue(prev => [...prev, randomSuggestion])
+				}
 			}
 		}, 15000) // Every 15 seconds
 
 		return () => clearInterval(demoInterval)
-	}, [dismissedSuggestions])
+	}, [dismissedSuggestions, isAlertActive])
 
 	return (
 		<div className="fixed top-4 right-4 z-50">
@@ -111,6 +154,12 @@ export const AISuggestionsContainer: React.FC<AISuggestionsContainerProps> = ({
 					onClose={() => handleClose(activeSuggestions[0].id)}
 					onDismiss={() => handleDismiss(activeSuggestions[0].id)}
 				/>
+			)}
+			{/* Queue indicator */}
+			{suggestionQueue.length > 0 && (
+				<div className="mt-2 bg-blue-600 text-white text-xs px-3 py-1 rounded-full shadow-lg">
+					{suggestionQueue.length} more alert{suggestionQueue.length > 1 ? 's' : ''} waiting
+				</div>
 			)}
 		</div>
 	)

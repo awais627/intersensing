@@ -17,6 +17,8 @@ export class AISuggestionService {
 	private static instance: AISuggestionService
 	private suggestions: AISuggestion[] = []
 	private listeners: ((suggestion: AISuggestion) => void)[] = []
+	private isAlertActive: boolean = false
+	private alertActiveCallback: (() => boolean) | null = null
 
 	private constructor() {}
 
@@ -33,6 +35,16 @@ export class AISuggestionService {
 		return () => {
 			this.listeners = this.listeners.filter(l => l !== listener)
 		}
+	}
+
+	// Register callback to check if alert is active
+	registerAlertActiveCallback(callback: () => boolean): void {
+		this.alertActiveCallback = callback
+	}
+
+	// Check if alert is currently active
+	private isAlertCurrentlyActive(): boolean {
+		return this.alertActiveCallback ? this.alertActiveCallback() : this.isAlertActive
 	}
 
 	// Generate suggestions based on telemetry data
@@ -185,7 +197,10 @@ export class AISuggestionService {
 		suggestions.forEach(suggestion => {
 			if (Math.random() < 0.3) {
 				this.suggestions.push(suggestion)
-				this.listeners.forEach(listener => listener(suggestion))
+				// Only emit if no alert is currently active
+				if (!this.isAlertCurrentlyActive()) {
+					this.listeners.forEach(listener => listener(suggestion))
+				}
 			}
 		})
 	}
