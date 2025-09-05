@@ -111,8 +111,8 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 			setIsAnimating(true)
 		}, 200)
 
-		// Auto-dismiss after 20 seconds for low severity, 25 seconds for others
-		const autoDismissTime = suggestion.severity === 'low' ? 20000 : 25000
+		// Auto-dismiss after 30 seconds for all severities
+		const autoDismissTime = 30000
 		const timer = setTimeout(() => {
 			handleDismiss()
 		}, autoDismissTime)
