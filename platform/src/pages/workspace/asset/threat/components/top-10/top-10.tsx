@@ -123,9 +123,9 @@ export const TopStatsItem = (props: {
 	return (
 		<div className="flex justify-between pt-4 pr-6" key={current.entity}>
 			<div className="flex items-center gap-2">
-				<div className="!text-t-default">
-					<TopItemIcon item={current} />
-				</div>
+				{/*<div className="!text-t-default">*/}
+				{/*	<TopItemIcon item={current} />*/}
+				{/*</div>*/}
 
 				<div className="flex flex-col">
 					<span className="text-t-default">{topItemName(current)}</span>

@@ -1,7 +1,7 @@
 export const cardFilterOptions = [
 	{ name: 'ALL', type: 'all' },
 	{ name: 'Temperature', type: 'temperature' },
-	{ name: 'Pressure', type: 'pressure' },
+	{ name: 'Damage', type: 'pressure' },
 	{ name: 'Humidity', type: 'humidity' }
 ]
 
@@ -11,14 +11,14 @@ export const alertFilterOptions = [
 	{ name: 'Critical', type: 'critical' },
 	{ name: 'High', type: 'high' },
 	{ name: 'Medium', type: 'medium' },
-	{ name: 'Low', type: 'low' },
+	{ name: 'Low', type: 'low' }
 ]
 
 export const alertTypeFilterOptions = [
 	{ name: 'All Types', type: 'all' },
 	{ name: 'Temperature', type: 'Temperature' },
 	{ name: 'Humidity', type: 'Humidity' },
-	{ name: 'Pressure', type: 'Pressure' },
+	{ name: 'Damage', type: 'Pressure' },
 	{ name: 'Air Quality', type: 'eCO2' },
 	{ name: 'TVOC', type: 'TVOC' },
 	{ name: 'PM1.0', type: 'PM1.0' },
