@@ -49,7 +49,7 @@ export const Sidebar = () => {
 							/>
 							<div className="flex items-center gap-1">
 								<LuRadioTower className="h-6 w-6" />{' '}
-								<span className="text-lg font-bold">Intersensing</span>
+								<span className="text-lg font-bold">IntSmart</span>
 							</div>
 						</picture>
 					) : (
@@ -95,11 +95,7 @@ export const Sidebar = () => {
 						</>
 					)}
 					<div className="pt-4">
-						<NavItem
-							label="Team"
-							to={() => '/team'}
-							icon={LuUser}
-						/>
+						<NavItem label="Team" to={() => '/team'} icon={LuUser} />
 						{/*<UserHeader />*/}
 					</div>
 				</div>

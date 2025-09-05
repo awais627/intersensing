@@ -69,10 +69,15 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 	// Typing animation effect
 	useEffect(() => {
 		setIsTyping(true)
+		setDisplayedMessage('')
+		setDisplayedAction('')
+		
 		let messageIndex = 0
 		let actionIndex = 0
+		let messageInterval: NodeJS.Timeout
+		let actionInterval: NodeJS.Timeout
 		
-		const messageInterval = setInterval(() => {
+		messageInterval = setInterval(() => {
 			if (messageIndex < suggestion.message.length) {
 				setDisplayedMessage(suggestion.message.slice(0, messageIndex + 1))
 				messageIndex++
@@ -80,7 +85,7 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 				clearInterval(messageInterval)
 				// Start typing action after message is complete
 				setTimeout(() => {
-					const actionInterval = setInterval(() => {
+					actionInterval = setInterval(() => {
 						if (actionIndex < suggestion.action.length) {
 							setDisplayedAction(suggestion.action.slice(0, actionIndex + 1))
 							actionIndex++
@@ -88,25 +93,26 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 							clearInterval(actionInterval)
 							setIsTyping(false)
 						}
-					}, 20)
-				}, 500)
+					}, 25)
+				}, 800)
 			}
-		}, 30)
+		}, 40)
 
 		return () => {
 			clearInterval(messageInterval)
+			clearInterval(actionInterval)
 		}
 	}, [suggestion.message, suggestion.action])
 
 	useEffect(() => {
-		// Animate in
+		// Animate in with a small delay to prevent glitches
 		setTimeout(() => {
 			setIsVisible(true)
 			setIsAnimating(true)
-		}, 100)
+		}, 200)
 
-		// Auto-dismiss after 12 seconds for low severity, 18 seconds for others
-		const autoDismissTime = suggestion.severity === 'low' ? 12000 : 18000
+		// Auto-dismiss after 20 seconds for low severity, 25 seconds for others
+		const autoDismissTime = suggestion.severity === 'low' ? 20000 : 25000
 		const timer = setTimeout(() => {
 			handleDismiss()
 		}, autoDismissTime)
@@ -118,19 +124,19 @@ export const AISuggestionPopup: React.FC<AISuggestionPopupProps> = ({
 		setIsAnimating(false)
 		setTimeout(() => {
 			onDismiss()
-		}, 300)
+		}, 500)
 	}
 
 	const handleClose = () => {
 		setIsAnimating(false)
 		setTimeout(() => {
 			onClose()
-		}, 300)
+		}, 500)
 	}
 
 	return (
 		<div
-			className={`fixed top-4 right-4 z-50 max-w-lg w-full mx-4 transform transition-all duration-500 ease-out ${
+			className={`fixed top-4 right-4 z-50 max-w-lg w-full mx-4 transform transition-all duration-700 ease-out ${
 				isVisible && isAnimating
 					? 'translate-x-0 opacity-100 scale-100'
 					: 'translate-x-full opacity-0 scale-95'

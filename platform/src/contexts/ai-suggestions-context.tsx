@@ -81,8 +81,8 @@ export const AISuggestionsProvider: React.FC<AISuggestionsProviderProps> = ({ ch
 	// Generate demo suggestions periodically for demo purposes
 	useEffect(() => {
 		const demoInterval = setInterval(() => {
-			// Generate demo suggestions with 30% probability
-			if (Math.random() < 0.3) {
+			// Generate demo suggestions with 20% probability
+			if (Math.random() < 0.2) {
 				const demoSuggestions = aiSuggestionService.generateDemoSuggestions()
 				const randomSuggestion = demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
 				
@@ -95,7 +95,7 @@ export const AISuggestionsProvider: React.FC<AISuggestionsProviderProps> = ({ ch
 					return [randomSuggestion]
 				})
 			}
-		}, 10000) // Every 10 seconds
+		}, 15000) // Every 15 seconds
 
 		return () => clearInterval(demoInterval)
 	}, [dismissedSuggestions])

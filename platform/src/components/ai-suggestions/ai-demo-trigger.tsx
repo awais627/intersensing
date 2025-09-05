@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAISuggestions } from '../../contexts/ai-suggestions-context'
 import { aiSuggestionService } from '../../services/ai-suggestions'
-import { RiRobotLine, RiRefreshLine } from 'react-icons/ri'
+import { RiRefreshLine, RiRobotLine } from 'react-icons/ri'
 
 export const AIDemoTrigger: React.FC = () => {
 	const { setTelemetryData } = useAISuggestions()
@@ -35,20 +35,30 @@ export const AIDemoTrigger: React.FC = () => {
 
 	const triggerStaticDemo = () => {
 		const demoSuggestions = aiSuggestionService.generateDemoSuggestions()
-		const randomSuggestion = demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
-		
+		const randomSuggestion =
+			demoSuggestions[Math.floor(Math.random() * demoSuggestions.length)]
+
 		// Manually trigger the suggestion by processing it
 		aiSuggestionService.processTelemetryData({
 			_id: `demo-${Date.now()}`,
 			id: `demo-${Date.now()}`,
 			timestamp: new Date().toISOString(),
-			Temperature: randomSuggestion.parameter === 'Temperature' ? randomSuggestion.value : 25,
-			Humidity: randomSuggestion.parameter === 'Humidity' ? randomSuggestion.value : 50,
-			TVOC: randomSuggestion.parameter === 'TVOC' ? randomSuggestion.value : 200,
-			eCO2: randomSuggestion.parameter === 'eCO2' ? randomSuggestion.value : 600,
+			Temperature:
+				randomSuggestion.parameter === 'Temperature'
+					? randomSuggestion.value
+					: 25,
+			Humidity:
+				randomSuggestion.parameter === 'Humidity' ? randomSuggestion.value : 50,
+			TVOC:
+				randomSuggestion.parameter === 'TVOC' ? randomSuggestion.value : 200,
+			eCO2:
+				randomSuggestion.parameter === 'eCO2' ? randomSuggestion.value : 600,
 			'Raw H2': 0,
 			'Raw Ethanol': 0,
-			Pressure: randomSuggestion.parameter === 'Pressure' ? randomSuggestion.value : 1013,
+			Pressure:
+				randomSuggestion.parameter === 'Pressure'
+					? randomSuggestion.value
+					: 1013,
 			'PM1.0': 0,
 			'PM2.5': 0,
 			'NC0.5': 0,
@@ -62,7 +72,7 @@ export const AIDemoTrigger: React.FC = () => {
 	}
 
 	return (
-		<div className="fixed bottom-4 left-4 z-50">
+		<div className="fixed bottom-[200px] left-4 z-50">
 			<div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl shadow-2xl border border-slate-700 p-4 backdrop-blur-sm">
 				<div className="flex items-center space-x-3 mb-3">
 					<div className="relative">
@@ -72,8 +82,10 @@ export const AIDemoTrigger: React.FC = () => {
 						<div className="absolute inset-0 rounded-full border-2 border-blue-400 animate-ping opacity-30"></div>
 					</div>
 					<div>
-						<span className="text-sm font-semibold text-white">AI Assistant</span>
-						<p className="text-xs text-slate-400">Demo Controls</p>
+						<span className="text-sm font-semibold text-white">
+							AI Assistant
+						</span>
+						<p className="text-xs text-slate-400">Controls</p>
 					</div>
 				</div>
 				<div className="space-y-2">
@@ -88,13 +100,15 @@ export const AIDemoTrigger: React.FC = () => {
 						onClick={triggerStaticDemo}
 						className="w-full px-4 py-2 text-xs font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
 					>
-						Demo Response
+						Response
 					</button>
 				</div>
 				<div className="mt-3 pt-2 border-t border-slate-700">
 					<div className="flex items-center space-x-2">
 						<div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-						<span className="text-xs text-green-400 font-medium">AI ACTIVE</span>
+						<span className="text-xs text-green-400 font-medium">
+							AI ACTIVE
+						</span>
 					</div>
 				</div>
 			</div>
